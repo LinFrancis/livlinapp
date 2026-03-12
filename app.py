@@ -152,7 +152,7 @@ def _sidebar():
 def _home():
     st.markdown(
         '<div class="app-header"><h1>Indagación Regenerativa</h1>'
-        '<div class="app-subtitle">Instrumento de diagnóstico colectivo para espacios en transición · LivLin v5</div>'
+        '<div class="app-subtitle">Instrumento de diagnóstico de oportunidades para una vida regenerativa· LivLin v5</div>'
         '</div>', unsafe_allow_html=True)
 
     _, cc, _ = st.columns([1, 2, 1])
@@ -160,7 +160,7 @@ def _home():
         st.markdown(
             '<p style="text-align:center;font-size:1rem;color:#3D5A47;line-height:1.7;">'
             'Bienvenidos/as a la <strong>Indagación Regenerativa</strong> — un instrumento colectivo para explorar '
-            'el potencial regenerativo de tu espacio desde los 7 pétalos de la Permacultura y el Tao como camino interior.'
+            'el potencial regenerativo de tu espacio desde los 7 pétalos de la Permacultura y el Taoismo filosófico como camino interior.'
             '</p>', unsafe_allow_html=True)
 
     cols = st.columns(4)
