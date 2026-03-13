@@ -48,19 +48,17 @@ def _login_page():
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
                 # Invalidate visit cache to force reload from Drive on login
-                st.session_state.pop("_visits_cache", None)
+                st.session_state.pop("_visits_cache_v12", None)
+                st.session_state.pop("_sb_status_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
                     v = get_visit(user["visit_id"])
                     st.session_state.visit_data = v if v else {}
                 else:
                     st.session_state.visit_data = {}
-                # Try to sync from Drive on login
-                try:
-                    from utils.gdrive import is_configured, sync_visits_from_drive
-                    if is_configured():
-                        sync_visits_from_drive(DATA_FILE)
-                except Exception: pass
+                # Force reload from Supabase on login
+                st.session_state.pop("_visits_cache", None)
+                st.session_state.pop("_db_status_cache", None)
                 st.rerun()
             else:
                 st.error("⚠️ Usuario o contraseña incorrectos.")
@@ -144,28 +142,28 @@ def _sidebar():
                     + (f'<br>🏡 {space}' if space else '')
                     + '</div>', unsafe_allow_html=True)
 
-        # ── Drive status indicator ──────────────────────────
+        # ── Supabase status indicator ───────────────────────
         try:
-            from utils.gdrive import is_configured, get_drive_status
+            from utils.supabase_db import is_configured, test_connection as get_status
             if is_configured():
-                status = st.session_state.get("_drive_status_cache")
-                if status is None:
-                    status = get_drive_status()
-                    st.session_state["_drive_status_cache"] = status
-                if status["ok"]:
-                    icon = "🔑" if status.get("auth_type") == "oauth" else "☁️"
+                sb_status = st.session_state.get("_sb_status_cache")
+                if sb_status is None:
+                    sb_status = get_status()
+                    st.session_state["_sb_status_cache"] = sb_status
+                if sb_status["ok"]:
                     st.markdown(
-                        f'<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
-                        f'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
-                        f'{icon} Drive conectado</div>', unsafe_allow_html=True)
+                        '<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
+                        'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
+                        '🗄️ Supabase conectado</div>', unsafe_allow_html=True)
                 else:
+                    err_short = str(sb_status.get("error",""))[:55]
                     st.markdown(
                         f'<div style="background:#FFE0E0;border-radius:8px;padding:0.35rem 0.6rem;'
                         f'font-size:0.7rem;color:#B00020;margin-top:0.5rem;">'
-                        f'⚠️ Drive: {str(status.get("error",""))[:55]}</div>', unsafe_allow_html=True)
-                errs = st.session_state.get("_drive_last_errors")
+                        f'⚠️ DB: {err_short}</div>', unsafe_allow_html=True)
+                errs = st.session_state.get("_db_last_errors")
                 if errs:
-                    with st.expander("⚠️ Errores Drive", expanded=False):
+                    with st.expander("⚠️ Errores DB", expanded=False):
                         for err in errs:
                             st.caption(f"• {err}")
         except Exception:

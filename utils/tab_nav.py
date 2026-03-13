@@ -42,17 +42,17 @@ def tab_nav_bottom(module_key: str, tabs: list, current_idx: int):
 
 
 def show_drive_save_status():
-    """Show Drive sync result after saving. Call right after st.success()."""
+    """Show DB sync result after saving. Call right after st.success()."""
     import streamlit as st
-    errs = st.session_state.get("_drive_last_errors")
+    errs = st.session_state.get("_db_last_errors")
     if errs:
-        st.warning("⚠️ Guardado localmente, errores en Drive:")
+        st.warning("⚠️ Guardado localmente, errores al sincronizar:")
         for e in errs:
             st.caption(f"  • {e}")
     else:
         try:
-            from utils.gdrive import is_configured
+            from utils.supabase_db import is_configured
             if is_configured():
-                st.caption("☁️ Sincronizado con Google Drive.")
+                st.caption("🗄️ Guardado en Supabase.")
         except Exception:
             pass

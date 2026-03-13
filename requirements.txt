@@ -3,9 +3,11 @@ openpyxl>=3.1.2
 plotly>=5.18.0
 pandas>=2.0.0
 requests>=2.31.0
-
-# Google Drive integration (required for cloud deployment):
-google-auth>=2.28.0
-google-auth-oauthlib>=1.2.0
-google-api-python-client>=2.118.0
 python-docx>=1.1.0
+
+# Supabase — base de datos principal + almacenamiento de fotos
+supabase>=2.3.0
+
+# Google Drive — opcional, solo si se configura para backup adicional
+google-auth>=2.28.0
+google-api-python-client>=2.118.0

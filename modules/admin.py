@@ -2,9 +2,8 @@
 import streamlit as st
 from utils.users import list_spaces, create_space, delete_space, update_password
 from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit, _invalidate_cache
-from utils.gdrive import (is_configured, get_drive_status, sync_visits_to_drive,
-                           sync_visits_from_drive, drive_load_visits, drive_save_visits,
-                           drive_upload_space_files, list_space_folders)
+from utils.supabase_client import (is_configured as sb_configured, get_status as sb_status,
+                                    db_load_all_visits, db_upsert_visit)
 
 
 def render():
@@ -84,7 +83,7 @@ def render():
     st.markdown("---")
 
     # ── Tabs: Espacios | Drive | Diagnósticos ────────────────────────────
-    tab1, tab2, tab3 = st.tabs(["👥 Espacios y Usuarios", "☁️ Google Drive", "📊 Todos los Diagnósticos"])
+    tab1, tab2, tab3 = st.tabs(["👥 Espacios y Usuarios", "🗄️ Supabase", "📊 Todos los Diagnósticos"])
 
     with tab1:
         spaces = list_spaces()
@@ -124,104 +123,54 @@ def render():
                                 st.rerun()
 
     with tab2:
-        st.markdown("### ☁️ Sincronización con Google Drive")
+        st.markdown("#### 🗄️ Supabase — Base de datos")
         gdrive_ok = is_configured()
-
-        if gdrive_ok:
-            status = get_drive_status()
+        if not gdrive_ok:
+            st.error("❌ Supabase no configurado. Agrega [supabase] url y key en Streamlit secrets.")
+        else:
+            status = test_connection()
             if status["ok"]:
-                auth_label = "🔑 OAuth (cuenta personal)" if status.get("auth_type") == "oauth" else "🤖 Cuenta de servicio"
-                st.success(f"✅ Google Drive conectado — {auth_label}")
-                st.caption(f"Cuenta: {status.get('email','?')} · {status.get('used_gb',0)} GB usados / {status.get('total_gb',0)} GB")
-                st.caption(f"Carpeta raíz ID: `{status['folder_id']}`")
-                if status.get("auth_type") != "oauth":
-                    st.warning("⚠️ Estás usando cuenta de servicio. Las cuentas de servicio NO pueden crear archivos (sin cuota de almacenamiento). Debes migrar a OAuth. Ejecuta `get_oauth_token.py` y actualiza los secrets.")
+                st.success("✅ Supabase conectado y funcionando.")
+                st.caption(f"URL: `{status['url']}`")
+                try:
+                    visits = load_all_visits()
+                    st.metric("Diagnósticos almacenados", len(visits))
+                except Exception as e:
+                    st.caption(f"No se pudo contar registros: {e}")
             else:
                 st.error(f"❌ Error de conexión: {status['error']}")
-            st.markdown(
-                '<div class="info-box">📁 Cada espacio tiene su propia carpeta en Drive con '
-                'su <code>diagnostico.json</code> y subcarpeta <code>fotos/</code>. '
-                'Además se mantiene un <code>visits.json</code> maestro en la raíz.</div>',
-                unsafe_allow_html=True)
-
+                st.caption("Verifica que url y key en secrets sean correctos.")
+            st.markdown("---")
             c1, c2, c3 = st.columns(3)
             with c1:
-                if st.button("⬆️ Forzar subida", use_container_width=True, type="primary",
-                             help="Sube el visits.json local a Drive"):
-                    visits = load_visits()
-                    ok = drive_save_visits(visits)
-                    st.success("✅ Subido correctamente.") if ok else st.error("❌ Error al subir.")
-            with c2:
-                if st.button("⬇️ Recargar desde Drive", use_container_width=True,
-                             help="Descarga datos de Drive y actualiza la sesión"):
-                    visits = drive_load_visits()
-                    if visits is not None:
-                        _invalidate_cache()
-                        st.session_state["_visits_cache"] = visits
-                        st.success(f"✅ {len(visits)} diagnóstico(s) cargado(s) desde Drive.")
-                    else:
-                        st.error("❌ No se pudo leer desde Drive.")
-            with c3:
                 if st.button("🔄 Limpiar caché", use_container_width=True,
-                             help="Fuerza recarga desde Drive en próxima acción"):
+                             help="Fuerza recarga desde Supabase en próxima acción"):
+                    st.session_state.pop("_visits_cache", None)
+                    st.session_state.pop("_db_status_cache", None)
+                    st.success("✅ Caché limpiado.")
+            with c2:
+                if st.button("⬆️ Re-sincronizar todo", use_container_width=True,
+                             help="Sube todos los diagnósticos locales a Supabase"):
+                    from utils.data_manager import load_visits
+                    from utils.supabase_db import upsert_visit
+                    visits = load_visits()
+                    ok_count = sum(1 for v in visits if upsert_visit(v))
+                    st.success(f"✅ {ok_count}/{len(visits)} diagnósticos sincronizados.")
+            with c3:
+                if st.button("⬇️ Recargar desde Supabase", use_container_width=True):
+                    from utils.supabase_db import load_all_visits
+                    from utils.data_manager import _invalidate_cache, _set_cached
+                    visits = load_all_visits()
                     _invalidate_cache()
-                    st.session_state.pop("_drive_status_cache", None)
-                    st.success("✅ Caché limpiado. Se recargará desde Drive.")
-
+                    _set_cached(visits)
+                    st.success(f"✅ {len(visits)} diagnóstico(s) cargados.")
             st.markdown("---")
             st.markdown(
-                '<div class="info-box">📁 <strong>Estructura por proyecto en Drive:</strong><br>'
-                '<code>[Nombre Espacio] — [visit_id]/</code><br>'
-                '&nbsp;&nbsp;├── <code>fotos/</code> — fotos subidas automáticamente<br>'
-                '&nbsp;&nbsp;├── <code>diagnostico/diagnostico.json</code> — datos del diagnóstico<br>'
-                '&nbsp;&nbsp;├── <code>excel/diagnostico_*.xlsx</code> — informe Excel<br>'
-                '&nbsp;&nbsp;└── <code>informe/informe_*.docx</code> — informe Word<br>'
-                'Todo se actualiza automáticamente al guardar cualquier módulo.</div>',
+                '<div class="info-box">📋 <strong>Estructura de datos:</strong><br>'
+                'Cada diagnóstico se guarda como un registro JSON en la tabla <code>visits</code>.<br>'
+                'Los archivos Excel y Word se generan al vuelo y se descargan desde el módulo Informe.<br>'
+                'Las fotos se guardan en <code>/tmp</code> durante la sesión activa.</div>',
                 unsafe_allow_html=True)
-            st.markdown("**📂 Proyectos en Drive:**")
-            try:
-                from utils.gdrive import list_space_folders
-                folders = list_space_folders()
-                if folders:
-                    for folder in folders:
-                        fecha = str(folder.get("createdTime",""))[:10]
-                        st.markdown(f"📁 **{folder['name']}** · {fecha}")
-                else:
-                    st.caption("Aún no hay carpetas de proyectos. Se crean automáticamente al guardar el primer diagnóstico.")
-            except Exception as e:
-                st.caption(f"No se pudo listar carpetas: {e}")
-        else:
-            st.markdown(
-                '<div class="warning-box">⚠️ <strong>Google Drive no configurado.</strong> '
-                'Para activarlo en Streamlit Cloud, agrega los secrets en la configuración de tu app.</div>',
-                unsafe_allow_html=True)
-            with st.expander("📖 Instrucciones de configuración"):
-                st.markdown("""
-**Streamlit Cloud Secrets** (recomendado):
-
-```toml
-[gdrive]
-enabled = true
-folder_id = "ID_DE_TU_CARPETA_EN_DRIVE"
-
-[gdrive.credentials]
-type = "service_account"
-project_id = "tu-proyecto"
-private_key_id = "..."
-private_key = "-----BEGIN RSA PRIVATE KEY-----\\n...\\n-----END RSA PRIVATE KEY-----\\n"
-client_email = "cuenta@proyecto.iam.gserviceaccount.com"
-client_id = "..."
-auth_uri = "https://accounts.google.com/o/oauth2/auth"
-token_uri = "https://oauth2.googleapis.com/token"
-```
-
-**Pasos:**
-1. [Google Cloud Console](https://console.cloud.google.com) → Habilitar **Google Drive API**
-2. Crear **Cuenta de servicio** → Descargar JSON de credenciales
-3. En Google Drive: crear carpeta → compartir con el email de la cuenta de servicio
-4. Copiar el ID de la carpeta desde la URL y pegarlo como `folder_id`
-5. En Streamlit Cloud → Settings → Secrets → pegar la configuración TOML
-                """)
 
     with tab3:
         st.markdown("### 📊 Todos los Diagnósticos")
