@@ -39,3 +39,20 @@ def tab_nav_bottom(module_key: str, tabs: list, current_idx: int):
                          key=f"tabnext_{module_key}_{current_idx}"):
                 st.session_state[f"active_tab_{module_key}"] = current_idx + 1
                 st.rerun()
+
+
+def show_drive_save_status():
+    """Show Drive sync result after saving. Call right after st.success()."""
+    import streamlit as st
+    errs = st.session_state.get("_drive_last_errors")
+    if errs:
+        st.warning("⚠️ Guardado localmente, errores en Drive:")
+        for e in errs:
+            st.caption(f"  • {e}")
+    else:
+        try:
+            from utils.gdrive import is_configured
+            if is_configured():
+                st.caption("☁️ Sincronizado con Google Drive.")
+        except Exception:
+            pass

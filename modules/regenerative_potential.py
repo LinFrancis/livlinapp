@@ -2,7 +2,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 from utils.data_manager import save_visit
-from utils.tab_nav import tab_header, tab_nav_bottom, get_active_tab
+from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 from utils.scoring import (FLOWER_DOMAINS, ETHICAL_PRINCIPLES, SCORE_SCALE,
                             compute_domain_scores, compute_regenerative_score, score_label)
 
@@ -226,3 +226,4 @@ def _save_button(data, suffix=""):
                 if is_configured(): sync_visits_to_drive(DATA_FILE)
             except Exception: pass
             st.success("✅ Módulo 7 guardado.")
+            show_drive_save_status()

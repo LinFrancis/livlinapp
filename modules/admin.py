@@ -1,8 +1,10 @@
 """Panel de Administración v6 — Gestión de espacios, primera acción = crear espacio."""
 import streamlit as st
 from utils.users import list_spaces, create_space, delete_space, update_password
-from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit
-from utils.gdrive import is_configured, sync_visits_to_drive, sync_visits_from_drive
+from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit, _invalidate_cache
+from utils.gdrive import (is_configured, get_drive_status, sync_visits_to_drive,
+                           sync_visits_from_drive, drive_load_visits, drive_save_visits,
+                           drive_upload_space_files, list_space_folders)
 
 
 def render():
@@ -126,22 +128,43 @@ def render():
         gdrive_ok = is_configured()
 
         if gdrive_ok:
-            st.success("✅ Google Drive configurado y activo.")
+            # Live connection test
+            status = get_drive_status()
+            if status["ok"]:
+                st.success("✅ Google Drive conectado y funcionando.")
+                st.caption(f"Carpeta raíz ID: `{status['folder_id']}`")
+            else:
+                st.error(f"❌ Drive configurado pero con error de conexión: {status['error']}")
+                st.caption("Verifica que la carpeta Drive esté compartida con la cuenta de servicio.")
             st.markdown(
                 '<div class="info-box">📁 Cada espacio tiene su propia carpeta en Drive con '
                 'su <code>diagnostico.json</code> y subcarpeta <code>fotos/</code>. '
                 'Además se mantiene un <code>visits.json</code> maestro en la raíz.</div>',
                 unsafe_allow_html=True)
 
-            c1, c2 = st.columns(2)
+            c1, c2, c3 = st.columns(3)
             with c1:
-                if st.button("⬆️ Subir visits.json maestro", use_container_width=True, type="primary"):
-                    ok = sync_visits_to_drive(DATA_FILE)
-                    st.success("✅ Subido.") if ok else st.error("❌ Error al subir.")
+                if st.button("⬆️ Forzar subida", use_container_width=True, type="primary",
+                             help="Sube el visits.json local a Drive"):
+                    visits = load_visits()
+                    ok = drive_save_visits(visits)
+                    st.success("✅ Subido correctamente.") if ok else st.error("❌ Error al subir.")
             with c2:
-                if st.button("⬇️ Restaurar datos desde Drive", use_container_width=True):
-                    ok = sync_visits_from_drive(DATA_FILE)
-                    st.success("✅ Restaurado.") if ok else st.error("❌ Error al restaurar.")
+                if st.button("⬇️ Recargar desde Drive", use_container_width=True,
+                             help="Descarga datos de Drive y actualiza la sesión"):
+                    visits = drive_load_visits()
+                    if visits is not None:
+                        _invalidate_cache()
+                        st.session_state["_visits_cache"] = visits
+                        st.success(f"✅ {len(visits)} diagnóstico(s) cargado(s) desde Drive.")
+                    else:
+                        st.error("❌ No se pudo leer desde Drive.")
+            with c3:
+                if st.button("🔄 Limpiar caché", use_container_width=True,
+                             help="Fuerza recarga desde Drive en próxima acción"):
+                    _invalidate_cache()
+                    st.session_state.pop("_drive_status_cache", None)
+                    st.success("✅ Caché limpiado. Se recargará desde Drive.")
 
             st.markdown("---")
             st.markdown(

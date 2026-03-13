@@ -1,6 +1,7 @@
 """Módulo 1 — Información del proyecto + Intención del grupo habitante."""
 import streamlit as st
 from utils.data_manager import save_visit
+from utils.tab_nav import show_drive_save_status
 
 TIPOS_ESPACIO = [
     "Casa con patio/jardín","Departamento con terraza","Departamento sin terraza",
@@ -260,3 +261,4 @@ def _save_button(data):
             data["id"] = vid
             st.session_state.visit_data = data
             st.success("✅ Módulo 1 guardado.")
+            show_drive_save_status()

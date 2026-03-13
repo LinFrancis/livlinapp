@@ -47,6 +47,8 @@ def _login_page():
                 st.session_state.authenticated = True
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
+                # Invalidate visit cache to force reload from Drive on login
+                st.session_state.pop("_visits_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
                     v = get_visit(user["visit_id"])
@@ -141,6 +143,33 @@ def _sidebar():
         st.markdown(f'<div style="font-size:0.75rem;color:#40916C;">👤 {user.get("display_name","")}'
                     + (f'<br>🏡 {space}' if space else '')
                     + '</div>', unsafe_allow_html=True)
+
+        # ── Drive status indicator ──────────────────────────
+        try:
+            from utils.gdrive import is_configured, get_drive_status
+            if is_configured():
+                status = st.session_state.get("_drive_status_cache")
+                if status is None:
+                    status = get_drive_status()
+                    st.session_state["_drive_status_cache"] = status
+                if status["ok"]:
+                    st.markdown(
+                        '<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
+                        'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
+                        '☁️ Drive conectado</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(
+                        f'<div style="background:#FFE0E0;border-radius:8px;padding:0.35rem 0.6rem;'
+                        f'font-size:0.7rem;color:#B00020;margin-top:0.5rem;">'
+                        f'⚠️ Drive: {str(status.get("error",""))[:55]}</div>', unsafe_allow_html=True)
+                errs = st.session_state.get("_drive_last_errors")
+                if errs:
+                    with st.expander("⚠️ Errores Drive", expanded=False):
+                        for err in errs:
+                            st.caption(f"• {err}")
+        except Exception:
+            pass
+
         if st.button("🚪 Cerrar sesión", use_container_width=True, key="btn_logout"):
             st.session_state.authenticated = False
             st.session_state.current_user  = {}
@@ -152,7 +181,7 @@ def _sidebar():
 def _home():
     st.markdown(
         '<div class="app-header"><h1>Indagación Regenerativa</h1>'
-        '<div class="app-subtitle">Instrumento de diagnóstico de oportunidades para una vida regenerativa· LivLin v5</div>'
+        '<div class="app-subtitle">Instrumento de diagnóstico colectivo para espacios en transición · LivLin v5</div>'
         '</div>', unsafe_allow_html=True)
 
     _, cc, _ = st.columns([1, 2, 1])
@@ -160,7 +189,7 @@ def _home():
         st.markdown(
             '<p style="text-align:center;font-size:1rem;color:#3D5A47;line-height:1.7;">'
             'Bienvenidos/as a la <strong>Indagación Regenerativa</strong> — un instrumento colectivo para explorar '
-            'el potencial regenerativo de tu espacio desde los 7 pétalos de la Permacultura y el Taoismo filosófico como camino interior.'
+            'el potencial regenerativo de tu espacio desde los 7 pétalos de la Permacultura y el Tao como camino interior.'
             '</p>', unsafe_allow_html=True)
 
     cols = st.columns(4)

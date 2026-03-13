@@ -5,7 +5,7 @@ from utils.data_manager import save_visit
 from utils.scoring import (compute_synthesis_potentials, compute_domain_scores,
                             compute_regenerative_score, score_label)
 from utils.synthesis import generate_all
-from utils.tab_nav import tab_header, tab_nav_bottom, get_active_tab
+from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 TABS = ["🌱 Potencial Regenerativo", "📝 Síntesis Narrativa", "🗓️ Plan de Acción"]
 MOD  = "m9"
@@ -346,3 +346,4 @@ def _save_button(data, suffix=""):
                 if is_configured(): sync_visits_to_drive(DATA_FILE)
             except Exception: pass
             st.success("✅ Módulo 9 guardado.")
+            show_drive_save_status()

@@ -1,7 +1,7 @@
 """Módulos 4–6 — Contexto · Agua · Energía · Materiales (v5) — clickable tab nav."""
 import streamlit as st
 from utils.data_manager import save_visit
-from utils.tab_nav import tab_header, tab_nav_bottom, get_active_tab
+from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 TABS = ["🏙️ Contexto Urbano", "💧 Gestión del Agua", "⚡ Energía", "♻️ Materiales"]
 MOD  = "systems"

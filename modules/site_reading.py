@@ -2,7 +2,7 @@
 import math
 import streamlit as st
 from utils.data_manager import save_visit
-from utils.tab_nav import tab_header, tab_nav_bottom, get_active_tab
+from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 NO_SOIL_TYPES  = ["Departamento con terraza","Departamento sin terraza","Balcón","Terraza comunitaria"]
 PARTIAL_SOIL   = ["Casa con patio/jardín","Patio trasero","Comunidad / copropiedad",
@@ -304,3 +304,4 @@ def _save_button(data, suffix=""):
                 if is_configured(): sync_visits_to_drive(DATA_FILE)
             except Exception: pass
             st.success("✅ Módulos 2–3 guardados.")
+            show_drive_save_status()
