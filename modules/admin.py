@@ -2,8 +2,7 @@
 import streamlit as st
 from utils.users import list_spaces, create_space, delete_space, update_password
 from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit, _invalidate_cache
-from utils.supabase_client import (is_configured as sb_configured, get_status as sb_status,
-                                    db_load_all_visits, db_upsert_visit)
+from utils.supabase_db import (is_configured, test_connection, load_all_visits, upsert_visit)
 
 
 def render():
@@ -124,8 +123,8 @@ def render():
 
     with tab2:
         st.markdown("#### 🗄️ Supabase — Base de datos")
-        gdrive_ok = is_configured()
-        if not gdrive_ok:
+        sb_ok = is_configured()
+        if not sb_ok:
             st.error("❌ Supabase no configurado. Agrega [supabase] url y key en Streamlit secrets.")
         else:
             status = test_connection()
