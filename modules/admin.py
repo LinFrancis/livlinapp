@@ -1,7 +1,7 @@
 """Panel de Administración v6 — Gestión de espacios, primera acción = crear espacio."""
 import streamlit as st
 from utils.users import list_spaces, create_space, delete_space, update_password
-from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit, _invalidate_cache
+from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit, _invalidate_cache, _set_cached
 from utils.supabase_db import (is_configured, test_connection, load_all_visits, upsert_visit)
 
 
@@ -150,19 +150,16 @@ def render():
             with c2:
                 if st.button("⬆️ Re-sincronizar todo", use_container_width=True,
                              help="Sube todos los diagnósticos locales a Supabase"):
-                    from utils.data_manager import load_visits
-                    from utils.supabase_db import upsert_visit
-                    visits = load_visits()
-                    ok_count = sum(1 for v in visits if upsert_visit(v))
-                    st.success(f"✅ {ok_count}/{len(visits)} diagnósticos sincronizados.")
+                    _all = load_visits()
+                    ok_count = sum(1 for v in _all if upsert_visit(v))
+                    st.success(f"✅ {ok_count}/{len(_all)} diagnósticos sincronizados.")
             with c3:
                 if st.button("⬇️ Recargar desde Supabase", use_container_width=True):
-                    from utils.supabase_db import load_all_visits
-                    from utils.data_manager import _invalidate_cache, _set_cached
-                    visits = load_all_visits()
+                    from utils.data_manager import _set_cached
+                    _fresh = load_all_visits()
                     _invalidate_cache()
-                    _set_cached(visits)
-                    st.success(f"✅ {len(visits)} diagnóstico(s) cargados.")
+                    _set_cached(_fresh)
+                    st.success(f"✅ {len(_fresh)} diagnóstico(s) cargados.")
             st.markdown("---")
             st.markdown(
                 '<div class="info-box">📋 <strong>Estructura de datos:</strong><br>'
