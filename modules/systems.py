@@ -1,6 +1,7 @@
 """Módulos 4–6 — Contexto · Agua · Energía · Materiales (v5) — clickable tab nav."""
 import streamlit as st
 from utils.data_manager import save_visit
+from utils.module_status import render_module_status, is_module_active
 from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 TABS = ["🏙️ Contexto Urbano", "💧 Gestión del Agua", "⚡ Energía", "♻️ Materiales"]
@@ -17,6 +18,24 @@ def render():
     st.markdown('<p class="module-subtitle">Contexto del espacio, recursos y sistemas existentes.</p>',
                 unsafe_allow_html=True)
     data = st.session_state.visit_data
+
+    # ── Estado del módulo ─────────────────────────────────────────────────
+    st.markdown("**Estado de este módulo:**")
+    _mod_status = render_module_status(data, "mod_sistemas")
+    if not is_module_active(_mod_status):
+        # Limpiar valores por defecto si el módulo no fue abordado
+        save_col1, save_col2 = st.columns([1,1])
+        with save_col1:
+            if st.button("💾 Guardar como No Abordado", key="save_na_mod_sistemas",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("✅ Módulo marcado como No Abordado.")
+                show_drive_save_status()
+        return
+    if _mod_status == "inferido":
+        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
+    st.markdown("---")
 
     tab_header(MOD, TABS)
     active = get_active_tab(MOD)

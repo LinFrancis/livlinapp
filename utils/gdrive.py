@@ -1,16 +1,17 @@
-"""Google Drive integration v9 — Drive como fuente de verdad.
+"""Google Drive integration v10 — OAuth con cuenta de usuario como fuente de verdad.
 
-Arquitectura:
-  - Drive ES la base de datos. Toda lectura/escritura va a Drive.
-  - st.session_state actúa como caché en memoria durante la sesión.
-  - Estructura por proyecto:
-      livlin-datos/
-      ├── visits.json                     ← JSON maestro de todos los diagnósticos
-      └── [NombreEspacio] — [visit_id]/   ← carpeta por proyecto
-          ├── fotos/                      ← fotos (subidas al instante)
-          ├── diagnostico/diagnostico.json
-          ├── excel/diagnostico_*.xlsx
-          └── informe/informe_*.docx
+Soporta dos modos de autenticación (detectado automáticamente desde secrets):
+  - auth_type = "oauth"          → refresh_token del usuario (RECOMENDADO)
+  - auth_type = "service_account"→ cuenta de servicio (solo lectura de carpetas funciona)
+
+Estructura en Drive:
+  livlin-datos/
+  ├── visits.json
+  └── [NombreEspacio] — [visit_id]/
+      ├── fotos/
+      ├── diagnostico/diagnostico.json
+      ├── excel/diagnostico_*.xlsx
+      └── informe/informe_*.docx
 """
 import json, io, re, traceback
 from pathlib import Path
@@ -20,73 +21,133 @@ CRED_FILE   = BASE_DIR / "credentials" / "gdrive_sa.json"
 CONFIG_FILE = BASE_DIR / "credentials" / "gdrive_config.json"
 
 _folder_cache: dict = {}
-_service_cache = None   # module-level cache of (service, root_id)
+_service_cache = None
 
 
 def is_configured() -> bool:
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and st.secrets.get("gdrive", {}).get("enabled"):
+        cfg = st.secrets.get("gdrive", {})
+        if cfg.get("enabled"):
             return True
     except Exception:
         pass
     return CRED_FILE.exists() and CONFIG_FILE.exists()
 
 
-def _get_service():
-    """Build & cache Drive API service. Returns (service, root_folder_id)."""
-    global _service_cache
-    if _service_cache is not None:
-        return _service_cache
-
-    try:
-        from google.oauth2 import service_account
-        from googleapiclient.discovery import build
-    except ImportError:
-        raise ImportError("Instala: pip install google-auth google-api-python-client")
-
+def _get_auth_type() -> str:
+    """Returns 'oauth', 'service_account', or 'local'."""
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and st.secrets.get("gdrive", {}).get("enabled"):
-            cred_dict = dict(st.secrets["gdrive"]["credentials"])
-            # Fix escaped newlines in private_key (common Streamlit secrets issue)
-            if "private_key" in cred_dict:
-                pk = cred_dict["private_key"]
-                if "\\n" in pk and "\n" not in pk:
-                    pk = pk.replace("\\n", "\n")
-                cred_dict["private_key"] = pk
-            folder_id = st.secrets["gdrive"]["folder_id"]
-            creds   = service_account.Credentials.from_service_account_info(
-                cred_dict, scopes=["https://www.googleapis.com/auth/drive"])
-            service = build("drive", "v3", credentials=creds, cache_discovery=False)
-            _service_cache = (service, folder_id)
-            return _service_cache
-    except Exception as e:
-        raise RuntimeError(f"Error cargando credenciales de Streamlit secrets: {e}")
+        cfg = st.secrets.get("gdrive", {})
+        if cfg.get("enabled"):
+            return cfg.get("auth_type", "service_account")
+    except Exception:
+        pass
+    if CRED_FILE.exists():
+        return "local_service_account"
+    return "none"
 
-    # Local files fallback
-    if not CRED_FILE.exists():
-        raise FileNotFoundError(f"Credenciales no encontradas: {CRED_FILE}")
-    if not CONFIG_FILE.exists():
-        raise FileNotFoundError(f"Config no encontrada: {CONFIG_FILE}")
-    with open(CONFIG_FILE) as f:
-        config = json.load(f)
-    folder_id = config.get("folder_id", "")
-    creds   = service_account.Credentials.from_service_account_file(
-        str(CRED_FILE), scopes=["https://www.googleapis.com/auth/drive"])
-    service = build("drive", "v3", credentials=creds, cache_discovery=False)
-    _service_cache = (service, folder_id)
-    return _service_cache
+
+def _build_oauth_credentials():
+    """Build credentials from OAuth refresh token stored in secrets."""
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
+    import streamlit as st
+
+    oauth = dict(st.secrets["gdrive"]["oauth"])
+    creds = Credentials(
+        token=None,
+        refresh_token=oauth["refresh_token"],
+        token_uri=oauth.get("token_uri", "https://oauth2.googleapis.com/token"),
+        client_id=oauth["client_id"],
+        client_secret=oauth["client_secret"],
+        scopes=["https://www.googleapis.com/auth/drive"],
+    )
+    # Refresh to get a valid access token
+    creds.refresh(Request())
+    return creds
+
+
+def _build_service_account_credentials():
+    """Build credentials from service account stored in secrets."""
+    from google.oauth2 import service_account
+    import streamlit as st
+
+    cred_dict = dict(st.secrets["gdrive"]["credentials"])
+    if "private_key" in cred_dict:
+        pk = cred_dict["private_key"]
+        if "\\n" in pk and "\n" not in pk:
+            pk = pk.replace("\\n", "\n")
+        cred_dict["private_key"] = pk
+    return service_account.Credentials.from_service_account_info(
+        cred_dict, scopes=["https://www.googleapis.com/auth/drive"])
+
+
+def _get_service():
+    """Build and cache Drive API service. Returns (service, root_folder_id)."""
+    global _service_cache
+    if _service_cache is not None:
+        # Refresh OAuth token if needed
+        try:
+            creds = _service_cache[2]  # stored as (service, folder_id, creds)
+            if hasattr(creds, "expired") and creds.expired:
+                from google.auth.transport.requests import Request
+                creds.refresh(Request())
+        except Exception:
+            pass
+        return _service_cache[0], _service_cache[1]
+
+    try:
+        from googleapiclient.discovery import build
+        import streamlit as st
+        cfg = st.secrets.get("gdrive", {})
+        folder_id = cfg.get("folder_id", "")
+        auth_type = cfg.get("auth_type", "service_account")
+
+        if auth_type == "oauth":
+            creds = _build_oauth_credentials()
+        else:
+            creds = _build_service_account_credentials()
+
+        service = build("drive", "v3", credentials=creds, cache_discovery=False)
+        _service_cache = (service, folder_id, creds)
+        return service, folder_id
+
+    except Exception as e:
+        # Local file fallback
+        if CRED_FILE.exists() and CONFIG_FILE.exists():
+            from google.oauth2 import service_account
+            from googleapiclient.discovery import build
+            with open(CONFIG_FILE) as f:
+                config = json.load(f)
+            folder_id = config.get("folder_id", "")
+            creds = service_account.Credentials.from_service_account_file(
+                str(CRED_FILE), scopes=["https://www.googleapis.com/auth/drive"])
+            service = build("drive", "v3", credentials=creds, cache_discovery=False)
+            _service_cache = (service, folder_id, creds)
+            return service, folder_id
+        raise RuntimeError(f"No se pudo conectar a Drive: {e}")
 
 
 def get_drive_status() -> dict:
-    """Test Drive connection. Returns {ok, folder_id, error}."""
+    """Test Drive connection. Returns {ok, folder_id, auth_type, email, error}."""
     try:
+        auth_type = _get_auth_type()
         service, root_id = _get_service()
-        service.files().get(fileId=root_id, fields="id,name").execute()
-        return {"ok": True, "folder_id": root_id, "error": None}
+        about = service.about().get(fields="user,storageQuota").execute()
+        email = about.get("user", {}).get("emailAddress", "?")
+        quota = about.get("storageQuota", {})
+        used  = round(int(quota.get("usage", 0)) / (1024**3), 2)
+        total = round(int(quota.get("limit", 1)) / (1024**3), 0)
+        return {
+            "ok": True, "folder_id": root_id,
+            "auth_type": auth_type, "email": email,
+            "used_gb": used, "total_gb": total, "error": None
+        }
     except Exception as e:
-        return {"ok": False, "folder_id": None, "error": str(e)}
+        return {"ok": False, "folder_id": None,
+                "auth_type": _get_auth_type(), "error": str(e)}
 
 
 # ── Folder helpers ───────────────────────────────────────────────────────────
@@ -126,17 +187,15 @@ def _find_file(service, folder_id: str, filename: str) -> str | None:
 
 def _upload_bytes(service, folder_id: str, filename: str,
                   data: bytes, mimetype: str) -> str:
-    """Upload or overwrite file in folder. Returns file ID. Raises on failure."""
+    """Upload or overwrite a file. Raises on failure."""
     from googleapiclient.http import MediaIoBaseUpload
     media    = MediaIoBaseUpload(io.BytesIO(data), mimetype=mimetype, resumable=False)
     existing = _find_file(service, folder_id, filename)
     if existing:
-        service.files().update(
-            fileId=existing, media_body=media).execute()
+        service.files().update(fileId=existing, media_body=media).execute()
         return existing
     meta   = {"name": filename, "parents": [folder_id]}
-    result = service.files().create(
-        body=meta, media_body=media, fields="id").execute()
+    result = service.files().create(body=meta, media_body=media, fields="id").execute()
     return result["id"]
 
 
@@ -148,7 +207,6 @@ def _project_folder_name(space_name: str, visit_id: str) -> str:
 
 def _get_project_subfolders(service, root_id: str,
                              space_name: str, visit_id: str) -> dict:
-    """Get or create the 4 subfolders for a project. Returns dict of folder IDs."""
     proj_name = _project_folder_name(space_name, visit_id)
     proj_id   = _get_or_create_folder(service, root_id, proj_name)
     return {
@@ -160,16 +218,15 @@ def _get_project_subfolders(service, root_id: str,
     }
 
 
-# ── Primary data operations (Drive as source of truth) ──────────────────────
+# ── Primary data operations ──────────────────────────────────────────────────
 
 def drive_load_visits() -> list:
-    """Load visits list directly from Drive. Returns [] on any error."""
     try:
         service, root_id = _get_service()
         file_id = _find_file(service, root_id, "visits.json")
         if not file_id:
             return []
-        raw = service.files().get_media(fileId=file_id).execute()
+        raw  = service.files().get_media(fileId=file_id).execute()
         data = json.loads(raw.decode("utf-8"))
         return data if isinstance(data, list) else []
     except Exception as e:
@@ -178,7 +235,6 @@ def drive_load_visits() -> list:
 
 
 def drive_save_visits(visits: list) -> bool:
-    """Write visits list to Drive visits.json. Returns True on success."""
     try:
         service, root_id = _get_service()
         content = json.dumps(visits, ensure_ascii=False, indent=2).encode("utf-8")
@@ -191,9 +247,7 @@ def drive_save_visits(visits: list) -> bool:
 
 
 def drive_upload_space_files(visit_data: dict) -> dict:
-    """Upload diagnostico.json + Excel + Word for a single project.
-    Returns dict: {json: bool, excel: bool, docx: bool, errors: [str]}
-    """
+    """Upload diagnostico.json + Excel + Word. Returns {json, excel, docx, errors}."""
     results = {"json": False, "excel": False, "docx": False, "errors": []}
     if not visit_data.get("id"):
         results["errors"].append("visit_data sin 'id'")
@@ -221,7 +275,7 @@ def drive_upload_space_files(visit_data: dict) -> dict:
     # 2. Excel
     try:
         from utils.report_generator import generate_excel
-        xlsx = generate_excel(visit_data)
+        xlsx    = generate_excel(visit_data)
         safe_sp = _safe_name(space_name, 40)
         _upload_bytes(service, folders["excel"],
                       f"diagnostico_{safe_sp}.xlsx", xlsx,
@@ -233,7 +287,7 @@ def drive_upload_space_files(visit_data: dict) -> dict:
     # 3. Word
     try:
         from utils.docx_generator import generate_docx
-        docx = generate_docx(visit_data)
+        docx    = generate_docx(visit_data)
         safe_sp = _safe_name(space_name, 40)
         _upload_bytes(service, folders["informe"],
                       f"informe_{safe_sp}.docx", docx,
@@ -248,17 +302,14 @@ def drive_upload_space_files(visit_data: dict) -> dict:
 def upload_photo_to_space(visit_id: str, space_name: str,
                           filename: str, file_bytes: bytes,
                           mimetype: str = "image/jpeg",
-                          label: str = "") -> tuple[bool, str]:
-    """Upload photo to fotos/ subfolder. Returns (success, error_msg)."""
+                          label: str = "") -> tuple:
     try:
         service, root_id = _get_service()
         folders = _get_project_subfolders(service, root_id, space_name, visit_id)
         _upload_bytes(service, folders["fotos"], filename, file_bytes, mimetype)
         return True, ""
     except Exception as e:
-        msg = str(e)
-        print(f"[GDrive] upload_photo error: {msg}")
-        return False, msg
+        return False, str(e)
 
 
 def list_space_folders() -> list:
@@ -275,7 +326,7 @@ def list_space_folders() -> list:
         return []
 
 
-# ── Legacy helpers (kept for admin manual sync buttons) ─────────────────────
+# ── Legacy compat ─────────────────────────────────────────────────────────────
 
 def sync_visits_to_drive(visits_file: Path) -> bool:
     try:
@@ -288,7 +339,7 @@ def sync_visits_to_drive(visits_file: Path) -> bool:
 
 def sync_visits_from_drive(visits_file: Path) -> bool:
     visits = drive_load_visits()
-    if not visits and visits != []:
+    if visits is None:
         return False
     visits_file.parent.mkdir(parents=True, exist_ok=True)
     with open(visits_file, "w", encoding="utf-8") as f:

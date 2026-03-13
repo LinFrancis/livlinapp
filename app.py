@@ -153,10 +153,11 @@ def _sidebar():
                     status = get_drive_status()
                     st.session_state["_drive_status_cache"] = status
                 if status["ok"]:
+                    icon = "🔑" if status.get("auth_type") == "oauth" else "☁️"
                     st.markdown(
-                        '<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
-                        'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
-                        '☁️ Drive conectado</div>', unsafe_allow_html=True)
+                        f'<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
+                        f'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
+                        f'{icon} Drive conectado</div>', unsafe_allow_html=True)
                 else:
                     st.markdown(
                         f'<div style="background:#FFE0E0;border-radius:8px;padding:0.35rem 0.6rem;'

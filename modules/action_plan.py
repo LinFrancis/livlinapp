@@ -5,6 +5,7 @@ from utils.data_manager import save_visit
 from utils.scoring import (compute_synthesis_potentials, compute_domain_scores,
                             compute_regenerative_score, score_label)
 from utils.synthesis import generate_all
+from utils.module_status import render_module_status, is_module_active
 from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 TABS = ["🌱 Potencial Regenerativo", "📝 Síntesis Narrativa", "🗓️ Plan de Acción"]
@@ -194,6 +195,24 @@ def _render_potencial(data):
         st.markdown(f'<div class="info-box" style="font-size:0.82rem;">{ig}</div>', unsafe_allow_html=True)
 
     # ── Dimensiones con interpretaciones editables ────────────────────────
+    st.markdown("---")
+
+    # ── Estado del módulo ─────────────────────────────────────────────────
+    st.markdown("**Estado de este módulo:**")
+    _mod_status = render_module_status(data, "mod_plan")
+    if not is_module_active(_mod_status):
+        # Limpiar valores por defecto si el módulo no fue abordado
+        save_col1, save_col2 = st.columns([1,1])
+        with save_col1:
+            if st.button("💾 Guardar como No Abordado", key="save_na_mod_plan",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("✅ Módulo marcado como No Abordado.")
+                show_drive_save_status()
+        return
+    if _mod_status == "inferido":
+        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
     st.markdown("---")
     st.markdown("### 🌱 Dimensiones Regenerativas — Interpretación y Análisis")
 

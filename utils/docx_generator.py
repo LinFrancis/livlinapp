@@ -28,6 +28,29 @@ C_PALE   = RGBColor(0xD8, 0xF3, 0xDC)   # #D8F3DC
 C_WHITE  = RGBColor(0xFF, 0xFF, 0xFF)
 C_GRAY   = RGBColor(0x66, 0x66, 0x66)
 
+MODULE_STATUS_LABELS = {
+    "respondido":  "✅ Respondido directamente",
+    "inferido":    "🔍 Inferido por facilitador",
+    "no_abordado": "⭕ Módulo no abordado",
+}
+
+def _module_status_line(doc, status: str):
+    """Add a small status line below a section heading."""
+    label = MODULE_STATUS_LABELS.get(status, "")
+    if not label:
+        return
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(4)
+    r = p.add_run(f"  {label}")
+    r.font.size = Pt(8)
+    r.italic = True
+    color_map = {
+        "respondido":  RGBColor(0x1B, 0x43, 0x32),
+        "inferido":    RGBColor(0x79, 0x55, 0x48),
+        "no_abordado": RGBColor(0x9E, 0x9E, 0x9E),
+    }
+    r.font.color.rgb = color_map.get(status, C_GRAY)
+
 
 def _set_cell_bg(cell, hex_color: str):
     tc = cell._tc
@@ -189,6 +212,7 @@ def generate_docx(data: dict) -> bytes:
     # 1. INTENCIÓN Y CONTEXTO
     # ════════════════════════════════════════════════════════════════════════
     _heading(doc, "1. Intención y Contexto", 1, C_DARK, 14)
+    _module_status_line(doc, data.get("mod_cliente", "respondido"))
 
     intenc = data.get("proyecto_intencion", "")
     tipo   = data.get("proyecto_tipo_espacio", "")
@@ -224,6 +248,7 @@ def generate_docx(data: dict) -> bytes:
     # 2. OBSERVACIÓN ECOLÓGICA
     # ════════════════════════════════════════════════════════════════════════
     _heading(doc, "2. Observación Ecológica del Sitio", 1, C_DARK, 14)
+    _module_status_line(doc, data.get("mod_sitio", "respondido"))
 
     suelo_rows = []
     for k, label in [
@@ -287,6 +312,7 @@ def generate_docx(data: dict) -> bytes:
     # 3. SISTEMAS — AGUA, ENERGÍA, MATERIALES
     # ════════════════════════════════════════════════════════════════════════
     _heading(doc, "3. Sistemas — Agua, Energía y Materiales", 1, C_DARK, 14)
+    _module_status_line(doc, data.get("mod_sistemas", "respondido"))
 
     # Agua
     _heading(doc, "3.1 · Sistema de Agua", 2, C_MED, 11)
@@ -336,6 +362,7 @@ def generate_docx(data: dict) -> bytes:
     # 4. FLOR DE LA PERMACULTURA — 7 PÉTALOS
     # ════════════════════════════════════════════════════════════════════════
     _heading(doc, "4. Flor de la Permacultura — 7 Pétalos", 1, C_DARK, 14)
+    _module_status_line(doc, data.get("mod_potencial", "respondido"))
     _para(doc, f"Regenerative Score Global: {global_score} / 5.0 — {score_label(global_score)[0]}",
           bold=True, color=C_MAIN, size=12)
     doc.add_paragraph()
@@ -395,6 +422,7 @@ def generate_docx(data: dict) -> bytes:
     # 5. SÍNTESIS Y PLAN DE ACCIÓN
     # ════════════════════════════════════════════════════════════════════════
     _heading(doc, "5. Síntesis y Plan de Acción", 1, C_DARK, 14)
+    _module_status_line(doc, data.get("mod_plan", "respondido"))
 
     for k, label in [
         ("sint_fortalezas",      "💚 Fortalezas del espacio"),

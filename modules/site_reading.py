@@ -2,6 +2,7 @@
 import math
 import streamlit as st
 from utils.data_manager import save_visit
+from utils.module_status import render_module_status, is_module_active
 from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 NO_SOIL_TYPES  = ["Departamento con terraza","Departamento sin terraza","Balcón","Terraza comunitaria"]
@@ -16,6 +17,24 @@ def render():
     st.markdown('<p class="module-subtitle">Registro de las características del espacio, '
                 'flujos naturales y potencial productivo.</p>', unsafe_allow_html=True)
     data = st.session_state.visit_data
+
+    # ── Estado del módulo ─────────────────────────────────────────────────
+    st.markdown("**Estado de este módulo:**")
+    _mod_status = render_module_status(data, "mod_sitio")
+    if not is_module_active(_mod_status):
+        # Limpiar valores por defecto si el módulo no fue abordado
+        save_col1, save_col2 = st.columns([1,1])
+        with save_col1:
+            if st.button("💾 Guardar como No Abordado", key="save_na_mod_sitio",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("✅ Módulo marcado como No Abordado.")
+                show_drive_save_status()
+        return
+    if _mod_status == "inferido":
+        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
+    st.markdown("---")
 
     tipo_espacio   = data.get("proyecto_tipo_espacio", "")
     only_containers = tipo_espacio in NO_SOIL_TYPES

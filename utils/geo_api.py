@@ -114,6 +114,31 @@ def get_annual_climate(lat: float, lon: float) -> dict | None:
             result["t_min"].append(avg(monthly[m]["t_min"]))
             result["prec"].append(total(monthly[m]["prec"]))
             result["wind"].append(avg(monthly[m]["wind"]))
+
+        # ── Extremos y meses clave ──────────────────────────────────────
+        valid_tmax = [(i, v) for i, v in enumerate(result["t_max"]) if v is not None]
+        valid_tmin = [(i, v) for i, v in enumerate(result["t_min"]) if v is not None]
+
+        if valid_tmax:
+            hottest_idx = max(valid_tmax, key=lambda x: x[1])[0]
+            coldest_idx = min(valid_tmin, key=lambda x: x[1])[0] if valid_tmin else 0
+            result["mes_mas_caluroso"] = MONTHS_ES[hottest_idx]
+            result["mes_mas_frio"]     = MONTHS_ES[coldest_idx]
+            result["t_max_media"]      = result["t_max"][hottest_idx]
+            result["t_min_media"]      = result["t_min"][coldest_idx] if valid_tmin else None
+        else:
+            result["mes_mas_caluroso"] = None
+            result["mes_mas_frio"]     = None
+            result["t_max_media"]      = None
+            result["t_min_media"]      = None
+
+        # ── Valores absolutos del último año disponible ─────────────────
+        last_year_tmax_all = [v for vals in [monthly[m]["t_max"][-365//12:] for m in range(1,13)] for v in vals]
+        last_year_tmin_all = [v for vals in [monthly[m]["t_min"][-365//12:] for m in range(1,13)] for v in vals]
+        result["abs_max_ultimo_anio"] = round(max(last_year_tmax_all), 1) if last_year_tmax_all else None
+        result["abs_min_ultimo_anio"] = round(min(last_year_tmin_all), 1) if last_year_tmin_all else None
+        result["anio_referencia"]     = end_year
+
         return result
     except Exception:
         return None

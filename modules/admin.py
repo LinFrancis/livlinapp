@@ -128,14 +128,16 @@ def render():
         gdrive_ok = is_configured()
 
         if gdrive_ok:
-            # Live connection test
             status = get_drive_status()
             if status["ok"]:
-                st.success("✅ Google Drive conectado y funcionando.")
+                auth_label = "🔑 OAuth (cuenta personal)" if status.get("auth_type") == "oauth" else "🤖 Cuenta de servicio"
+                st.success(f"✅ Google Drive conectado — {auth_label}")
+                st.caption(f"Cuenta: {status.get('email','?')} · {status.get('used_gb',0)} GB usados / {status.get('total_gb',0)} GB")
                 st.caption(f"Carpeta raíz ID: `{status['folder_id']}`")
+                if status.get("auth_type") != "oauth":
+                    st.warning("⚠️ Estás usando cuenta de servicio. Las cuentas de servicio NO pueden crear archivos (sin cuota de almacenamiento). Debes migrar a OAuth. Ejecuta `get_oauth_token.py` y actualiza los secrets.")
             else:
-                st.error(f"❌ Drive configurado pero con error de conexión: {status['error']}")
-                st.caption("Verifica que la carpeta Drive esté compartida con la cuenta de servicio.")
+                st.error(f"❌ Error de conexión: {status['error']}")
             st.markdown(
                 '<div class="info-box">📁 Cada espacio tiene su propia carpeta en Drive con '
                 'su <code>diagnostico.json</code> y subcarpeta <code>fotos/</code>. '

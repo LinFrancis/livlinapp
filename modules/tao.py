@@ -4,6 +4,7 @@ Preguntas redactadas directamente a las personas del grupo.
 """
 import streamlit as st
 from utils.data_manager import save_visit
+from utils.module_status import render_module_status, is_module_active
 from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 
@@ -260,6 +261,24 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
     data["tao_notas"]= st.text_area("📝 Notas del Tao de la Regeneración", value=data.get("tao_notas",""), height=80)
     st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown("---")
+
+    # ── Estado del módulo ─────────────────────────────────────────────────
+    st.markdown("**Estado de este módulo:**")
+    _mod_status = render_module_status(data, "mod_tao")
+    if not is_module_active(_mod_status):
+        # Limpiar valores por defecto si el módulo no fue abordado
+        save_col1, save_col2 = st.columns([1,1])
+        with save_col1:
+            if st.button("💾 Guardar como No Abordado", key="save_na_mod_tao",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("✅ Módulo marcado como No Abordado.")
+                show_drive_save_status()
+        return
+    if _mod_status == "inferido":
+        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
     st.markdown("---")
     _, col_b, _ = st.columns([2,1,2])
     with col_b:

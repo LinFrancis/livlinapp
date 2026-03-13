@@ -25,6 +25,23 @@ def render():
     # ── 1.1 Datos generales ──────────────────────────────────────────────
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown("### 📋 1.1 · Datos Generales del Espacio")
+
+    # ── Estado del módulo ─────────────────────────────────────────────────
+    from utils.module_status import render_module_status, is_module_active
+    from utils.tab_nav import show_drive_save_status
+    st.markdown("**Estado de este módulo:**")
+    _mod_status = render_module_status(data, "mod_cliente")
+    if not is_module_active(_mod_status):
+        if st.button("💾 Guardar como No Abordado", key="save_na_mod_cliente",
+                     use_container_width=True):
+            st.session_state.visit_data = data
+            save_visit(data)
+            st.success("✅ Módulo marcado como No Abordado.")
+            show_drive_save_status()
+        return
+    if _mod_status == "inferido":
+        st.info("🔍 **Modo inferido** — Las respuestas son interpretaciones del facilitador.")
+    st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
         data["proyecto_nombre"]   = st.text_input("Nombre del proyecto *", value=data.get("proyecto_nombre",""), placeholder="Ej: Diagnóstico Casa Familia Soto")
@@ -187,9 +204,41 @@ def render():
                     paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.5)",
                 )
                 st.plotly_chart(fig, use_container_width=True)
+
+                # ── Métricas clave del clima ────────────────────────────
+                st.markdown("**📊 Datos climáticos clave**")
+                km1, km2, km3, km4, km5 = st.columns(5)
+                with km1:
+                    st.metric("🌡️ Mes más cálido",
+                              climate.get("mes_mas_caluroso") or "—",
+                              f"Máx promedio: {climate.get('t_max_media','?')}°C")
+                with km2:
+                    st.metric("🥶 Mes más frío",
+                              climate.get("mes_mas_frio") or "—",
+                              f"Mín promedio: {climate.get('t_min_media','?')}°C")
+                with km3:
+                    abs_max = climate.get("abs_max_ultimo_anio")
+                    st.metric("🔴 T° máxima registrada",
+                              f"{abs_max}°C" if abs_max is not None else "—",
+                              f"Año {climate.get('anio_referencia','')}")
+                with km4:
+                    abs_min = climate.get("abs_min_ultimo_anio")
+                    st.metric("🔵 T° mínima registrada",
+                              f"{abs_min}°C" if abs_min is not None else "—",
+                              f"Año {climate.get('anio_referencia','')}")
+                with km5:
+                    prec_total = round(sum(p for p in climate.get("prec",[]) if p))
+                    st.metric("💧 Precipitación anual",
+                              f"{prec_total} mm", "promedio histórico")
+
                 data["geo_clima_anual"] = str(climate)
-                # Pre-populate annual precipitation for water module
+                # Guardar métricas clave para otros módulos
                 try:
+                    if climate.get("mes_mas_caluroso"):
+                        data["clima_mes_caluroso"]  = climate["mes_mas_caluroso"]
+                        data["clima_mes_frio"]       = climate.get("mes_mas_frio","")
+                        data["clima_t_max_abs"]      = climate.get("abs_max_ultimo_anio")
+                        data["clima_t_min_abs"]      = climate.get("abs_min_ultimo_anio")
                     prec_sum = round(sum(p for p in climate.get("prec", []) if p))
                     if prec_sum > 0:
                         data["agua_prec_anual"] = float(prec_sum)
