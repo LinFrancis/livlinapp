@@ -1,0 +1,374 @@
+{
+  "niveles_excel": [
+    "petalo",
+    "categoria",
+    "accion"
+  ],
+  "petalos": [
+    {
+      "petalo": "Manejo de la tierra y la naturaleza",
+      "categorias": {
+        "Agricultura y Horticultura": [
+          "Agricultura orgánica",
+          "Agricultura biodinámica",
+          "Agricultura biointensiva",
+          "Huertas familiares",
+          "Huertas escolares"
+        ],
+        "Sistemas Agroforestales": [
+          "Bosques comestibles",
+          "Forestería análoga",
+          "Sistemas silvopastoriles"
+        ],
+        "Manejo del Suelo": [
+          "Labranza mínima (no arar)",
+          "Mulching o acolchado",
+          "Uso de gallinaza",
+          "Compostaje",
+          "Lombricomposta"
+        ],
+        "Conservación de Semillas": [
+          "Bancos de semillas criollas",
+          "Bancos de semillas nativas"
+        ],
+        "Gestión del Agua": [
+          "Diseño Keyline",
+          "Construcción de estanques",
+          "Construcción de presas",
+          "Construcción de bordos",
+          "Zanjas de infiltración (swales)"
+        ],
+        "Manejo de Espacios Silvestres": [
+          "Recolección de frutos silvestres",
+          "Recolección de especies silvestres",
+          "Restauración de ecosistemas con especies nativas"
+        ],
+        "Control de Plagas": [
+          "Manejo integrado de plagas",
+          "Control biológico natural con lagartijas",
+          "Control biológico natural con arañas"
+        ],
+        "Manejo Holístico de Praderas": [
+          "Planificación regenerativa del pastoreo"
+        ]
+      }
+    },
+    {
+      "petalo": "Manejo de la tierra y la naturaleza (urbano)",
+      "categorias": {
+        "Producción alimentaria urbana": [
+          "Huertos en balcones y terrazas",
+          "Huertos en macetas recicladas",
+          "Huertos verticales en muros o cercos",
+          "Jardines comestibles en patios pequeños",
+          "Huertos en azoteas o techos planos",
+          "Microhuertos en ventanas",
+          "Cultivo en sistemas hidropónicos domésticos",
+          "Cultivo en sistemas acuapónicos domésticos",
+          "Cultivo en bolsas de cultivo o contenedores textiles",
+          "Huertos en patios comunitarios",
+          "Huertos escolares urbanos",
+          "Huertos en centros culturales",
+          "Huertos en espacios públicos recuperados",
+          "Guerrilla gardening",
+          "Cultivo de microgreens",
+          "Germinados en casa",
+          "Cultivo de hongos comestibles",
+          "Cultivo de setas en café reciclado",
+          "Cultivo de algas comestibles domésticas",
+          "Apicultura urbana (donde sea legal)",
+          "Crianza pequeña de gallinas (si normativa lo permite)"
+        ],
+        "Suelo vivo": [
+          "Vermicompostaje doméstico",
+          "Compostaje en baldes",
+          "Compostaje bokashi",
+          "Compostaje comunitario en el barrio",
+          "Compostaje en departamentos usando lombrices",
+          "Creación de suelo vivo en macetas",
+          "Incorporación de microorganismos eficientes",
+          "Uso de bioles",
+          "Uso de biofertilizantes",
+          "Producción de biochar",
+          "Fabricación de té de compost"
+        ],
+        "Biodiversidad urbana": [
+          "Plantación de árboles frutales urbanos",
+          "Corredores de polinizadores",
+          "Jardines para abejas nativas",
+          "Jardines de mariposas",
+          "Jardines medicinales urbanos",
+          "Jardines aromáticos",
+          "Refugios para insectos",
+          "Casas para murciélagos",
+          "Bebederos para aves",
+          "Restauración de pequeños espacios degradados",
+          "Plantación de especies nativas"
+        ],
+        "Agua": [
+          "Captación de agua lluvia en casas",
+          "Captación de agua lluvia en edificios",
+          "Barriles recolectores de agua",
+          "Sistemas de infiltración en patios",
+          "Micro zanjas de infiltración",
+          "Reutilización de aguas grises para riego",
+          "Riego por goteo casero",
+          "Jardines de lluvia urbanos",
+          "Micro humedales artificiales"
+        ],
+        "Semillas": [
+          "Guardar semillas en casa",
+          "Intercambio de semillas entre vecinos",
+          "Bibliotecas de semillas",
+          "Bancos comunitarios de semillas",
+          "Cultivo de variedades locales",
+          "Multiplicación de plantas por esquejes",
+          "Propagación de plantas nativas"
+        ]
+      }
+    },
+    {
+      "petalo": "Ambiente construido",
+      "categorias": {
+        "Bioconstrucción": [
+          "Uso de adobe",
+          "Uso de cob",
+          "Uso de pacas de paja",
+          "Superadobe",
+          "Uso de madera",
+          "Uso de arcilla",
+          "Uso de paja-arcilla"
+        ],
+        "Diseño bioclimático": [
+          "Diseño solar pasivo",
+          "Ventanas orientadas al norte (hemisferio sur)",
+          "Climatización natural",
+          "Uso de termomasa"
+        ],
+        "Autoconstrucción": [
+          "Construcción participativa de viviendas",
+          "Recuperación de técnicas tradicionales"
+        ],
+        "Reciclaje de materiales": [
+          "Earthships con neumáticos",
+          "Ecoladrillos"
+        ],
+        "Infraestructura integrada": [
+          "Techos vivos",
+          "Sótanos para almacenamiento",
+          "Sótanos para cultivo de hongos",
+          "Captación de agua lluvia desde techos"
+        ],
+        "Infraestructura urbana verde": [
+          "Techos verdes",
+          "Muros verdes",
+          "Balcones verdes",
+          "Patios interiores con vegetación"
+        ]
+      }
+    },
+    {
+      "petalo": "Herramientas y tecnologías",
+      "categorias": {
+        "Energías renovables": [
+          "Paneles solares fotovoltaicos",
+          "Calefones solares",
+          "Generadores eólicos domésticos",
+          "Microhidroelectricidad"
+        ],
+        "Saneamiento ecológico": [
+          "Baños secos",
+          "Biobaños",
+          "Letrinas aboneras"
+        ],
+        "Eficiencia energética": [
+          "Estufas rocket",
+          "Estufas rusas",
+          "Cocinas solares",
+          "Hornos solares",
+          "Hornos de barro"
+        ],
+        "Gestión del agua": [
+          "Filtros de aguas grises",
+          "Filtros de carbón activado",
+          "Colectores de agua de lluvia",
+          "Riego por goteo"
+        ],
+        "Transporte sostenible": [
+          "Uso de bicicleta",
+          "Herramientas manuales",
+          "Tracción animal",
+          "Motores adaptados a aceite reutilizado"
+        ],
+        "Conservación de alimentos": [
+          "Fresqueras naturales",
+          "Secadores solares",
+          "Conservas",
+          "Fermentos"
+        ]
+      }
+    },
+    {
+      "petalo": "Educación y cultura",
+      "categorias": {
+        "Pedagogías alternativas": [
+          "Educación en casa",
+          "Pedagogía Waldorf",
+          "Educación para la paz"
+        ],
+        "Formación técnica": [
+          "Cursos de diseño en permacultura (PDC)",
+          "Talleres de herrería",
+          "Talleres de costura",
+          "Talleres de panadería artesanal",
+          "Investigación acción participativa"
+        ],
+        "Conciencia ambiental": [
+          "Lectura del paisaje",
+          "Video debates ambientales",
+          "Bibliotecas de ecofilosofía"
+        ],
+        "Artes participativas": [
+          "Música comunitaria",
+          "Teatro comunitario",
+          "Pintura colectiva",
+          "Muralismo comunitario"
+        ],
+        "Movimiento de transición": [
+          "Iniciativas de transición",
+          "Resiliencia local"
+        ]
+      }
+    },
+    {
+      "petalo": "Salud y bienestar físico-espiritual",
+      "categorias": {
+        "Medicina holística": [
+          "Herbología ancestral",
+          "Fitoterapia",
+          "Uso de plantas medicinales locales"
+        ],
+        "Cuidado personal": [
+          "Yoga",
+          "Meditación",
+          "Respiración holotrópica"
+        ],
+        "Sanación tradicional": [
+          "Temascales",
+          "Caminatas matutinas en la naturaleza"
+        ],
+        "Hitos de la vida": [
+          "Parto en casa",
+          "Lactancia materna",
+          "Morir con dignidad"
+        ],
+        "Alimentación sana": [
+          "Consumo de alimentos orgánicos",
+          "Alimentos integrales",
+          "Alimentos frescos",
+          "Alimentos locales",
+          "Dietas veganas",
+          "Dietas crudívoras"
+        ]
+      }
+    },
+    {
+      "petalo": "Economía y finanzas",
+      "categorias": {
+        "Intercambio": [
+          "Mercados de trueque",
+          "Sistemas LETS",
+          "Ferias comunitarias"
+        ],
+        "Finanzas éticas": [
+          "Inversiones éticas",
+          "Bancos éticos",
+          "Fondos solidarios"
+        ],
+        "Organización laboral": [
+          "Cooperativas de producción",
+          "Cooperativas de consumo",
+          "Mingas",
+          "Minkas"
+        ],
+        "Consumo responsable": [
+          "Comercio justo",
+          "Compras comunitarias a granel",
+          "Relocalización del comercio"
+        ],
+        "Sustento basado en habilidades": [
+          "WWOOFing",
+          "Servicios técnicos sustentables"
+        ]
+      }
+    },
+    {
+      "petalo": "Tenencia de la tierra y gobierno comunitario",
+      "categorias": {
+        "Asentamientos sostenibles": [
+          "Ecoaldeas",
+          "Eco-villas",
+          "Cohousing",
+          "Comunidades intencionales resilientes"
+        ],
+        "Gestión participativa": [
+          "Asambleas horizontales",
+          "Resolución no violenta de conflictos"
+        ],
+        "Defensa del territorio": [
+          "Asociaciones de vecinos",
+          "Asambleas ciudadanas para proteger agua y tierra"
+        ],
+        "Estructuras legales": [
+          "Títulos nativos de tierras",
+          "Propiedad comunitaria",
+          "Cooperativas de tierra"
+        ],
+        "Biorregionalismo": [
+          "Organización por cuencas",
+          "Organización por regiones ecológicas"
+        ]
+      }
+    },
+    {
+      "petalo": "Prácticas cotidianas de sustentabilidad",
+      "categorias": {
+        "Energía doméstica": [
+          "Apagar las luces",
+          "Usar luces LED",
+          "Usar equipos de bajo consumo eléctrico",
+          "Desconectar cargadores",
+          "Aprovechar la luz natural"
+        ],
+        "Agua": [
+          "Duchas cortas",
+          "Cerrar la llave al cepillarse los dientes",
+          "Cerrar la llave al lavar platos",
+          "Reparar fugas de agua"
+        ],
+        "Consumo": [
+          "Comprar colectivamente",
+          "Comprar a productores locales",
+          "Comprar a granel",
+          "Evitar envases innecesarios",
+          "Reutilizar materiales",
+          "Reparar objetos"
+        ],
+        "Comunidad": [
+          "Conectar con el barrio",
+          "Participar en organizaciones locales",
+          "Participar en huertos comunitarios",
+          "Apoyar iniciativas ambientales locales"
+        ],
+        "Desarrollo personal": [
+          "Estudiar regeneración",
+          "Estudiar agroecología",
+          "Practicar agroecología",
+          "Practicar tai chi",
+          "Practicar yoga",
+          "Practicar meditación"
+        ]
+      }
+    }
+  ]
+}
