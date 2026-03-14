@@ -1,11 +1,11 @@
-"""Indagación Regenerativa v2.3 — LivLin · Multi-usuario · www.livlin.cl"""
+"""Indagación Regenerativa v3.0 — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin v2.3",
+    page_title="Indagación Regenerativa · LivLin v3.0",
     page_icon="🌿", layout="wide",
     initial_sidebar_state="expanded")
 
@@ -48,7 +48,7 @@ def _login_page():
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
                 # Invalidate visit cache to force reload from Drive on login
-                st.session_state.pop("_visits_cache_v2.3", None)
+                st.session_state.pop("_visits_cache_v3.0", None)
                 st.session_state.pop("_sb_status_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
@@ -62,7 +62,7 @@ def _login_page():
                 st.rerun()
             else:
                 st.error("⚠️ Usuario o contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v2.3 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v3.0 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
 
 
 def _sidebar():
@@ -181,7 +181,7 @@ def _home():
     st.markdown(
         '<div class="app-header">'
         '<h1>Indagación Regenerativa</h1>'
-        '<p>Potencial para una vida regenerativa · LivLin v2.3 · www.livlin.cl</p>'
+        '<p>Potencial para una vida regenerativa  ·  LivLin v3.0  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
 
     _, cc, _ = st.columns([1, 3, 1])
@@ -216,12 +216,15 @@ def _home():
                 unsafe_allow_html=True)
 
     st.markdown(
-        '<div class="info-box" style="max-width:700px;margin:1.2rem auto;text-align:center;">'
-        '«Cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida. '
-        'Cada práctica que sumas transforma tu espacio y contribuye a la red de '
-        'espacios regenerativos que van configurando una nueva cultura de vida.»<br>'
-        '<span style="font-size:0.8rem;color:#338B85;">— Mason, F. (2025). '
-        'Introducción al enfoque de la regeneración. LivLin.</span></div>',
+        '<div class="tao-quote" style="max-width:720px;margin:1.2rem auto;text-align:center;">'
+        '<strong style="font-size:1.05rem;color:#1B4332;display:block;margin-bottom:0.5rem;">'
+        '«Cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida.»</strong>'
+        'Frente a los desafíos globales del cambio climático, la pérdida de biodiversidad '
+        'y la contaminación, ofrecemos soluciones locales y prácticas que regeneran los '
+        'ecosistemas que sostienen la vida de las presentes y futuras generaciones.<br><br>'
+        '<span style="font-size:0.78rem;color:#40916C;font-style:normal;font-weight:600;">'
+        '— Mason, F. (2025). Introducción al enfoque de la regeneración. LivLin. '
+        '· www.livlin.cl</span></div>',
         unsafe_allow_html=True)
 
     _, cb, _ = st.columns([2, 1, 2])

@@ -1,4 +1,4 @@
-"""Generador Word v2.3 — LivLin Indagación Regenerativa.
+"""Generador Word v3.0 — LivLin Indagación Regenerativa.
 Narrativa regenerativa alineada con Mason (2025). Logo embebido.
 """
 import io, base64, json, tempfile
@@ -7,7 +7,8 @@ from pathlib import Path
 from utils.petal_content import (
     PETAL_DESC, PETAL_ICONS, IPR_SCALE, IPR_WHAT_IS, IPR_OBS_VS_POT,
     LIVLIN_URL, LIVLIN_TAGLINE, LIVLIN_DESC, LIVLIN_MODULES,
-    LIVLIN_SERVICES_PITCH, LIVLIN_CLOSING, REGENERATION_FRAMEWORK, GLOBAL_REFS
+    LIVLIN_SERVICES_PITCH, LIVLIN_CLOSING, REGENERATION_FRAMEWORK, GLOBAL_REFS,
+    TAO_REFLEXION_SHORT, TAO_INVITACION
 )
 
 try:
@@ -143,7 +144,7 @@ def generate_docx(data:dict)->bytes:
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
 
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v2.3  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v3.0  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
 
     doc.add_paragraph()
@@ -361,7 +362,7 @@ def generate_docx(data:dict)->bytes:
 
     # ── PIE ───────────────────────────────────────────────────────────────
     p_pie=doc.add_paragraph(); p_pie.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v2.3  ·  {str(datetime.now())[:10]}")
+    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.0  ·  {str(datetime.now())[:10]}")
     r_pie.font.size=Pt(8); r_pie.font.color.rgb=CG; r_pie.italic=True
 
     buf=io.BytesIO(); doc.save(buf); buf.seek(0)

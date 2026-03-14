@@ -1,4 +1,4 @@
-"""Excel export v2.3 — LivLin Indagación Regenerativa.
+"""Excel export v3.0 — LivLin Indagación Regenerativa.
 Auto-explicativo, narrativa regenerativa alineada con Mason (2025).
 Logo LivLin embebido en portada.
 """
@@ -11,10 +11,11 @@ from openpyxl.drawing.image import Image as XLImage
 from utils.petal_content import (
     PETAL_DESC, PETAL_ICONS, IPR_SCALE, IPR_WHAT_IS, IPR_OBS_VS_POT,
     LIVLIN_URL, LIVLIN_TAGLINE, LIVLIN_DESC, LIVLIN_MODULES,
-    LIVLIN_SERVICES_PITCH, LIVLIN_CLOSING, REGENERATION_FRAMEWORK, GLOBAL_REFS
+    LIVLIN_SERVICES_PITCH, LIVLIN_CLOSING, REGENERATION_FRAMEWORK, GLOBAL_REFS,
+    TAO_REFLEXION_SHORT, TAO_INVITACION
 )
 
-C1="#005954"; C2="#338B85"; C3="#5DC1B9"; C4="#9CE0DB"; C5="#D5FFFF"
+C1="1B4332"; C2="2D6A4F"; C3="40916C"; C4="52B788"; C5="D8F3DC"
 WHITE="FFFFFF"; GRAY="F5F5F5"; GOLD="FFF8DC"; AMBER="FFF3E0"; AMBER_D="E65100"
 
 def _f(h): return PatternFill("solid", fgColor=h)
@@ -115,7 +116,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Título principal (col 2 en adelante para dar espacio al logo)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v2.3"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.0"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55
@@ -475,6 +476,12 @@ def generate_excel(data: dict) -> bytes:
         r=_sp(ws6,r)
     r=_h(ws6,r,"🌿 LivLin — Tu aliado en la implementación",bg=C2)
     r=_expl(ws6,r,LIVLIN_CLOSING,h=65)
+
+    # Tao closing in M9 sheet
+    r=_sp(ws6,r)
+    r=_h(ws6,r,"🌿 Un camino interior — Tao de la Regeneración",bg=C1)
+    r=_expl(ws6,r,TAO_REFLEXION_SHORT,h=60)
+    r=_expl(ws6,r,TAO_INVITACION,h=45)
 
     # ═══════════════════════════════════════════════════════════════════
     # HOJA 7 — DATOS BIOCLIMÁTICOS

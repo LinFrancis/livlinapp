@@ -265,13 +265,13 @@ IPR_SCALE = [
     ("○ Sin inicio",   "0",   "#9E9E9E",
      "Este pétalo aún no tiene prácticas activas. Gran potencial latente esperando ser "
      "activado. Todo camino comienza aquí."),
-    ("🌱 Iniciando",   "1",   "#5DC1B9",
+    ("🌱 Iniciando",   "1",   "#40916C",
      "El primer paso ya está dado. En el enfoque regenerativo, una primera práctica es "
      "el acto más importante: rompe el patrón y abre el camino."),
-    ("🌿 Avanzando",   "2",   "#338B85",
+    ("🌿 Avanzando",   "2",   "#2D6A4F",
      "Dos prácticas activas muestran intención sostenida. El sistema empieza a tomar "
      "forma y a generar sus primeros frutos concretos."),
-    ("🌳 Consolidado", "3",   "#005954",
+    ("🌳 Consolidado", "3",   "#1B4332",
      "Sistema estable que genera rendimientos constantes. La práctica regenerativa "
      "es parte del modo habitual de vida del espacio."),
     ("🌸 Destacado",   "4–5", "#004540",
@@ -317,3 +317,21 @@ GLOBAL_REFS = [
     ("Raworth, K. (2017)", "Doughnut Economics. Chelsea Green Publishing", "https://doughnuteconomics.org"),
     ("LivLin", "Potencial para una vida regenerativa", "https://www.livlin.cl"),
 ]
+
+TAO_REFLEXION_SHORT = (
+    "«La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando aprendemos "
+    "a cooperar con ella. No se trata de salvar la naturaleza como si fuera algo externo a nosotros. "
+    "Somos naturaleza. Cuando cuidamos nuestra propia vida, también estamos cuidando la red de vida "
+    "de la cual formamos parte. Por eso el camino regenerativo también es un camino interior. "
+    "Mente abierta. Corazón abierto. Voluntad abierta. Como enseña el Tao, el agua transforma "
+    "la roca no por violencia, sino por persistencia.»"
+)
+
+TAO_INVITACION = (
+    "Este diagnóstico es solo un momento dentro de un proceso mucho más amplio. "
+    "Cada espacio tiene su propio ritmo de transformación. A veces la regeneración "
+    "comienza con algo pequeño: un huerto, un sistema de compostaje, una conversación comunitaria. "
+    "Lo importante es seguir caminando. Cuando muchas personas comienzan a escuchar ese mismo "
+    "pulso de vida, los territorios cambian. Y con ellos, también cambia nuestra forma de habitar "
+    "el mundo. 🌱 — www.livlin.cl"
+)

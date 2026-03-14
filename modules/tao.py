@@ -8,6 +8,63 @@ from utils.module_status import render_module_status, is_module_active
 from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
 
+
+TAO_REFLEXION = """
+Lo que buscas también está aquí. Y aquello que no buscas, también.
+Lo deseado y lo no deseado coexisten en el mismo mundo, como el yin y el yang. La regeneración comienza cuando aprendemos a habitar esa realidad con serenidad.
+
+A veces parece que todo está perdido. Que los suelos están degradados. Que los ecosistemas están colapsando. Que las sociedades han olvidado su relación con la tierra.
+Sin embargo, la vida sigue latiendo.
+Siempre queda una semilla. Siempre queda suelo vivo en algún lugar. Siempre hay personas que escuchan el llamado.
+
+La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando aprendemos a cooperar con ella.
+
+Durante mucho tiempo la humanidad ha intentado resolver los problemas que ella misma ha creado utilizando los mismos métodos que los generaron: más control, más tecnología, más producción. Pero el camino regenerativo invita a otra cosa.
+
+Invita a escuchar primero.
+Escuchar al suelo. Escuchar al agua. Escuchar al viento.
+
+Los árboles antiguos nos recuerdan que la vida tiene escalas de tiempo mucho más largas que las nuestras. Un bosque de mil años simplemente está viviendo. Nosotros somos apenas un instante en ese ciclo.
+Regenerar es recordar esa pertenencia.
+
+No se trata de salvar la naturaleza como si fuera algo externo a nosotros. Somos naturaleza.
+Cuando cuidamos nuestra propia vida, nuestro cuerpo, nuestra mente y nuestras relaciones, también estamos cuidando la red de vida de la cual formamos parte.
+Por eso el camino regenerativo también es un camino interior.
+
+Mente abierta. Corazón abierto. Voluntad abierta.
+
+La regeneración no se impone a otros. No se fuerza.
+Como enseña el Tao, el agua transforma la roca no por violencia, sino por persistencia.
+El mundo cambia cuando las personas comienzan a vivir de otra manera.
+
+Cuando alguien cultiva alimentos. Cuando alguien cuida el suelo. Cuando una comunidad aprende a compartir.
+Pequeños gestos, repetidos muchas veces, pueden cambiar territorios enteros.
+
+Hoy, en distintos lugares del mundo, están emergiendo respuestas locales frente a desafíos globales. Personas que deciden vivir con mayor simplicidad. Reducir el consumo. Regenerar la tierra. Reconstruir comunidad.
+Estas respuestas no siempre se conocen entre sí, pero comparten un mismo pulso.
+Podríamos llamarlo el pulso de la regeneración.
+Un latido profundo que atraviesa culturas, geografías y generaciones.
+
+Seguir ese pulso implica disciplina, humildad y atención.
+Implica reconocer cuándo avanzar y cuándo detenerse. Cuándo hablar y cuándo escuchar. Cuándo actuar y cuándo dejar que las cosas encuentren su propio equilibrio.
+
+En ese sentido, regenerar no es solo un conjunto de técnicas.
+Es una forma de vida.
+Una forma de caminar con respeto por la tierra, por las personas y por los ciclos de la vida.
+"""
+
+TAO_INVITACION = """
+Este diagnóstico es solo un momento dentro de un proceso mucho más amplio.
+Cada espacio tiene su propio ritmo de transformación.
+A veces la regeneración comienza con algo pequeño: un huerto, un sistema de compostaje, una conversación comunitaria.
+Lo importante es seguir caminando.
+
+Si deseas continuar profundizando este proceso, puedes conocer más sobre el trabajo de LivLin en www.livlin.cl.
+También te invitamos a sumarte a la comunidad de práctica LivLin, donde personas y organizaciones comparten aprendizajes y experiencias relacionadas con la regeneración.
+
+Porque cuando muchas personas comienzan a escuchar ese mismo pulso de vida, los territorios cambian.
+Y con ellos, también cambia nuestra forma de habitar el mundo. 🌱
+"""
 def render():
     st.markdown("## ☯️ Tao de la Regeneración")
     st.markdown(
@@ -279,6 +336,19 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
         return
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
+    st.markdown("---")
+
+    # ── Reflexión: Tao de la Regeneración ────────────────────────────────
+    with st.expander("🌿 Reflexiones desde el Tao de la Regeneración", expanded=False):
+        st.markdown(
+            '<div class="tao-quote">' +
+            TAO_REFLEXION.replace("\n\n", "</div><div class='tao-quote'>") +
+            '</div>', unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown(
+            '<div class="info-box">' + TAO_INVITACION + '</div>',
+            unsafe_allow_html=True)
+
     st.markdown("---")
     _, col_b, _ = st.columns([2,1,2])
     with col_b:
