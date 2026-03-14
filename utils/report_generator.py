@@ -72,7 +72,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Header
     ws1.merge_cells("A1:F1")
-    ws1["A1"] = "INDAGACIÓN REGENERATIVA · LivLin v4"
+    ws1["A1"] = "INDAGACIÓN REGENERATIVA · LivLin v2.0  ·  www.livlin.com"
     ws1["A1"].fill = _f(G_DARK); ws1["A1"].font = Font(color=WHITE, bold=True, size=18, name="Calibri")
     ws1["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws1.row_dimensions[1].height = 42
@@ -336,48 +336,88 @@ def generate_excel(data: dict) -> bytes:
     # HOJA 5 — FLOR DE LA PERMACULTURA
     # ════════════════════════════════════════════════════════════════════════
     ws5 = wb.create_sheet("🌸 M7 Flor Permacultura")
-    _set_col_widths(ws5, [30, 8, 22, 30, 30])
+    _set_col_widths(ws5, [32, 14, 14, 8, 32])
     ws5.merge_cells("A1:E1")
-    ws5["A1"] = "🌸 FLOR DE LA PERMACULTURA — 7 PÉTALOS OFICIALES"
+    ws5["A1"] = "🌸 FLOR DE LA PERMACULTURA — OBSERVADO vs POTENCIAL  ·  LivLin v2.0"
     ws5["A1"].fill = _f(G_DARK); ws5["A1"].font = Font(color=WHITE, bold=True, size=14, name="Calibri")
     ws5["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws5.row_dimensions[1].height = 32
     r = 2
 
-    for domain, meta in FLOWER_DOMAINS.items():
-        r = _sec(ws5, r, f"{meta['icon']} Pétalo {meta['petal_num']}: {domain}", span=5)
-        ws5.cell(r-1, 1).font = Font(color=WHITE, bold=True, size=12, name="Calibri")
-        # Headers
-        for ci, h in enumerate(["Indicador","Puntaje","Prácticas actuales","Prácticas futuras"], 1):
-            _cs(ws5, r, ci+1 if ci>1 else ci, h, bg=G_PALE, bold=True, size=9, ha="center")
-        r += 1
-        for ind in meta["indicators"]:
-            key = ind["key"]
-            val = data.get(key)
-            na  = data.get(f"{key}_na", False)
-            score_disp = "N/A" if na else (str(val) if val is not None else "—")
-            _cs(ws5, r, 1, ind["label"], bg=G_ULTRA, size=9, wrap=True, border=THIN_B)
-            _cs(ws5, r, 2, score_disp, bg=G_PALE, bold=True, size=10, ha="center", border=THIN_B)
-            ws5.row_dimensions[r].height = 22; r += 1
+    # Legend
+    _cs(ws5, r, 1, "✅ OBSERVADO = prácticas activas en el espacio", bg="E8F5E9", fg=G_DARK, bold=True, size=10, mc=2)
+    _cs(ws5, r, 3, "🌟 POTENCIAL = identificado por el facilitador", bg="FFF8E1", fg="E65100", bold=True, size=10, mc=3)
+    ws5.row_dimensions[r].height = 22; r += 1
+    r = _sp(ws5, r, span=5)
 
-        avg = compute_domain_scores(data).get(domain, 0)
-        _cs(ws5, r, 1, f"📊 Puntaje del pétalo: {avg:.2f}/5", bg=G_MED, fg=WHITE, bold=True, mc=2, ha="center")
-        pk_a = f"flower_practicas_actuales_{domain}"
-        pk_f = f"flower_practicas_futuras_{domain}"
-        _cs(ws5, r, 3, _safe(data.get(pk_a,"")), bg=G_ULTRA, size=9, wrap=True)
-        _cs(ws5, r, 4, _safe(data.get(pk_f,"")), bg=G_ULTRA, size=9, wrap=True)
-        ws5.row_dimensions[r].height = 28; r += 1
+    # Per-petal sheets
+    import json as _json
+    from pathlib import Path as _Path
+    _jf = _Path(__file__).parent.parent / "data" / "petalos_regeneracion_urbana.json"
+    try:
+        with open(_jf, encoding="utf-8") as _f2:
+            _petalos = _json.load(_f2)["petalos"]
+    except Exception:
+        _petalos = []
+
+    icons = ["🌳","🏡","🛠️","📚","🧘","💚","🤝","🌿"]
+    ipr_obs = data.get("ipr_obs", [])
+    ipr_pot = data.get("ipr_pot", [])
+
+    for i, p in enumerate(_petalos):
+        icon = icons[i] if i < len(icons) else "🌱"
+        n_obs = ipr_obs[i] if i < len(ipr_obs) else 0
+        n_pot = ipr_pot[i] if i < len(ipr_pot) else 0
+        r = _sec(ws5, r, f"{icon} {p['nombre']}", bg=G_MED, span=5)
+        # Score row
+        _cs(ws5, r, 1, f"✅ Observado: {n_obs} práctica(s)", bg="E8F5E9", fg=G_DARK, bold=True, mc=2)
+        _cs(ws5, r, 3, f"🌟 Potencial: {n_pot} práctica(s)", bg="FFF8E1", fg="E65100", bold=True, mc=2)
+        ws5.row_dimensions[r].height = 20; r += 1
+
+        # Acciones observadas
+        obs_data = data.get(f"petalo_{i}_obs", {})
+        pot_data = data.get(f"petalo_{i}_pot", {})
+        otros_obs = data.get(f"petalo_{i}_otros_obs", [])
+        otros_pot = data.get(f"petalo_{i}_otros_pot", [])
+
+        for cat_key in p.get("categorias", {}):
+            cat_label = cat_key.replace("_"," ").title()
+            obs_sel = obs_data.get(cat_key, [])
+            pot_sel = pot_data.get(cat_key, [])
+            if obs_sel or pot_sel:
+                _cs(ws5, r, 1, cat_label, bg=G_PALE, bold=True, size=9, mc=2)
+                _cs(ws5, r, 3, "", bg=G_PALE, mc=3)
+                ws5.row_dimensions[r].height = 18; r += 1
+                max_len = max(len(obs_sel), len(pot_sel), 1)
+                for j in range(max_len):
+                    obs_v = obs_sel[j] if j < len(obs_sel) else ""
+                    pot_v = pot_sel[j] if j < len(pot_sel) else ""
+                    _cs(ws5, r, 1, f"  ✅ {obs_v}" if obs_v else "", bg="F1F8F1", size=9, mc=2, wrap=True)
+                    _cs(ws5, r, 3, f"  🌟 {pot_v}" if pot_v else "", bg="FFFDE7", size=9, mc=3, wrap=True)
+                    ws5.row_dimensions[r].height = 18; r += 1
+
+        if otros_obs or otros_pot:
+            _cs(ws5, r, 1, "Otros (observados)", bg=G_PALE, bold=True, size=9, mc=2)
+            _cs(ws5, r, 3, "Otros (potencial)", bg=G_PALE, bold=True, size=9, mc=3)
+            ws5.row_dimensions[r].height = 18; r += 1
+            for txt in otros_obs:
+                _cs(ws5, r, 1, f"  ✅ {txt}", bg="F1F8F1", size=9, mc=2, wrap=True)
+                ws5.row_dimensions[r].height = 18; r += 1
+            for txt in otros_pot:
+                _cs(ws5, r, 3, f"  🌟 {txt}", bg="FFFDE7", size=9, mc=3, wrap=True)
+                ws5.row_dimensions[r].height = 18; r += 1
+
+        notas = data.get(f"petalo_{i}_notas","")
+        if notas:
+            r = _notes(ws5, r, f"📝 Notas: {notas}", span=5)
+
         r = _sp(ws5, r, span=5)
 
-    r = _sec(ws5, r, "⚖️ TRES PRINCIPIOS ÉTICOS", span=5)
-    for principle in ETHICAL_PRINCIPLES:
-        sk = f"eth_score_{principle['key']}"
-        _cs(ws5, r, 1, principle["title"], bg=G_PALE, bold=True, size=11, mc=2)
-        _cs(ws5, r, 3, f"Nivel: {data.get(sk,0)}/5", bg=G_PALE, bold=True, ha="center")
-        ws5.row_dimensions[r].height = 24; r += 1
-        for key, label, _ in principle["questions"]:
-            r = _row(ws5, r, label, _safe(data.get(key,"")))
-        r = _sp(ws5, r, span=5)
+    # Prácticas destacadas
+    dest = data.get("pot_practicas_destacadas","")
+    if dest:
+        r = _sec(ws5, r, "✨ Prácticas más destacadas", span=5)
+        r = _notes(ws5, r, dest, span=5, h=50)
 
     # ════════════════════════════════════════════════════════════════════════
     # HOJA 6 — SÍNTESIS Y PLAN

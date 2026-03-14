@@ -169,7 +169,7 @@ def generate_docx(data: dict) -> bytes:
 
     p_subtitle = doc.add_paragraph()
     p_subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    rs = p_subtitle.add_run("Diagnóstico de Permacultura Urbana — LivLin")
+    rs = p_subtitle.add_run("Diagnóstico de Permacultura Urbana — LivLin v2.0  ·  www.livlin.com")
     rs.font.size = Pt(13); rs.font.color.rgb = C_MED; rs.italic = True
 
     doc.add_paragraph()
@@ -367,54 +367,63 @@ def generate_docx(data: dict) -> bytes:
           bold=True, color=C_MAIN, size=12)
     doc.add_paragraph()
 
-    # IPR global
-    ipr_global = data.get("ipr_global", 0)
-    ipr_por_petalo = data.get("ipr_por_petalo", {})
-    _para(doc, f"IPR Global: {ipr_global:.0f}%", bold=True, color=C_MAIN, size=12)
+    # IPR scores
+    ipr_obs = data.get("ipr_obs", [])
+    ipr_pot = data.get("ipr_pot", [])
+    _para(doc, "Observado vs Potencial por pétalo:", bold=True, color=C_MAIN, size=12)
     doc.add_paragraph()
 
-    # Load petal actions data
-    import json
-    from pathlib import Path as _Path
-    _json = _Path(__file__).parent.parent / "data" / "petalos_regeneracion_urbana.json"
+    import json as _json2
+    from pathlib import Path as _Path2
+    _jf2 = _Path2(__file__).parent.parent / "data" / "petalos_regeneracion_urbana.json"
     try:
-        with open(_json, encoding="utf-8") as _f:
-            _petalos = json.load(_f)["petalos"]
+        with open(_jf2, encoding="utf-8") as _ff:
+            _petalos2 = _json2.load(_ff)["petalos"]
     except Exception:
-        _petalos = []
+        _petalos2 = []
 
-    icons = ["🌳","🏡","🛠️","📚","🧘","💚","🤝","🌿"]
-    for i, p in enumerate(_petalos):
-        ipr = ipr_por_petalo.get(p["nombre"], 0)
-        icon = icons[i] if i < len(icons) else "🌱"
-        _heading(doc, f"{icon} {p['nombre']}  — IPR: {ipr:.0f}%", 2, C_MED, 11)
+    icons2 = ["🌳","🏡","🛠️","📚","🧘","💚","🤝","🌿"]
+    for i, p in enumerate(_petalos2):
+        n_o = ipr_obs[i] if i < len(ipr_obs) else 0
+        n_p = ipr_pot[i] if i < len(ipr_pot) else 0
+        icon = icons2[i] if i < len(icons2) else "🌱"
+        _heading(doc, f"{icon} {p['nombre']}", 2, C_MED, 11)
+        _module_status_line(doc, "respondido")
 
-        notas = data.get(f"petalo_{i}_notas", "")
-        if notas: _para(doc, notas, italic=True, color=C_GRAY, size=9)
+        # Score summary
+        score_txt = f"✅ Observado: {n_o} práctica(s)   |   🌟 Potencial: {n_p} práctica(s)"
+        _para(doc, score_txt, bold=True, color=C_MAIN, size=10)
 
-        acciones = data.get(f"petalo_{i}_acciones", {})
-        sel_rows = []
-        for cat_key, sel_list in acciones.items():
-            if sel_list:
-                cat_label = cat_key.replace("_", " ").title()
-                sel_rows.append((cat_label, ", ".join(sel_list)))
-        if sel_rows:
-            _kv_table(doc, sel_rows)
-        else:
-            _para(doc, "Sin prácticas registradas.", italic=True, color=C_GRAY, size=9)
+        obs_data = data.get(f"petalo_{i}_obs", {})
+        pot_data = data.get(f"petalo_{i}_pot", {})
+        otros_obs = data.get(f"petalo_{i}_otros_obs", [])
+        otros_pot = data.get(f"petalo_{i}_otros_pot", [])
+
+        obs_rows = [(cat_key.replace("_"," ").title(), ", ".join(v))
+                    for cat_key, v in obs_data.items() if v]
+        if otros_obs: obs_rows.append(("Otros observados", ", ".join(otros_obs)))
+        pot_rows = [(cat_key.replace("_"," ").title(), ", ".join(v))
+                    for cat_key, v in pot_data.items() if v]
+        if otros_pot: pot_rows.append(("Otros potencial", ", ".join(otros_pot)))
+
+        if obs_rows:
+            _para(doc, "✅ Prácticas observadas:", bold=True, color=RGBColor(0x1B,0x43,0x32), size=9)
+            _kv_table(doc, obs_rows)
+        if pot_rows:
+            doc.add_paragraph()
+            _para(doc, "🌟 Potencial identificado:", bold=True, color=RGBColor(0xE6,0x51,0x00), size=9)
+            _kv_table(doc, pot_rows)
+
+        notas = data.get(f"petalo_{i}_notas","")
+        if notas:
+            _para(doc, f"📝 {notas}", italic=True, color=C_GRAY, size=9)
         doc.add_paragraph()
 
-    # Reflexiones
-    for k, label in [
-        ("pot_practicas_destacadas", "✨ Prácticas destacadas"),
-        ("pot_integraciones",        "🔗 Integraciones / sinergias"),
-        ("pot_proximos_pasos",       "🚀 Próximos pasos"),
-        ("pot_vision",               "🌟 Visión de futuro"),
-    ]:
-        v = data.get(k, "")
-        if v:
-            _para(doc, label, bold=True, color=C_DARK, size=10)
-            _para(doc, v, italic=True, color=C_GRAY, size=9)
+    # Prácticas destacadas
+    dest = data.get("pot_practicas_destacadas","")
+    if dest:
+        _para(doc, "✨ Prácticas más destacadas", bold=True, color=C_DARK, size=11)
+        _para(doc, dest, italic=True, color=C_GRAY, size=10)
 
     # Principios éticos
     _heading(doc, "Principios Éticos", 2, C_MED, 11)
@@ -485,6 +494,12 @@ def generate_docx(data: dict) -> bytes:
     p_pie.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r_pie = p_pie.add_run(f"Diagnóstico generado con LivLin — Indagación Regenerativa  ·  {str(datetime.now())[:10]}")
     r_pie.font.size = Pt(8); r_pie.font.color.rgb = C_GRAY; r_pie.italic = True
+
+    # LivLin website line
+    p_web = doc.add_paragraph()
+    p_web.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r_web = p_web.add_run("🌿 LivLin · Permacultura Urbana · www.livlin.com")
+    r_web.font.size = Pt(9); r_web.font.color.rgb = C_MAIN; r_web.bold = True
 
     # ── Serialize to bytes ─────────────────────────────────────────────────
     buf = io.BytesIO()
