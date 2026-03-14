@@ -1,4 +1,4 @@
-"""Generador Word v4.0 — LivLin Indagación Regenerativa.
+"""Generador Word v4.2 — LivLin Indagación Regenerativa.
 Narrativa regenerativa alineada con Mason (2025). Logo embebido.
 """
 import io, base64, json, tempfile
@@ -152,7 +152,7 @@ def generate_docx(data:dict)->bytes:
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
 
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v4.0  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v4.2  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
 
     doc.add_paragraph()
@@ -388,7 +388,7 @@ def generate_docx(data:dict)->bytes:
 
     # ── PIE ───────────────────────────────────────────────────────────────
     p_pie=doc.add_paragraph(); p_pie.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v4.0  ·  {str(datetime.now())[:10]}")
+    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v4.2  ·  {str(datetime.now())[:10]}")
     r_pie.font.size=Pt(8); r_pie.font.color.rgb=CG; r_pie.italic=True
 
     buf=io.BytesIO(); doc.save(buf); buf.seek(0)

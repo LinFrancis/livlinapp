@@ -1,4 +1,4 @@
-"""Excel export v4.0 — LivLin Indagación Regenerativa.
+"""Excel export v4.2 — LivLin Indagación Regenerativa.
 Auto-explicativo, narrativa regenerativa alineada con Mason (2025).
 Logo LivLin embebido en portada.
 """
@@ -124,7 +124,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Título principal (col 2 en adelante para dar espacio al logo)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v4.0"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v4.2"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55
@@ -478,7 +478,7 @@ def generate_excel(data: dict) -> bytes:
     # Dimensional scores with interpretations
     try:
         from utils.scoring import compute_synthesis_potentials
-        from modules.action_plan import DIM_INTERP, DIM_DESC
+        from utils.dim_content import DIM_INTERP, DIM_DESC
         pots = compute_synthesis_potentials(data)
         if pots:
             r=_h(ws6,r,"Dimensiones Regenerativas — Puntaje e Interpretación",bg=C2,span=6)
