@@ -1,11 +1,11 @@
-"""Indagación Regenerativa v2.2 — LivLin · Multi-usuario + Google Drive."""
+"""Indagación Regenerativa v2.3 — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin",
+    page_title="Indagación Regenerativa · LivLin v2.3",
     page_icon="🌿", layout="wide",
     initial_sidebar_state="expanded")
 
@@ -48,7 +48,7 @@ def _login_page():
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
                 # Invalidate visit cache to force reload from Drive on login
-                st.session_state.pop("_visits_cache_v2.2", None)
+                st.session_state.pop("_visits_cache_v2.3", None)
                 st.session_state.pop("_sb_status_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
@@ -62,7 +62,7 @@ def _login_page():
                 st.rerun()
             else:
                 st.error("⚠️ Usuario o contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v2.2 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v2.3 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
 
 
 def _sidebar():
@@ -79,7 +79,7 @@ def _sidebar():
                 '<span style="font-family:Georgia;font-size:1.3rem;font-weight:800;color:#1B4332;">🌿 LivLin</span></div>',
                 unsafe_allow_html=True)
         st.markdown('<div style="text-align:center;padding:0 0 0.4rem;">'
-            '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Indagación Regenerativa v2.2</span></div>',
+            '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Potencial para una vida regenerativa</span></div>',
             unsafe_allow_html=True)
         st.markdown("---")
 
@@ -179,37 +179,49 @@ def _sidebar():
 
 def _home():
     st.markdown(
-        '<div class="app-header"><h1>Indagación Regenerativa</h1>'
-        '<div class="app-subtitle">Instrumento de diagnóstico colectivo para espacios en transición · LivLin v5</div>'
+        '<div class="app-header">'
+        '<h1>Indagación Regenerativa</h1>'
+        '<p>Potencial para una vida regenerativa · LivLin v2.3 · www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
 
-    _, cc, _ = st.columns([1, 2, 1])
+    _, cc, _ = st.columns([1, 3, 1])
     with cc:
         st.markdown(
-            '<p style="text-align:center;font-size:1rem;color:#3D5A47;line-height:1.7;">'
-            'Bienvenidos/as a la <strong>Indagación Regenerativa</strong> — un instrumento colectivo para explorar '
-            'el potencial regenerativo de tu espacio desde los 7 pétalos de la Permacultura y el Tao como camino interior.'
+            '<p style="text-align:center;font-size:0.95rem;color:#338B85;line-height:1.8;'
+            'font-family:Montserrat,sans-serif;margin:1rem 0;">'
+            'Cada espacio urbano alberga un <strong>potencial regenerativo</strong> que todavía no ha sido activado. '
+            'Esta herramienta co-diseñada con el enfoque de la permacultura y el diseño regenerativo '
+            'te ayuda a reconocer lo que ya está floreciendo en tu espacio '
+            'y a trazar una ruta hacia lo que puede llegar a ser.'
             '</p>', unsafe_allow_html=True)
 
-    cols = st.columns(4)
+    cols = st.columns(3)
     for col, (icon, title, desc) in zip(cols, [
-        ("🌸", "Flor de la Permacultura", "7 pétalos: evalúa prácticas actuales y futuras"),
-        ("☯️", "Tao de la Regeneración",  "Exploración interior: presencia, triple crisis"),
-        ("📐", "Calculadoras",             "Bancales, energía eléctrica y gestión del agua"),
-        ("🌡️", "Clima y Geo",             "Clima anual, solar, lunar y contexto urbano"),
+        ("🌸", "Flor de la Permacultura",
+         "Mapea las prácticas activas de tu espacio y el potencial adicional en los 8 pétalos de Holmgren. "
+         "Genera el Índice de Potencial Regenerativo (IPR)."),
+        ("🌍", "Observación Ecológica",
+         "Lee el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad y clima histórico. "
+         "La base de todo proceso regenerativo bien fundamentado."),
+        ("🗺️", "Plan de Acción",
+         "Hoja de ruta en 3 horizontes temporales: acciones inmediatas, estacionales y estructurales "
+         "para el descenso creativo de tu espacio."),
     ]):
         with col:
             st.markdown(
-                f'<div class="section-card" style="text-align:center;min-height:140px;">'
-                f'<div style="font-size:1.8rem;margin-bottom:0.3rem;">{icon}</div>'
-                f'<strong style="color:#1B4332;font-size:0.88rem;">{title}</strong>'
-                f'<p style="font-size:0.76rem;color:#666;margin-top:0.3rem;">{desc}</p></div>',
+                f'<div class="section-card" style="text-align:center;min-height:150px;">'
+                f'<div style="font-size:2rem;margin-bottom:0.5rem;">{icon}</div>'
+                f'<strong style="color:#005954;font-size:0.88rem;font-family:Montserrat,sans-serif;">{title}</strong>'
+                f'<p style="font-size:0.78rem;color:#338B85;margin-top:0.4rem;line-height:1.5;">{desc}</p></div>',
                 unsafe_allow_html=True)
 
     st.markdown(
-        '<div class="tao-quote" style="max-width:680px;margin:1rem auto;">'
-        '«Somos naturaleza. Al cuidarme, facilito que la naturaleza se manifieste a través de mí.»<br>'
-        '<span style="font-size:0.82rem;color:#A67C00;">— Hua Dao (2025)</span></div>',
+        '<div class="info-box" style="max-width:700px;margin:1.2rem auto;text-align:center;">'
+        '«Cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida. '
+        'Cada práctica que sumas transforma tu espacio y contribuye a la red de '
+        'espacios regenerativos que van configurando una nueva cultura de vida.»<br>'
+        '<span style="font-size:0.8rem;color:#338B85;">— Mason, F. (2025). '
+        'Introducción al enfoque de la regeneración. LivLin.</span></div>',
         unsafe_allow_html=True)
 
     _, cb, _ = st.columns([2, 1, 2])

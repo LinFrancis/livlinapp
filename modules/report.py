@@ -230,13 +230,31 @@ def render():
             st.warning("⚠️ Completa al menos el Módulo 1 antes de exportar.")
         else:
             safe_n = data.get('proyecto_nombre','Diagnostico').replace(' ','_')
+
+            st.markdown("**Antes de descargar — Datos del informe:**")
+            facilitador = st.text_input(
+                "👤 Nombre del facilitador/a",
+                value=data.get("proyecto_facilitador",""),
+                placeholder="Nombre completo del facilitador que realizó la visita",
+                key="facilitador_dl")
+            if facilitador:
+                data["proyecto_facilitador"] = facilitador
+
+            fecha_emision = st.date_input(
+                "📅 Fecha de emisión del informe",
+                key="fecha_emision_dl")
+            if fecha_emision:
+                data["informe_fecha_emision"] = str(fecha_emision)
+
+            st.markdown("---")
+
             xlsx_bytes = generate_excel(data)
             col_xl, col_wd = st.columns(2)
             with col_xl:
                 st.download_button(
                     label="⬇️ Descargar Excel (.xlsx)",
                     data=xlsx_bytes,
-                    file_name=f"LivLin_{safe_n}.xlsx",
+                    file_name=f"LivLin_IR_{safe_n}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True,
                     type="primary",
@@ -248,11 +266,18 @@ def render():
                     st.download_button(
                         label="⬇️ Descargar Informe Word (.docx)",
                         data=docx_bytes,
-                        file_name=f"Informe_LivLin_{safe_n}.docx",
+                        file_name=f"LivLin_IR_{safe_n}.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         use_container_width=True,
                     )
                 except Exception as e:
                     st.caption(f"⚠️ Word no disponible: {e}")
             st.caption("💡 Datos guardados en Supabase. Descarga los archivos desde aquí.")
+            st.markdown(
+                '<div class="info-box">🌿 <strong>¿Quieres llevar este proceso más lejos?</strong><br>'
+                'LivLin ofrece servicios de diseño regenerativo, talleres e implementación '
+                'para transformar el potencial de este diagnóstico en realidad. '
+                '<a href="https://www.livlin.cl" target="_blank">www.livlin.cl</a> · '
+                '<em>Potencial para una vida regenerativa</em></div>',
+                unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
