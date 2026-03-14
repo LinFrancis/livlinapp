@@ -198,7 +198,7 @@ def generate_docx(data:dict)->bytes:
             import base64 as _b64
             img_bytes = _b64.b64decode(radar_b64)
             tmp_radar = "/tmp/livlin_radar.png"
-            with open(tmp_radar,"wb") as _f: _f.write(img_bytes)
+            with open(tmp_radar,"wb") as _fh: _fh.write(img_bytes)
             p_r = doc.add_paragraph(); p_r.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p_r.add_run().add_picture(tmp_radar, width=Inches(5.5))
             _p(doc,"Verde sólido = Observado hoy · Verde punteado = Con potencial adicional. "

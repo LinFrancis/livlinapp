@@ -92,8 +92,8 @@ def _add_logo(ws, row=1, col=1, size_cm=2.5):
         tmp_path = "/tmp/livlin_logo.png"
         if not os.path.exists(tmp_path):
             logo_bytes = base64.b64decode(LOGO_B64)
-            with open(tmp_path, "wb") as f_tmp:
-                f_tmp.write(logo_bytes)
+            with open(tmp_path, "wb") as _fh2:
+                _fh2.write(logo_bytes)
         _LOGO_TMP = tmp_path
         img = XLImage(tmp_path)
         px = int(size_cm * 37.8)
@@ -438,7 +438,7 @@ def generate_excel(data: dict) -> bytes:
             from openpyxl.drawing.image import Image as _XLImg
             img_bytes = base64.b64decode(radar_b64)
             tmp_radar = "/tmp/livlin_radar.png"
-            with open(tmp_radar,"wb") as _f: _f.write(img_bytes)
+            with open(tmp_radar,"wb") as _fh: _fh.write(img_bytes)
             xl_img = _XLImg(tmp_radar)
             xl_img.width = 520; xl_img.height = 320
             ws5.add_image(xl_img, ws5.cell(row=r, column=1).coordinate)
