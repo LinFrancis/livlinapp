@@ -1,4 +1,4 @@
-"""Módulo 7 — Flor de la Permacultura v3.3
+"""Módulo 7 — Flor de la Permacultura v4.0
 7 pétalos Holmgren · Navegación por botones · Sin rerun en selección · IPR.
 """
 import json

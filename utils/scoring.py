@@ -1,7 +1,7 @@
 """Lógica de puntaje regenerativo v6 — 7 pétalos oficiales Holmgren con descripciones extendidas."""
 
 FLOWER_DOMAINS = {
-    "Cultura y Educación": {
+    "Educación y Cultura": {
         "icon": "📚", "petal_num": 1, "color": "#7B61FF",
         "desc": "Educación viva, saberes locales, cultura regenerativa y transmisión intergeneracional",
         "long_desc": (
@@ -112,7 +112,7 @@ FLOWER_DOMAINS = {
              "help": "Prácticas activas de meditación, contemplación o conexión espiritual"},
         ]
     },
-    "Economía y Finanzas": {
+    "Finanzas y Economía": {
         "icon": "💚", "petal_num": 5, "color": "#2D6A4F",
         "desc": "Finanzas éticas, autosuficiencia, comercio justo y soberanía económica del grupo",
         "long_desc": (
@@ -140,7 +140,7 @@ FLOWER_DOMAINS = {
              "help": "Nivel de autoabastecimiento: alimentos, energía, agua, materiales"},
         ]
     },
-    "Tenencia de la Tierra y Comunidad": {
+    "Tenencia de la Tierra y Gobernanza Comunitaria": {
         "icon": "🤝", "petal_num": 6, "color": "#1A6B6B",
         "desc": "Gobernanza colectiva, administración de la tierra, cooperativas y resolución de conflictos",
         "long_desc": (
@@ -169,7 +169,7 @@ FLOWER_DOMAINS = {
              "help": "Registro, sistematización y compartición de aprendizajes del proceso"},
         ]
     },
-    "Manejo de la Tierra y la Naturaleza": {
+    "Administración de la Tierra y la Naturaleza": {
         "icon": "🌳", "petal_num": 7, "color": "#40916C",
         "desc": "Sistemas regenerativos: bosques comestibles, semillas, agua, agroforestería y lectura del paisaje",
         "long_desc": (
@@ -305,12 +305,12 @@ def compute_synthesis_potentials(data: dict) -> dict:
         return default or 0.0
 
     return {
-        "Producción alimentaria":  _pot("sint_pot_alimentaria",  "Manejo de la Tierra y la Naturaleza"),
-        "Biodiversidad urbana":    _pot("sint_pot_biodiversidad", "Manejo de la Tierra y la Naturaleza"),
+        "Producción alimentaria":  _pot("sint_pot_alimentaria",  "Administración de la Tierra y la Naturaleza"),
+        "Biodiversidad urbana":    _pot("sint_pot_biodiversidad", "Administración de la Tierra y la Naturaleza"),
         "Captación de agua":       _pot("sint_pot_agua",         "Herramientas y Tecnología"),
-        "Regeneración del suelo":  _pot("sint_pot_suelo",        "Manejo de la Tierra y la Naturaleza"),
-        "Educación ambiental":     _pot("sint_pot_educacion",    "Cultura y Educación"),
-        "Bienestar comunitario":   _pot("sint_pot_bienestar",    "Tenencia de la Tierra y Comunidad"),
-        "Economía regenerativa":   _pot("sint_pot_economia",     "Economía y Finanzas"),
+        "Regeneración del suelo":  _pot("sint_pot_suelo",        "Administración de la Tierra y la Naturaleza"),
+        "Educación ambiental":     _pot("sint_pot_educacion",    "Educación y Cultura"),
+        "Bienestar comunitario":   _pot("sint_pot_bienestar",    "Tenencia de la Tierra y Gobernanza Comunitaria"),
+        "Economía regenerativa":   _pot("sint_pot_economia",     "Finanzas y Economía"),
         "Bienestar interior":      _pot("sint_pot_interior",     None, wb_score),
     }

@@ -1,11 +1,11 @@
-"""Indagación Regenerativa v3.3 — LivLin · Multi-usuario · www.livlin.cl"""
+"""Indagación Regenerativa v4.0 — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin v3.3",
+    page_title="Indagación Regenerativa · LivLin v4.0",
     page_icon="🌿", layout="wide",
     initial_sidebar_state="expanded")
 
@@ -48,7 +48,7 @@ def _login_page():
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
                 # Invalidate visit cache to force reload from Drive on login
-                st.session_state.pop("_visits_cache_v3.3", None)
+                st.session_state.pop("_visits_cache_v4.0", None)
                 st.session_state.pop("_sb_status_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
@@ -62,7 +62,7 @@ def _login_page():
                 st.rerun()
             else:
                 st.error("⚠️ Usuario o contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v3.3 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v4.0 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
 
 
 def _sidebar():
@@ -196,7 +196,7 @@ def _home():
     st.markdown(
         '<div class="app-header">'
         '<h1>Indagación Regenerativa</h1>'
-        '<p>Potencial para una vida regenerativa  ·  LivLin v3.3  ·  www.livlin.cl</p>'
+        '<p>Potencial para una vida regenerativa  ·  LivLin v4.0  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
 
     _, cc, _ = st.columns([1, 3, 1])

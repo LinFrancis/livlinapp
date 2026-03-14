@@ -120,7 +120,7 @@ def render():
             st.info("Completa el Módulo 9 para ver los potenciales.")
 
         # Métricas rápidas
-        area = data.get("proyecto_area", 0)
+        area = data.get("proyecto_superficie", 0)
         m2_cult = data.get("cultivo_m2", 0)
         pct_cult = round((float(m2_cult) / float(area)) * 100) if float(area) > 0 else 0
         st.markdown(f"""
@@ -248,17 +248,20 @@ def render():
 
             st.markdown("---")
 
-            xlsx_bytes = generate_excel(data)
             col_xl, col_wd = st.columns(2)
             with col_xl:
-                st.download_button(
-                    label="⬇️ Descargar Excel (.xlsx)",
-                    data=xlsx_bytes,
-                    file_name=f"LivLin_IR_{safe_n}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True,
-                    type="primary",
-                )
+                try:
+                    xlsx_bytes = generate_excel(data)
+                    st.download_button(
+                        label="⬇️ Descargar Excel (.xlsx)",
+                        data=xlsx_bytes,
+                        file_name=f"LivLin_IR_{safe_n}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        use_container_width=True,
+                        type="primary",
+                    )
+                except Exception as e_xl:
+                    st.error(f"❌ Error generando Excel: {e_xl}")
             with col_wd:
                 try:
                     from utils.docx_generator import generate_docx
@@ -270,8 +273,8 @@ def render():
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         use_container_width=True,
                     )
-                except Exception as e:
-                    st.caption(f"⚠️ Word no disponible: {e}")
+                except Exception as e_wd:
+                    st.caption(f"⚠️ Word: {e_wd}")
             st.caption("💡 Datos guardados en Supabase. Descarga los archivos desde aquí.")
             st.markdown(
                 '<div class="info-box">🌿 <strong>¿Quieres llevar este proceso más lejos?</strong><br>'
