@@ -1,4 +1,4 @@
-"""Contenido LivLin v3.2 — 7 pétalos Holmgren + marco regenerativo.
+"""Contenido LivLin v3.3 — 7 pétalos Holmgren + marco regenerativo.
 Fuentes: Holmgren (2002, 2020), Mason (2025), Mang & Reed (2012).
 """
 

@@ -13,6 +13,16 @@ MOD  = "m9"
 ESTADOS = ["⏳ Pendiente", "🔄 En progreso", "✅ Completado", "❌ Cancelado"]
 
 # ── Descripciones de cada dimensión ──────────────────────────────────────────
+# ── Fuentes de las Dimensiones Regenerativas ─────────────────────────────────
+# Las 8 dimensiones integran marcos complementarios:
+# - Permacultura / 7 pétalos (Holmgren, 2002): Tierra, Construido, Herramientas,
+#   Educación, Salud, Economía, Gobernanza.
+# - Diseño Regenerativo (Mang & Reed, 2012): énfasis en salud ecosistémica y
+#   capital natural como resultado del diseño.
+# - Enfoque ecosocial (Mason, 2025): inclusión del bienestar interior y la
+#   dimensión espiritual como base de la acción regenerativa sostenida.
+# LivLin sintetiza estos marcos en 8 dimensiones operativas para el diagnóstico.
+
 DIM_DESC = {
     "Producción alimentaria":  "Capacidad del espacio para producir alimentos frescos — cultivos, hierbas, frutales y hortalizas que contribuyen a la soberanía alimentaria del grupo.",
     "Biodiversidad urbana":    "Diversidad de especies vegetales y animales presentes — polinizadores, aves, plantas nativas, cobertura vegetal. Un espacio rico en biodiversidad es resiliente y saludable.",

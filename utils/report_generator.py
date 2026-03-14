@@ -1,4 +1,4 @@
-"""Excel export v3.2 — LivLin Indagación Regenerativa.
+"""Excel export v3.3 — LivLin Indagación Regenerativa.
 Auto-explicativo, narrativa regenerativa alineada con Mason (2025).
 Logo LivLin embebido en portada.
 """
@@ -124,7 +124,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Título principal (col 2 en adelante para dar espacio al logo)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.2"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.3"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55
@@ -430,6 +430,24 @@ def generate_excel(data: dict) -> bytes:
                 ws5.row_dimensions[r].height=16; r+=1
         r=_sp(ws5,r,span=5)
 
+    # Radar chart image
+    radar_b64 = data.get("ipr_radar_b64","")
+    if radar_b64:
+        try:
+            import base64, io as _io
+            from openpyxl.drawing.image import Image as _XLImg
+            img_bytes = base64.b64decode(radar_b64)
+            tmp_radar = "/tmp/livlin_radar.png"
+            with open(tmp_radar,"wb") as _f: _f.write(img_bytes)
+            xl_img = _XLImg(tmp_radar)
+            xl_img.width = 520; xl_img.height = 320
+            ws5.add_image(xl_img, ws5.cell(row=r, column=1).coordinate)
+            r += 20  # space for image
+            r=_expl(ws5,r,"Gráfico radar: verde sólido = Observado hoy · verde punteado = Con potencial adicional. "
+                    "Escala 0–10 normalizada al máximo de prácticas del diagnóstico.",span=5,h=28)
+        except Exception as e:
+            r=_expl(ws5,r,f"[Gráfico radar no disponible: {e}]",span=5,h=18)
+
     dest=data.get("pot_practicas_destacadas","")
     if dest:
         r=_h(ws5,r,"✨ Prácticas más destacadas del espacio",span=5)
@@ -450,6 +468,34 @@ def generate_excel(data: dict) -> bytes:
             "motivación + transformaciones de fondo que se sostienen en generaciones (Mason, 2025).",h=45)
     r=_sp(ws6,r)
     r=_h(ws6,r,"📊 Síntesis del Diagnóstico")
+    # Source explanation
+    r=_expl(ws6,r,
+        "Las dimensiones regenerativas son un instrumento de síntesis desarrollado por LivLin "
+        "para visualizar el potencial del espacio en 8 áreas clave interconectadas, "
+        "fundamentadas en los principios de la permacultura (Holmgren, 2002), "
+        "el diseño regenerativo (Mang & Reed, 2012) y el enfoque ecosocial (Mason, 2025).",h=40)
+
+    # Dimensional scores with interpretations
+    try:
+        from utils.scoring import compute_synthesis_potentials
+        from modules.action_plan import DIM_INTERP, DIM_DESC
+        pots = compute_synthesis_potentials(data)
+        if pots:
+            r=_h(ws6,r,"Dimensiones Regenerativas — Puntaje e Interpretación",bg=C2,span=6)
+            for dim, val in pots.items():
+                level_idx = min(int(round(val)), 5)
+                interp = DIM_INTERP.get(dim, [""]*(level_idx+1))[level_idx] if dim in DIM_INTERP else ""
+                dim_desc = DIM_DESC.get(dim, "")
+                _cs(ws6,r,1,dim,bg=C4,bold=True,size=9,mc=2,border=THIN)
+                _cs(ws6,r,3,f"{val:.1f}/5",bg=C5,bold=True,size=10,ha="center",border=THIN)
+                _cs(ws6,r,5,dim_desc[:200],bg=WHITE,size=8,mc=2,wrap=True,border=BOT)
+                ws6.row_dimensions[r].height=20; r+=1
+                if interp:
+                    r=_expl(ws6,r,f"📊 {interp}",h=35)
+            r=_sp(ws6,r)
+    except Exception as e:
+        print(f"[report] dimensions: {e}")
+
     for key,lbl in [("sint_fortalezas","💚 Fortalezas — lo que ya florece"),
                     ("sint_desafios","⚡ Desafíos — obstáculos reales"),
                     ("sint_oportunidades","🌱 Oportunidades — potencial por activar"),
@@ -497,9 +543,15 @@ def generate_excel(data: dict) -> bytes:
     ws7=wb.create_sheet("🌡️ Datos Bioclimáticos")
     _wcol(ws7,[26,14,24,12,14,10])
     r=_H(ws7,1,"🌡️ Datos Bioclimáticos del Sitio")
-    r=_expl(ws7,r,"El clima es el contexto de fondo de todo diseño regenerativo. Conocer la temperatura, "
-            "precipitación y radiación solar permite diseñar sistemas de captación de agua, calcular el "
-            "potencial solar y seleccionar cultivos apropiados para el lugar. Fuente: Open-Meteo Historical API.",h=45)
+    r=_expl(ws7,r,
+        "Los datos climáticos de este informe son generados automáticamente mediante dos APIs externas:\n"
+        "1) NOMINATIM / OpenStreetMap (https://nominatim.openstreetmap.org): geocodificación — "
+        "convierte la dirección del espacio en coordenadas geográficas precisas.\n"
+        "2) OPEN-METEO Historical Weather API (https://open-meteo.com): proporciona estadísticas "
+        "climáticas históricas (promedio de los últimos 5 años disponibles) incluyendo temperatura "
+        "máxima y mínima mensual, precipitación acumulada y velocidad del viento.\n"
+        "Ambas son APIs abiertas y gratuitas sin términos comerciales. "
+        "Los datos son referenciales y deben complementarse con observación directa del sitio.",h=65)
     r=_sp(ws7,r)
     for lbl,key in [("Latitud","lat"),("Longitud","lon"),("Ciudad","proyecto_ciudad"),("Elevación","elevation")]:
         v=data.get(key,"")

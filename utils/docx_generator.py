@@ -1,4 +1,4 @@
-"""Generador Word v3.2 — LivLin Indagación Regenerativa.
+"""Generador Word v3.3 — LivLin Indagación Regenerativa.
 Narrativa regenerativa alineada con Mason (2025). Logo embebido.
 """
 import io, base64, json, tempfile
@@ -152,7 +152,7 @@ def generate_docx(data:dict)->bytes:
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
 
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v3.2  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v3.3  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
 
     doc.add_paragraph()
@@ -191,6 +191,22 @@ def generate_docx(data:dict)->bytes:
     _ipr_table(doc)
     doc.add_paragraph()
 
+    # Add radar chart if available
+    radar_b64 = data.get("ipr_radar_b64","")
+    if radar_b64:
+        try:
+            import base64 as _b64
+            img_bytes = _b64.b64decode(radar_b64)
+            tmp_radar = "/tmp/livlin_radar.png"
+            with open(tmp_radar,"wb") as _f: _f.write(img_bytes)
+            p_r = doc.add_paragraph(); p_r.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_r.add_run().add_picture(tmp_radar, width=Inches(5.5))
+            _p(doc,"Verde sólido = Observado hoy · Verde punteado = Con potencial adicional. "
+               "Escala normalizada al máximo de prácticas registradas.",
+               italic=True, color=CG, size=8)
+        except Exception as e:
+            _p(doc,f"[Gráfico no disponible: {e}]",italic=True,color=CG,size=8)
+
     if ipr_obs or ipr_new:
         _p(doc,"Resumen IPR por pétalo:",bold=True,color=C1,size=10)
         rows=[]
@@ -226,16 +242,18 @@ def generate_docx(data:dict)->bytes:
     # ── M2-3 ─────────────────────────────────────────────────────────────
     _H(doc,"2. Observación Ecológica del Sitio",1,C1,14)
     _mod_status(doc,data,"mod_sitio")
-    _box(doc,"'Observar e interactuar' — primer principio de Holmgren. Antes de diseñar, se lee el lugar: "
+    _box(doc,"'Observar e interactuar' — primer principio de Holmgren (2002). Antes de diseñar, se lee el lugar: "
          "su suelo, agua, sol, viento y biodiversidad son el texto del que emerge el diseño regenerativo.",color=C2)
     for section,fields in [
         ("Suelo",[("suelo_tipo","Tipo"),("suelo_compactacion","Compactación"),
                   ("suelo_materia_organica","Materia org."),("suelo_drenaje","Drenaje"),
                   ("suelo_color","Color"),("suelo_notas","Notas")]),
-        ("Flujos Naturales",[("sol_horas","Horas sol"),("sol_orientacion","Orientación"),
-                              ("clima_mes_caluroso","Mes cálido"),("clima_mes_frio","Mes frío"),
-                              ("clima_t_max_abs","T° máx"),("clima_t_min_abs","T° mín"),
-                              ("agua_prec_anual","Precipitación (mm)")]),
+        ("Flujos Naturales",[("sol_horas","Horas sol (estimado/medido)"),("sol_orientacion","Orientación"),
+                              ("clima_mes_caluroso","Mes cálido [Open-Meteo API]"),
+                              ("clima_mes_frio","Mes frío [Open-Meteo API]"),
+                              ("clima_t_max_abs","T° máx [Open-Meteo API]"),
+                              ("clima_t_min_abs","T° mín [Open-Meteo API]"),
+                              ("agua_prec_anual","Precipitación anual mm [Open-Meteo API]")]),
         ("Vegetación",[("veg_especies","Especies"),("veg_invasoras","Invasoras")]),
     ]:
         _H(doc,section,2,C2,11)
@@ -370,7 +388,7 @@ def generate_docx(data:dict)->bytes:
 
     # ── PIE ───────────────────────────────────────────────────────────────
     p_pie=doc.add_paragraph(); p_pie.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.2  ·  {str(datetime.now())[:10]}")
+    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.3  ·  {str(datetime.now())[:10]}")
     r_pie.font.size=Pt(8); r_pie.font.color.rgb=CG; r_pie.italic=True
 
     buf=io.BytesIO(); doc.save(buf); buf.seek(0)
