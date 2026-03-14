@@ -1,337 +1,317 @@
-"""Contenido LivLin v2.3 — fuente única de verdad narrativa.
-Alineado con: Mason, F. (2025). Introducción al enfoque de la regeneración. LivLin.
-https://doi.org/10.17605/OSF.IO/UCDEH
+"""Contenido LivLin v3.1 — 7 pétalos Holmgren + marco regenerativo.
+Fuentes: Holmgren (2002, 2020), Mason (2025), Mang & Reed (2012).
 """
 
-PETAL_ICONS = ["🌳", "🏡", "🛠️", "📚", "🧘", "💚", "🤝", "🌿"]
+# 7 pétalos oficiales de la Flor de la Permacultura (Holmgren, 2002)
+PETAL_ICONS = ["🌳", "🏡", "🛠️", "📚", "🧘", "💚", "🤝"]
 
 LIVLIN_URL     = "https://www.livlin.cl"
 LIVLIN_TAGLINE = "Potencial para una vida regenerativa"
 TOOL_NAME      = "Indagación Regenerativa"
 
 LIVLIN_DESC = (
-    "LivLin nace desde la convicción de que cada espacio urbano alberga un potencial "
-    "regenerativo que todavía no ha sido activado. Acompañamos a personas, familias y "
-    "comunidades en el proceso de transitar desde prácticas convencionales hacia un "
-    "'descenso creativo': formas de vida que usan menos energía fósil y al mismo tiempo "
-    "aumentan la salud ecosistémica del lugar que habitamos.\n\n"
-    "Nuestra metodología integra el diseño regenerativo (Mang & Reed, 2012), la Flor de la "
-    "Permacultura (Holmgren, 2020) y los principios del enfoque ecosocial para co-diseñar "
-    "con cada comunidad su ruta particular hacia una vida más conectada, autónoma y plena. "
-    "Cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida. "
-    "— Mason (2025)"
+    "LivLin acompaña procesos de transformación regenerativa de espacios urbanos, "
+    "guiando a personas, familias y comunidades hacia formas de vida más conectadas "
+    "con los ciclos naturales, más autónomas y más significativas. "
+    "A través de diagnósticos participativos, diseño regenerativo y acompañamiento "
+    "continuo, trabajamos para convertir el potencial latente de cada espacio en "
+    "prácticas concretas que mejoran la calidad de vida hoy y construyen resiliencia "
+    "para las generaciones futuras."
 )
 
 LIVLIN_SERVICES_PITCH = (
-    "Este diagnóstico es el primer paso de un proceso mayor. Con él en mano tienes claridad "
-    "sobre dónde está el potencial regenerativo de tu espacio y qué prácticas pueden "
-    "transformarlo. Algunas puedes comenzarlas hoy mismo, con tus propios recursos. "
+    "Este diagnóstico es el primer paso de un proceso mayor. Con él en mano, tienes "
+    "claridad sobre dónde está el potencial regenerativo de tu espacio y qué prácticas "
+    "pueden transformarlo. Algunas puedes comenzarlas hoy mismo con tus propios recursos. "
     "Para las transformaciones más profundas — diseño integral, bioconstrucción, sistemas "
-    "de agua, energía solar, formación comunitaria — el equipo de LivLin puede acompañarte "
-    "con servicios especializados de diseño, implementación y seguimiento. "
-    "Visítanos en www.livlin.cl · Potencial para una vida regenerativa."
+    "de captación de agua, instalaciones solares, formación comunitaria — el equipo de "
+    "LivLin puede acompañarte con servicios especializados de diseño, implementación "
+    "y seguimiento. Visítanos en www.livlin.cl"
 )
 
 LIVLIN_CLOSING = (
-    "Regenerar no es un destino, es un camino que se recorre con acciones cotidianas "
-    "persistentes y coherentes. Este diagnóstico reconoce y celebra lo que ya está "
-    "ocurriendo en tu espacio, y traza una ruta hacia lo que puede llegar a ser. "
     "Cada práctica que sumas no solo transforma tu entorno: contribuye a la red de "
-    "espacios regenerativos que van configurando una nueva cultura de vida en las ciudades.\n\n"
+    "espacios regenerativos que van configurando nuevas formas de habitar la ciudad. "
+    "El camino regenerativo es un proceso gradual, persistente y colectivo. "
     "LivLin te acompaña en ese proceso.\n"
     "www.livlin.cl · Potencial para una vida regenerativa."
 )
 
 REGENERATION_FRAMEWORK = (
-    "La Indagación Regenerativa se inscribe en el enfoque del descenso creativo propuesto por "
-    "David Holmgren (2020): asumir que existen límites planetarios y que el desafío no es "
-    "evitarlos, sino aprender a vivir bien dentro de ellos, reduciendo dependencia de energías "
-    "fósiles mientras se regenera la base ecológica. Este diagnóstico mapea dónde está tu espacio "
-    "en esa transición y qué pasos concretos pueden llevarlo más lejos."
+    "La permacultura propone el 'diseño consciente de paisajes que imitan los patrones "
+    "y relaciones de la naturaleza, mientras suministran alimento, fibras y energía "
+    "para satisfacer las necesidades locales' (Holmgren, 2002). En contextos urbanos, "
+    "este enfoque abre posibilidades extraordinarias: transformar patios, terrazas y "
+    "espacios comunitarios en sistemas productivos que regeneran suelo, conservan agua "
+    "y fortalecen los vínculos entre las personas y su entorno."
 )
 
 LIVLIN_MODULES = [
     ("📋 M1 · Intención y Contexto",
-     "Explora la motivación regenerativa del espacio: el sueño que mueve a quienes lo habitan "
-     "y su percepción de la triple crisis planetaria (cambio climático, pérdida de biodiversidad, "
-     "contaminación). Define el horizonte de sentido que guiará el proceso de transformación."),
-    ("🌍 M2-3 · Observación Ecológica del Sitio",
-     "Lectura del lugar desde los principios de la permacultura: suelo, agua, sol, viento, "
-     "vegetación y fauna. 'Observar e interactuar' es el primer principio de Holmgren: el "
-     "diagnóstico comienza por conocer profundamente el sitio antes de diseñar cualquier intervención."),
+     "Registra los datos del espacio y explora la motivación regenerativa de quienes "
+     "lo habitan. Define el horizonte de sentido que guiará todo el proceso."),
+    ("🌍 M2-3 · Observación Ecológica",
+     "'Observar e interactuar' — primer principio de Holmgren. Lee el sitio antes de "
+     "diseñar: suelo, agua, sol, viento, vegetación y fauna son el punto de partida."),
     ("🏙️ M4-6 · Sistemas del Espacio",
-     "Análisis de los flujos vitales: ¿de dónde viene el agua y adónde va? ¿Cómo se genera y "
-     "consume la energía? ¿Qué ocurre con los materiales y residuos? Identificar y cerrar estos "
-     "ciclos es la base de la autonomía regenerativa."),
-    ("🌸 M7 · Flor de la Permacultura — IPR",
-     "Corazón del diagnóstico: mapa de prácticas activas (Observado) y potencial adicional "
-     "identificado por el facilitador tras la visita. Genera el Índice de Potencial Regenerativo "
-     "(IPR) organizado en los 8 pétalos de Holmgren, con radar visual Observado vs Potencial."),
+     "Analiza los flujos vitales: agua, energía y materiales. Identificar y cerrar "
+     "estos ciclos es la base de la autonomía regenerativa del espacio."),
+    ("🌸 M7 · Flor de la Permacultura",
+     "Registro de prácticas activas (Observado) y potencial adicional (Potencial) "
+     "en los 7 pétalos de Holmgren. Genera el Índice de Potencial Regenerativo (IPR)."),
     ("🗺️ M9 · Síntesis y Plan de Acción",
-     "Integración de todos los hallazgos en una hoja de ruta concreta. Plan de acción en 3 "
-     "horizontes: inmediato (0-3 meses), estacional (3-12 meses) y estructural (1-5 años), "
-     "siguiendo la lógica del descenso creativo: pequeñas acciones cotidianas + transformaciones "
-     "de fondo que se sostienen en el tiempo."),
+     "Hoja de ruta en 3 horizontes: acciones inmediatas (0-3 meses), estacionales "
+     "(3-12 meses) y estructurales (1-5 años)."),
     ("📷 Registro Fotográfico",
-     "Documentación visual del espacio por categorías. Las fotos quedan registradas "
-     "permanentemente en el diagnóstico y pueden descargarse como galería."),
+     "Documentación visual del espacio por categorías. "
+     "Las fotos se almacenan permanentemente en la base de datos del diagnóstico."),
 ]
 
+# 7 pétalos oficiales — Holmgren (2002), adaptados al contexto urbano
 PETAL_DESC = {
-    "Manejo de la tierra y la naturaleza (urbano)": {
+    "Administración de la Tierra y la Naturaleza": {
+        "holmgren_name": "Land & Nature Stewardship",
+        "subtitulo": "Agricultura urbana · suelo vivo · biodiversidad · agua",
         "resumen": (
-            "El pétalo central de la permacultura urbana: aprender a co-diseñar con los procesos "
-            "naturales para producir alimentos, regenerar suelos vivos y restaurar biodiversidad "
-            "en el tejido urbano. Transitar del extractivismo al cuidado activo del territorio."
+            "Punto de partida de la permacultura: diseñar sistemas productivos que "
+            "imitan los patrones naturales. En el contexto urbano incluye huertos, "
+            "compostaje, captación de agua lluvia y creación de hábitat para fauna "
+            "benéfica. Históricamente es el pétalo central de la práctica permacultural "
+            "(Holmgren, 2002; Mollison, 1988)."
         ),
         "detalle": (
-            "Este pétalo reconoce que incluso en contextos urbanos densificados es posible "
-            "crear sistemas alimentarios locales que cierren ciclos: el compost transforma "
-            "residuos en suelo vivo, el huerto produce alimentos frescos sin depender de "
-            "cadenas industriales, la captación de lluvia reduce la presión sobre redes de "
-            "agua potable, y los corredores de polinizadores devuelven biodiversidad al barrio. "
-            "Cada práctica en este pétalo es un acto concreto de descenso creativo: más salud "
-            "ecosistémica, menos dependencia del modelo extractivo."
+            "Este pétalo reconoce que incluso en los entornos urbanos más densos es "
+            "posible crear sistemas alimentarios locales y regenerar la base ecológica. "
+            "El compostaje doméstico convierte residuos orgánicos en suelo vivo; los "
+            "huertos en macetas, balcones y patios producen alimentos frescos sin "
+            "cadenas industriales; la captación de lluvia reduce la dependencia de "
+            "la red de agua potable. Cada práctica en este pétalo acerca el espacio "
+            "al ideal de la 'cultura permanente': un sistema que se sostiene y mejora "
+            "con el tiempo (Holmgren, 2002)."
         ),
         "referencias": [
-            ("Holmgren, D. (2020)", "Permacultura: Principios y senderos. Kaicron", "https://permacultureprinciples.com/es/"),
-            ("Holmgren — Principios (EN)", "Permaculture Principles & Pathways", "https://permacultureprinciples.com/"),
-            ("Hemenway, T. (2009)", "Gaia's Garden: A Guide to Home-Scale Permaculture", "https://www.chelseagreen.com"),
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos más allá de la sustentabilidad", "https://permacultureprinciples.com/es/"),
+            ("Mollison, B. (1988)", "Permaculture: A Designers' Manual. Tagari Publications", "https://www.permaculturenews.org"),
             ("Lawton, G.", "Introducción a la Permacultura (video)", "https://youtu.be/-5N9Q8KtB5w"),
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
         ],
     },
-    "Ambiente construido": {
+    "Entorno Construido": {
+        "holmgren_name": "Built Environment",
+        "subtitulo": "Bioconstrucción · diseño bioclimático · espacios regenerativos",
         "resumen": (
-            "El diseño de edificaciones e infraestructuras con criterios bioclimáticos y bajo "
-            "impacto. Las decisiones sobre cómo construimos y habitamos nuestros espacios "
-            "determinan décadas de consumo energético y calidad de vida."
+            "El diseño del entorno construido con criterios bioclimáticos y bajo impacto "
+            "ambiental. Las decisiones sobre cómo construimos y habitamos nuestros "
+            "espacios determinan décadas de consumo energético y calidad de vida "
+            "(Holmgren, 2002; Reed & Moff, 2007)."
         ),
         "detalle": (
-            "El ambiente construido representa la mayor huella material de nuestra vida cotidiana. "
-            "La bioconstrucción, el diseño solar pasivo, el uso de materiales naturales y locales, "
-            "y la integración de naturaleza en los edificios (techos verdes, muros vivos, jardines "
-            "interiores) transforman los edificios de consumidores de energía en sistemas que "
-            "colaboran con los ciclos naturales. Desde una lógica regenerativa (Wahl, 2020), "
-            "el espacio construido no solo 'reduce daño' sino que puede aumentar activamente "
-            "la salud ecosistémica: captar agua, generar alimento, crear hábitat y fortalecer "
-            "el bienestar de quienes lo habitan."
+            "Desde el diseño solar pasivo que reduce la necesidad de calefacción y "
+            "refrigeración artificial, hasta el uso de materiales naturales locales y "
+            "la integración de vegetación en los edificios (techos y muros verdes, "
+            "jardines interiores), este pétalo transforma los edificios de consumidores "
+            "de energía en sistemas que colaboran con los ciclos naturales. Pequeñas "
+            "intervenciones — una pérgola verde, aislación natural, una ventana orientada "
+            "al norte — pueden tener un impacto significativo en el bienestar y el "
+            "consumo energético del espacio (Minke, 2006)."
         ),
         "referencias": [
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
             ("Reed, B. & Moff, S. (2007)", "Regenerative Development and Design. Wiley", "https://youtu.be/pBuN9CtUVAw"),
-            ("Wahl, D.C. (2020)", "Diseñando culturas regenerativas (video)", "https://youtu.be/drY0L-wAop8"),
-            ("Minke, G. (2006)", "Building with Earth. Birkhäuser", "https://birkhauser.com"),
-            ("Living Future Institute", "Living Building Challenge Standard", "https://living-future.org"),
+            ("Minke, G. (2006)", "Building with Earth: Design and Technology. Birkhäuser", "https://birkhauser.com"),
         ],
     },
-    "Herramientas y tecnologías apropiadas": {
+    "Herramientas y Tecnología": {
+        "holmgren_name": "Tools & Technology",
+        "subtitulo": "Energía renovable · tecnología simple · movilidad sostenible",
         "resumen": (
-            "La tecnología apropiada no es la más sofisticada, sino la más adecuada al contexto: "
-            "accesible, reparable localmente, de bajo impacto y que fortalece la autonomía. "
-            "Priorizar herramientas que sirven a la vida, no al crecimiento ilimitado."
+            "La selección crítica de herramientas y tecnologías que sirven a las personas "
+            "y al ecosistema. La tecnología apropiada no es la más sofisticada, sino la "
+            "más adecuada al contexto: accesible, reparable y de bajo impacto "
+            "(Holmgren, 2002; Schumacher, 1973)."
         ),
         "detalle": (
-            "Este pétalo encarna la diferencia entre tecnología verde — que mantiene intacto "
-            "el modelo de consumo, solo cambiando la fuente de energía — y tecnología apropiada, "
-            "que transforma los patrones de vida hacia el descenso creativo (Mason, 2025). "
-            "Un calentador solar que reemplaza el gas, un biodigestor que convierte residuos en "
-            "gas de cocina y abono, un sistema de riego por goteo que usa el 30% del agua "
-            "convencional: estas herramientas reducen dependencias externas y aumentan la "
-            "resiliencia del espacio. La clave es que sean comprensibles, reparables y "
-            "transferibles entre vecinos."
+            "Paneles solares, calentadores solares de agua, biodigestores, sistemas de "
+            "riego por goteo casero, la bicicleta como transporte cotidiano: estas "
+            "herramientas reducen dependencias externas y aumentan la resiliencia del "
+            "espacio. El principio clave es que sean comprensibles, reparables localmente "
+            "y transferibles entre vecinos. Holmgren (2002) distingue entre la tecnología "
+            "que refuerza la autonomía local y la que la debilita, independientemente de "
+            "su complejidad o fuente energética."
         ),
         "referencias": [
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
             ("Schumacher, E.F. (1973)", "Small is Beautiful: Economics as if People Mattered", "https://www.schumachercollege.org.uk"),
-            ("Practical Action", "Technology Challenging Poverty", "https://practicalaction.org"),
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
+            ("Practical Action", "Technology Challenging Poverty — recursos técnicos", "https://practicalaction.org"),
         ],
     },
-    "Educación y cultura": {
+    "Educación y Cultura": {
+        "holmgren_name": "Culture & Education",
+        "subtitulo": "Saberes locales · arte comunitario · redes de conocimiento",
         "resumen": (
-            "Sin cultura regenerativa, las técnicas no persisten. Compartir saberes, "
-            "crear arte, intercambiar semillas y fortalecer redes locales de conocimiento "
-            "son actos tan transformadores como cualquier instalación técnica."
+            "Transmisión de saberes, valores y prácticas que sostienen culturas "
+            "regenerativas. Para Holmgren (2002), sin transformación cultural "
+            "los cambios técnicos no persisten: la permacultura es tanto un sistema "
+            "de diseño como un movimiento de cambio cultural."
         ),
         "detalle": (
-            "La cultura es el sistema operativo de cualquier cambio social duradero. "
-            "Como señala Mason (2025), la transformación hacia la regeneración requiere "
-            "'cambiar la mentalidad: de ver cosas a ver sistemas vivos'. Este pétalo "
-            "cultiva esa capacidad: talleres de agroecología, intercambio de semillas, "
-            "festivales comunitarios, mentorías entre vecinos y redes de conocimiento local "
-            "son las semillas de una nueva cultura que hace del cuidado ecosistémico una "
-            "práctica cotidiana y celebrada, no una carga. Cada acción educativa es "
-            "también una acción de regeneración cultural."
+            "Este pétalo reconoce que compartir saberes — un taller de compostaje, "
+            "un intercambio de semillas, una jornada de construcción colectiva — "
+            "tiene un impacto transformador comparable a cualquier instalación técnica. "
+            "Las redes de educación entre pares y los espacios de intercambio "
+            "intercultural generan la base cultural sobre la que se sostienen todas "
+            "las demás prácticas regenerativas. El arte, la música y las celebraciones "
+            "comunitarias también son parte de este pétalo: son la expresión viva de "
+            "una cultura que valora la vida y la naturaleza (Holmgren, 2002)."
         ),
         "referencias": [
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
-            ("Wahl, D.C.", "Diseñar para la regeneración y la salud planetaria (video)", "https://youtu.be/drY0L-wAop8"),
-            ("Transition Network", "Manual de Transición — Recursos para comunidades", "https://transitionnetwork.org"),
-            ("Holmgren — Principios ES", "Principios de Permacultura en español", "https://permacultureprinciples.com/es/"),
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+            ("Capra, F.", "Visión sistémica de la vida (video)", "https://youtu.be/O33uA_9kj4U"),
+            ("Transition Network", "Manual de Transición — recursos para comunidades", "https://transitionnetwork.org"),
         ],
     },
-    "Salud y bienestar": {
+    "Salud y Bienestar Espiritual": {
+        "holmgren_name": "Health & Spiritual Wellbeing",
+        "subtitulo": "Alimentación viva · plantas medicinales · bienestar integral",
         "resumen": (
-            "La salud regenerativa integra cuerpo, mente, comunidad y ecosistema. "
-            "Cultivar plantas medicinales, cocinar alimentos frescos, crear espacios "
-            "de contemplación y fortalecer el bienestar colectivo son prácticas de salud "
-            "que no dependen del sistema médico industrial."
+            "Sistemas de salud preventivos basados en alimentación viva, movimiento, "
+            "plantas medicinales y comunidad. Holmgren (2002) incluye el bienestar "
+            "espiritual como dimensión esencial: la salud regenerativa integra cuerpo, "
+            "mente, comunidad y ecosistema."
         ),
         "detalle": (
-            "Regenerar la salud implica sanar la desconexión entre seres humanos y naturaleza "
-            "que describe Mason (2025): 'una reconciliación que habilita comprender a la "
-            "naturaleza como algo que se manifiesta en patrones'. La jardinería terapéutica, "
-            "los baños de naturaleza urbanos, el consumo de alimentos cultivados propios y las "
-            "redes de cuidado comunitario no son lujos: son la base de una salud que no depende "
-            "de la cadena farmacéutica ni alimentaria industrial. Cada práctica en este pétalo "
-            "reduce huella ecológica y aumenta calidad de vida simultáneamente."
+            "Cultivar plantas medicinales, cocinar con alimentos frescos de producción "
+            "propia, crear espacios de contemplación en el jardín, participar en "
+            "comunidades de cuidado mutuo: estas prácticas construyen salud de manera "
+            "preventiva y reduce la dependencia de cadenas farmacéuticas y alimentarias "
+            "industriales. La investigación en ecoterapia confirma que el contacto "
+            "regular con entornos naturales reduce el estrés y mejora el bienestar "
+            "integral. La jardinería terapéutica es reconocida en este pétalo como "
+            "una práctica con doble beneficio: produce alimentos y nutre la salud "
+            "mental (Holmgren, 2002)."
         ),
         "referencias": [
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
             ("IPES-Food (2017)", "Too big to feed: Exploring the impacts of mega-mergers", "https://www.ipes-food.org"),
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
-            ("Holmgren, D. (2020)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+            ("Wahl, D.C.", "Diseñar para la regeneración y la salud planetaria (video)", "https://youtu.be/drY0L-wAop8"),
         ],
     },
-    "Economía y finanzas": {
+    "Finanzas y Economía": {
+        "holmgren_name": "Finances & Economics",
+        "subtitulo": "Mercados locales · economías solidarias · soberanía alimentaria",
         "resumen": (
-            "Economías que circulan la riqueza localmente: mercados agroecológicos, cooperativas, "
-            "trueque, monedas locales y finanzas éticas. La soberanía económica es parte "
-            "inseparable de la soberanía alimentaria y ecosistémica."
+            "Sistemas económicos que mantienen la riqueza circulando localmente: "
+            "mercados agroecológicos, cooperativas, trueque y finanzas éticas. "
+            "Para Holmgren (2002), la soberanía económica es inseparable de "
+            "la soberanía alimentaria y ecosistémica."
         ),
         "detalle": (
-            "Desde la lógica del descenso creativo (Holmgren, 2020; Mason, 2025), las economías "
-            "locales y solidarias son una respuesta concreta a la sobrecarga: reducen la dependencia "
-            "de cadenas de valor largas y extractivas, mantienen la riqueza circulando en el "
-            "territorio y fortalecen los vínculos comunitarios. Comprar directamente a productores "
-            "locales, participar en cooperativas de consumo o crear un banco de tiempo son "
-            "prácticas que transforman la economía desde abajo, construyendo resiliencia "
-            "ante crisis sistémicas. No es solo una decisión económica: es una declaración "
-            "de valores sobre qué tipo de futuro se quiere construir."
+            "Las economías solidarias y locales crean circuitos cortos donde la "
+            "riqueza generada permanece en la comunidad en lugar de extractarse hacia "
+            "sistemas globales. Comprar directamente a productores locales, participar "
+            "en cooperativas de consumo, crear bancos de tiempo o usar monedas "
+            "comunitarias son prácticas que fortalecen la resiliencia económica del "
+            "territorio. Este pétalo también incluye la 'contabilidad de la emergía' "
+            "y las inversiones éticas que el propio diagrama de Holmgren menciona: "
+            "herramientas para valorar el capital natural, no solo el financiero "
+            "(Holmgren, 2002; Raworth, 2017)."
         ),
         "referencias": [
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
             ("Raworth, K. (2017)", "Doughnut Economics: 7 Ways to Think Like a 21st-Century Economist", "https://doughnuteconomics.org"),
-            ("Gibson-Graham (2006)", "A Postcapitalist Politics. Univ. of Minnesota Press", "https://www.upress.umn.edu"),
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
+            ("P2P Foundation", "Commons Economy — recursos y casos", "https://p2pfoundation.net"),
         ],
     },
-    "Tenencia de la tierra y gobernanza": {
+    "Tenencia de la Tierra y Gobernanza Comunitaria": {
+        "holmgren_name": "Land Tenure & Community Governance",
+        "subtitulo": "Uso colectivo del territorio · participación comunitaria",
         "resumen": (
-            "Marcos comunitarios para el acceso y cuidado colectivo de la tierra. "
-            "Co-diseñar con la comunidad y con el lugar — no para ella — es una de las "
-            "premisas centrales del diseño regenerativo."
+            "Marcos legales y comunitarios para el acceso y cuidado colectivo de la "
+            "tierra. Holmgren (2002) incluye este pétalo como condición estructural: "
+            "sin acuerdos sobre el uso del territorio, las demás prácticas no tienen "
+            "base estable donde arraigarse."
         ),
         "detalle": (
-            "Como señala Mason (2025), una premisa clave del diseño regenerativo es "
-            "'asumir nuevos roles: co-diseñar con la comunidad y con el lugar'. Esto implica "
-            "transformar el rol del experto en facilitador, y el de los habitantes en "
-            "diseñadores activos de su territorio. Los huertos comunitarios, las asambleas "
-            "barriales, los fideicomisos de tierra y la participación en planificación urbana "
-            "no son solo instrumentos técnicos: son la forma en que una comunidad se "
-            "apropia de su territorio y construye las condiciones para que 'quienes vengan "
-            "después encuentren un territorio con más opciones, más resiliencia y más "
-            "posibilidades de florecer'."
+            "Los huertos comunitarios, las asambleas barriales, los fideicomisos de "
+            "tierra comunitaria (Community Land Trusts) y la participación en "
+            "planificación urbana son herramientas concretas para democratizar el "
+            "acceso a la tierra en contextos urbanos. La resolución colaborativa de "
+            "conflictos y los modelos de co-vivienda (co-housing) también forman parte "
+            "de este pétalo. Ostrom (1990) demostró que las comunidades pueden "
+            "gestionar recursos colectivos de manera efectiva y sostenible cuando "
+            "tienen marcos institucionales adecuados — una evidencia fundamental "
+            "para la gobernanza regenerativa (Holmgren, 2002; Ostrom, 1990)."
         ),
         "referencias": [
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
             ("Ostrom, E. (1990)", "Governing the Commons. Cambridge University Press", "https://wtf.tw/ref/ostrom_1990.pdf"),
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
-            ("Community Land Trust Network", "Guías y casos de fideicomisos de tierra", "https://www.communitylandtrusts.org.uk"),
-        ],
-    },
-    "Prácticas cotidianas de sustentabilidad": {
-        "resumen": (
-            "Las decisiones cotidianas que, persistentes y coherentes, acumulan impacto "
-            "sistémico. Como dice Mason (2025): 'incluso las acciones más pequeñas dejan de "
-            "ser irrelevantes y se convierten en parte de una respuesta colectiva y esperanzadora'."
-        ),
-        "detalle": (
-            "Este pétalo honra la sabiduría de Mason (2025): 'la épica ya no reside en imaginar "
-            "una única gran solución tecnológica, sino en la persistencia de decisiones "
-            "cotidianas que abren camino a nuevas formas de co-habitar los territorios'. "
-            "Apagar luces, reparar antes de comprar, compostar, compartir herramientas, "
-            "conectar con vecinos: cada acto individual, multiplicado por miles de personas "
-            "y sostenido en el tiempo, 'rompe patrones culturales degenerativos y genera "
-            "coherencia ética'. El cambio de cultura comienza aquí, en lo cotidiano, "
-            "en cada decisión que elige la vida."
-        ),
-        "referencias": [
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
-            ("Holmgren, D. (2020)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-            ("Shove, E. (2003)", "Comfort, Cleanliness and Convenience. Berg Publishers", "https://www.bergpublishers.com"),
-            ("Ellen MacArthur Foundation", "Economía circular — recursos y casos", "https://ellenmacarthurfoundation.org"),
+            ("Community Land Trust Network", "Fideicomisos de tierra comunitaria", "https://www.communitylandtrusts.org.uk"),
         ],
     },
 }
 
 IPR_SCALE = [
-    ("○ Sin inicio",   "0",   "#9E9E9E",
-     "Este pétalo aún no tiene prácticas activas. Gran potencial latente esperando ser "
-     "activado. Todo camino comienza aquí."),
-    ("🌱 Iniciando",   "1",   "#40916C",
-     "El primer paso ya está dado. En el enfoque regenerativo, una primera práctica es "
-     "el acto más importante: rompe el patrón y abre el camino."),
-    ("🌿 Avanzando",   "2",   "#2D6A4F",
-     "Dos prácticas activas muestran intención sostenida. El sistema empieza a tomar "
-     "forma y a generar sus primeros frutos concretos."),
-    ("🌳 Consolidado", "3",   "#1B4332",
-     "Sistema estable que genera rendimientos constantes. La práctica regenerativa "
-     "es parte del modo habitual de vida del espacio."),
-    ("🌸 Destacado",   "4–5", "#004540",
-     "Alta integración entre prácticas. El espacio genera abundancia e inspira a "
-     "otros en la comunidad. Es un nodo de aprendizaje y cuidado mutuo."),
-    ("✨ Referente",   "6+",  "#002E2B",
-     "Sistema autónomo, resiliente y capaz de compartir excedentes con la comunidad. "
-     "Modelo vivo de descenso creativo y regeneración urbana."),
+    ("Sin inicio",   "0",   "#9E9E9E",
+     "Este pétalo aún no tiene prácticas activas. Gran potencial latente — todo camino comienza aquí."),
+    ("🌱 Iniciando",   "1",   "#74C69D",
+     "El primer paso ya está dado. En la permacultura, una primera práctica activa es el acto más importante."),
+    ("🌿 Avanzando",   "2",   "#52B788",
+     "Dos prácticas muestran intención sostenida. El sistema empieza a tomar forma y generar sus primeros resultados."),
+    ("🌳 Consolidado", "3",   "#40916C",
+     "Sistema estable con rendimientos constantes. La práctica regenerativa es parte del modo habitual del espacio."),
+    ("🌸 Destacado",   "4–5", "#2D6A4F",
+     "Alta integración entre prácticas. El espacio genera abundancia y puede compartir con la comunidad."),
+    ("✨ Referente",   "6+",  "#1B4332",
+     "Sistema autónomo y resiliente, capaz de compartir excedentes. Modelo de transformación regenerativa urbana."),
 ]
 
 IPR_WHAT_IS = (
     "El Índice de Potencial Regenerativo (IPR) mide la diversidad de prácticas regenerativas "
-    "activas en un espacio, organizadas según los 8 pétalos de la Flor de la Permacultura "
-    "(Holmgren, 2020). No es un puntaje punitivo: celebra cada práctica existente como un "
-    "logro real. El IPR no pregunta '¿cuánto falta?' sino '¿qué ya está floreciendo aquí "
-    "y qué más podría despertar?'"
+    "activas en un espacio, organizadas según los 7 pétalos de la Flor de la Permacultura "
+    "(Holmgren, 2002). El IPR no es un puntaje punitivo: celebra cada práctica existente "
+    "como un logro real. La pregunta no es '¿cuánto falta?' sino '¿qué ya está floreciendo "
+    "aquí y qué más podría despertar?'"
 )
 
 IPR_OBS_VS_POT = (
-    "OBSERVADO: prácticas que ya existen y funcionan en el espacio hoy — reconocimiento "
-    "y celebración de lo que ya está ocurriendo. "
-    "POTENCIAL ADICIONAL: nuevas prácticas concretas y viables identificadas por el "
-    "facilitador tras la visita diagnóstica, basándose en las condiciones reales del espacio. "
-    "El potencial no requiere re-ingresar lo observado: solo suma lo nuevo, lo que aún "
-    "duerme y puede despertar."
+    "OBSERVADO: prácticas que ya existen y funcionan en el espacio hoy. "
+    "POTENCIAL ADICIONAL: nuevas prácticas concretas y viables identificadas "
+    "por el facilitador tras la visita diagnóstica. El potencial no requiere "
+    "re-ingresar lo ya observado — solo suma lo nuevo, lo que puede activarse."
 )
 
-GLOBAL_REFS = [
-    ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. Material de apoyo para la docencia regenerativa. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
-    ("Mason, F. (2025)", "Documento en Google Drive", "https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing"),
-    ("Holmgren, D. (2020)", "Permacultura: Principios y senderos (español)", "https://permacultureprinciples.com/es/"),
-    ("Holmgren, D. (2020)", "Permaculture Principles (English)", "https://permacultureprinciples.com/"),
-    ("Lawton, G.", "Introducción a la Permacultura (video)", "https://youtu.be/-5N9Q8KtB5w"),
-    ("Capra, F.", "Visión sistémica de la vida (video)", "https://youtu.be/O33uA_9kj4U"),
-    ("Reed, B.", "Desarrollo y Diseño Regenerativo (video, subtítulos)", "https://youtu.be/pBuN9CtUVAw"),
-    ("Wahl, D.C.", "Diseñar para la regeneración y la salud planetaria (video, subtítulos)", "https://youtu.be/drY0L-wAop8"),
-    ("AEMET/YouTube", "La diferencia entre clima y el tiempo", "https://www.youtube.com/watch?v=emPKer_pV14"),
-    ("Elementos climáticos", "Elementos y factores climáticos (video)", "https://www.youtube.com/watch?v=fQmHwUqX91E"),
-    ("YouTube", "Clima y Permacultura — búsqueda de recursos", "https://www.youtube.com/results?search_query=clima+permacultura"),
-    ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework. Building Research & Information", "https://doi.org/10.1080/09613218.2012.62134"),
-    ("Wahl, D.C. (2020)", "Diseñando culturas regenerativas", "https://medium.com/age-of-awareness/la-sostenibilidad-ya-no-es-suficiente"),
-    ("Ostrom, E. (1990)", "Governing the Commons. Cambridge University Press", "https://wtf.tw/ref/ostrom_1990.pdf"),
-    ("Raworth, K. (2017)", "Doughnut Economics. Chelsea Green Publishing", "https://doughnuteconomics.org"),
-    ("LivLin", "Potencial para una vida regenerativa", "https://www.livlin.cl"),
-]
-
 TAO_REFLEXION_SHORT = (
-    "«La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando aprendemos "
-    "a cooperar con ella. No se trata de salvar la naturaleza como si fuera algo externo a nosotros. "
-    "Somos naturaleza. Cuando cuidamos nuestra propia vida, también estamos cuidando la red de vida "
-    "de la cual formamos parte. Por eso el camino regenerativo también es un camino interior. "
-    "Mente abierta. Corazón abierto. Voluntad abierta. Como enseña el Tao, el agua transforma "
-    "la roca no por violencia, sino por persistencia.»"
+    "«La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando "
+    "aprendemos a cooperar con ella. No se trata de salvar la naturaleza como si fuera "
+    "algo externo a nosotros — somos naturaleza. Cuando cuidamos nuestra propia vida, "
+    "también cuidamos la red de vida de la cual formamos parte. Por eso el camino "
+    "regenerativo también es un camino interior: mente abierta, corazón abierto, "
+    "voluntad abierta. Como enseña el Tao, el agua transforma la roca no por violencia, "
+    "sino por persistencia.»"
 )
 
 TAO_INVITACION = (
-    "Este diagnóstico es solo un momento dentro de un proceso mucho más amplio. "
-    "Cada espacio tiene su propio ritmo de transformación. A veces la regeneración "
-    "comienza con algo pequeño: un huerto, un sistema de compostaje, una conversación comunitaria. "
-    "Lo importante es seguir caminando. Cuando muchas personas comienzan a escuchar ese mismo "
-    "pulso de vida, los territorios cambian. Y con ellos, también cambia nuestra forma de habitar "
-    "el mundo. 🌱 — www.livlin.cl"
+    "Este diagnóstico es un momento dentro de un proceso más amplio. Cada espacio tiene "
+    "su propio ritmo de transformación — a veces comienza con algo pequeño: un huerto, "
+    "un compostador, una conversación entre vecinos. Lo importante es seguir caminando. "
+    "Cuando muchas personas comienzan a escuchar ese mismo pulso de vida, "
+    "los territorios cambian. www.livlin.cl · Potencial para una vida regenerativa. 🌱"
 )
+
+GLOBAL_REFS = [
+    ("Holmgren, D. (2002)", "Permacultura: Principios y senderos más allá de la sustentabilidad. Kaicron", "https://permacultureprinciples.com/es/"),
+    ("Holmgren, D. (2002)", "Permaculture Principles and Pathways (English)", "https://permacultureprinciples.com/"),
+    ("Mollison, B. (1988)", "Permaculture: A Designers' Manual. Tagari Publications", "https://www.permaculturenews.org"),
+    ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework. Building Research & Information", "https://doi.org/10.1080/09613218.2012.62134"),
+    ("Ostrom, E. (1990)", "Governing the Commons. Cambridge University Press", "https://wtf.tw/ref/ostrom_1990.pdf"),
+    ("Raworth, K. (2017)", "Doughnut Economics. Chelsea Green Publishing", "https://doughnuteconomics.org"),
+    ("Schumacher, E.F. (1973)", "Small is Beautiful: Economics as if People Mattered", "https://www.schumachercollege.org.uk"),
+    ("IPES-Food (2017)", "Too big to feed: Exploring the impacts of mega-mergers", "https://www.ipes-food.org"),
+    ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin", "https://doi.org/10.17605/OSF.IO/UCDEH"),
+    ("Mason, F. (2025)", "Texto completo disponible en Google Drive", "https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing"),
+    ("Lawton, G.", "Introducción a la Permacultura (video)", "https://youtu.be/-5N9Q8KtB5w"),
+    ("Capra, F.", "Visión sistémica de la vida (video)", "https://youtu.be/O33uA_9kj4U"),
+    ("Reed, B.", "Desarrollo y Diseño Regenerativo (video)", "https://youtu.be/pBuN9CtUVAw"),
+    ("Wahl, D.C.", "Diseñar para la regeneración (video)", "https://youtu.be/drY0L-wAop8"),
+    ("Recursos climáticos", "Clima y Permacultura — videos", "https://www.youtube.com/results?search_query=clima+permacultura"),
+    ("LivLin", "Potencial para una vida regenerativa", "https://www.livlin.cl"),
+]

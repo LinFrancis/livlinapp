@@ -1,4 +1,4 @@
-streamlit>=1.32.0
+streamlit>=1.32.0,<1.45.0
 openpyxl>=3.1.2
 plotly>=5.18.0
 pandas>=2.0.0
@@ -6,7 +6,6 @@ requests>=2.31.0
 python-docx>=1.1.0
 
 # Supabase — base de datos principal + almacenamiento de fotos
-supabase>=2.3.0
 
 # Google Drive — opcional, solo si se configura para backup adicional
 google-auth>=2.28.0

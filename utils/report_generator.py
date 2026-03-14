@@ -1,4 +1,4 @@
-"""Excel export v3.0 — LivLin Indagación Regenerativa.
+"""Excel export v3.1 — LivLin Indagación Regenerativa.
 Auto-explicativo, narrativa regenerativa alineada con Mason (2025).
 Logo LivLin embebido en portada.
 """
@@ -81,20 +81,28 @@ def _load_petalos():
         with open(jf,encoding="utf-8") as f: return json.load(f)["petalos"]
     except: return []
 
+_LOGO_TMP = None
+
 def _add_logo(ws, row=1, col=1, size_cm=2.5):
-    """Add LivLin logo to worksheet."""
+    """Add LivLin logo to worksheet. Uses /tmp/livlin_logo.png for cloud compatibility."""
+    global _LOGO_TMP
     try:
         from utils.logo_b64 import LOGO_B64
-        logo_bytes = base64.b64decode(LOGO_B64)
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-            tmp.write(logo_bytes); tmp_path = tmp.name
+        import os
+        tmp_path = "/tmp/livlin_logo.png"
+        if not os.path.exists(tmp_path):
+            logo_bytes = base64.b64decode(LOGO_B64)
+            with open(tmp_path, "wb") as f_tmp:
+                f_tmp.write(logo_bytes)
+        _LOGO_TMP = tmp_path
         img = XLImage(tmp_path)
         px = int(size_cm * 37.8)
         img.width = px; img.height = px
         ws.add_image(img, ws.cell(row=row, column=col).coordinate)
         return True
     except Exception as e:
-        print(f"[logo] {e}"); return False
+        print(f"[logo] {e}")
+        return False
 
 
 def generate_excel(data: dict) -> bytes:
@@ -116,7 +124,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Título principal (col 2 en adelante para dar espacio al logo)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.0"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.1"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55

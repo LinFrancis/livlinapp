@@ -1,7 +1,7 @@
 {
   "petalos": [
     {
-      "nombre": "Manejo de la tierra y la naturaleza (urbano)",
+      "nombre": "Administración de la Tierra y la Naturaleza",
       "categorias": {
         "produccion_alimentaria_urbana": [
           "Huertos en balcones y terrazas",
@@ -67,11 +67,18 @@
           "Cultivo de variedades locales",
           "Multiplicación de plantas por esquejes",
           "Propagación de plantas nativas"
+        ],
+        "agua_domestica": [
+          "Duchas cortas",
+          "Cerrar la llave al lavar platos",
+          "Reparar fugas de agua",
+          "Reutilizar agua para riego"
         ]
-      }
+      },
+      "subtitulo": "Agricultura urbana, suelo vivo, biodiversidad y agua"
     },
     {
-      "nombre": "Ambiente construido",
+      "nombre": "Entorno Construido",
       "categorias": {
         "vivienda_ecologica": [
           "Bioconstrucción en ampliaciones",
@@ -109,10 +116,11 @@
           "Construcción de mini invernaderos",
           "Reutilización de contenedores"
         ]
-      }
+      },
+      "subtitulo": "Bioconstrucción, diseño bioclimático y espacios regenerativos"
     },
     {
-      "nombre": "Herramientas y tecnologías apropiadas",
+      "nombre": "Herramientas y Tecnología",
       "categorias": {
         "energia": [
           "Paneles solares domésticos",
@@ -146,11 +154,19 @@
           "Conservas caseras",
           "Almacenamiento natural de alimentos",
           "Refrigeración pasiva"
+        ],
+        "energia_domestica": [
+          "Apagar luces cuando no se usan",
+          "Usar ampolletas LED",
+          "Usar electrodomésticos de bajo consumo",
+          "Desconectar cargadores",
+          "Usar regletas con interruptor"
         ]
-      }
+      },
+      "subtitulo": "Energía renovable, tecnología simple y movilidad sostenible"
     },
     {
-      "nombre": "Educación y cultura",
+      "nombre": "Educación y Cultura",
       "categorias": {
         "educacion_comunitaria": [
           "Talleres de agroecología urbana",
@@ -183,11 +199,20 @@
           "Redes de semillas",
           "Redes de consumo local",
           "Redes de economía solidaria"
+        ],
+        "desarrollo_personal_regenerativo": [
+          "Estudiar sobre regeneración",
+          "Practicar agroecología",
+          "Practicar meditación",
+          "Practicar tai chi",
+          "Practicar yoga",
+          "Participar en talleres de regeneración"
         ]
-      }
+      },
+      "subtitulo": "Saberes locales, arte comunitario y redes de conocimiento"
     },
     {
-      "nombre": "Salud y bienestar",
+      "nombre": "Salud y Bienestar Espiritual",
       "categorias": {
         "salud_fisica": [
           "Alimentación basada en plantas",
@@ -218,10 +243,11 @@
           "Caminatas ecológicas",
           "Bicicleteadas comunitarias"
         ]
-      }
+      },
+      "subtitulo": "Alimentación viva, plantas medicinales y bienestar integral"
     },
     {
-      "nombre": "Economía y finanzas",
+      "nombre": "Finanzas y Economía",
       "categorias": {
         "economia_local": [
           "Mercados agroecológicos",
@@ -255,11 +281,19 @@
           "Compras colectivas de alimentos",
           "Comprar a granel",
           "Evitar plásticos de un solo uso"
+        ],
+        "consumo_consciente": [
+          "Comprar productos locales",
+          "Comprar colectivamente",
+          "Evitar envases innecesarios",
+          "Reparar antes de comprar",
+          "Compartir herramientas"
         ]
-      }
+      },
+      "subtitulo": "Mercados locales, economías solidarias y soberanía alimentaria"
     },
     {
-      "nombre": "Tenencia de la tierra y gobernanza",
+      "nombre": "Tenencia de la Tierra y Gobernanza Comunitaria",
       "categorias": {
         "organizacion_comunitaria": [
           "Asambleas barriales",
@@ -286,47 +320,15 @@
           "Redes de agroecología urbana",
           "Redes de transición urbana",
           "Redes de resiliencia comunitaria"
-        ]
-      }
-    },
-    {
-      "nombre": "Prácticas cotidianas de sustentabilidad",
-      "categorias": {
-        "energia_domestica": [
-          "Apagar luces cuando no se usan",
-          "Usar ampolletas LED",
-          "Usar electrodomésticos de bajo consumo",
-          "Desconectar cargadores",
-          "Usar regletas con interruptor"
-        ],
-        "agua_domestica": [
-          "Duchas cortas",
-          "Cerrar la llave al lavar platos",
-          "Reparar fugas de agua",
-          "Reutilizar agua para riego"
-        ],
-        "consumo_consciente": [
-          "Comprar productos locales",
-          "Comprar colectivamente",
-          "Evitar envases innecesarios",
-          "Reparar antes de comprar",
-          "Compartir herramientas"
         ],
         "vida_comunitaria": [
           "Conectar con vecinos",
           "Participar en organizaciones locales",
           "Participar en huertos comunitarios",
           "Organizar actividades de barrio"
-        ],
-        "desarrollo_personal_regenerativo": [
-          "Estudiar sobre regeneración",
-          "Practicar agroecología",
-          "Practicar meditación",
-          "Practicar tai chi",
-          "Practicar yoga",
-          "Participar en talleres de regeneración"
         ]
-      }
+      },
+      "subtitulo": "Uso colectivo del territorio y participación comunitaria"
     }
   ]
 }

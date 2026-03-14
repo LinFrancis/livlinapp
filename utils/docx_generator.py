@@ -1,4 +1,4 @@
-"""Generador Word v3.0 — LivLin Indagación Regenerativa.
+"""Generador Word v3.1 — LivLin Indagación Regenerativa.
 Narrativa regenerativa alineada con Mason (2025). Logo embebido.
 """
 import io, base64, json, tempfile
@@ -84,18 +84,26 @@ def _ipr_table(doc):
             r.font.size=Pt(8)
             _shd(tbl.rows[i].cells[j],"F0FFFE" if i%2==0 else "FFFFFF")
 
-def _logo(doc):
-    """Add logo to document."""
+def _logo(doc, width_inches=1.5):
+    """Add logo to document. Uses /tmp/livlin_logo.png for cloud compatibility."""
     try:
         from utils.logo_b64 import LOGO_B64
-        logo_bytes=base64.b64decode(LOGO_B64)
-        with tempfile.NamedTemporaryFile(suffix=".png",delete=False) as tmp:
-            tmp.write(logo_bytes); tmp_path=tmp.name
-        p=doc.add_paragraph(); p.alignment=WD_ALIGN_PARAGRAPH.CENTER
-        r=p.add_run(); r.add_picture(tmp_path,width=Inches(1.5))
+        import os
+        tmp_path = "/tmp/livlin_logo.png"
+        if not os.path.exists(tmp_path):
+            logo_bytes = base64.b64decode(LOGO_B64)
+            with open(tmp_path, "wb") as f_tmp:
+                f_tmp.write(logo_bytes)
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r = p.add_run(); r.add_picture(tmp_path, width=Inches(width_inches))
         return True
     except Exception as e:
-        print(f"[logo docx] {e}"); return False
+        print(f"[logo docx] {e}")
+        # Fallback: text logo
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r = p.add_run("🌿 LivLin"); r.bold = True; r.font.size = Pt(18)
+        if C1: r.font.color.rgb = C1
+        return False
 
 def _mod_status(doc,data,key):
     status=data.get(key,"respondido")
@@ -144,7 +152,7 @@ def generate_docx(data:dict)->bytes:
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
 
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v3.0  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v3.1  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
 
     doc.add_paragraph()
@@ -362,7 +370,7 @@ def generate_docx(data:dict)->bytes:
 
     # ── PIE ───────────────────────────────────────────────────────────────
     p_pie=doc.add_paragraph(); p_pie.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.0  ·  {str(datetime.now())[:10]}")
+    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.1  ·  {str(datetime.now())[:10]}")
     r_pie.font.size=Pt(8); r_pie.font.color.rgb=CG; r_pie.italic=True
 
     buf=io.BytesIO(); doc.save(buf); buf.seek(0)
