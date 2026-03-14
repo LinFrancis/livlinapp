@@ -1,5 +1,5 @@
-"""Módulo 7 — Flor de la Permacultura v2.0
-Observado vs Potencial · IPR simplificado · Radar dual · Acciones + Otros.
+"""Módulo 7 — Flor de la Permacultura v2.1
+Observado + Potencial ADICIONAL · Sin doble entrada · Radar dual · IPR.
 """
 import json
 import streamlit as st
@@ -12,75 +12,100 @@ _PETALOS_DATA = [{"nombre": "Manejo de la tierra y la naturaleza (urbano)", "cat
 
 PETAL_ICONS = ["🌳","🏡","🛠️","📚","🧘","💚","🤝","🌿"]
 
-# ── Descripciones oficiales (Holmgren, 2002) ─────────────────────────────────
+# ── Descripciones oficiales ───────────────────────────────────────────────────
 PETAL_DESC = {
     "Manejo de la tierra y la naturaleza (urbano)":
-        "Corazón de la permacultura: diseño con la naturaleza para producir alimentos, "
-        "regenerar suelos y aumentar biodiversidad. En contexto urbano incluye huertos, "
-        "compostaje, captación de agua y corredores de polinizadores. "
-        "(Holmgren, *Permacultura: Principios y senderos más allá de la sustentabilidad*, 2002)",
+        ("Corazón de la permacultura urbana: diseñar con la naturaleza para producir "
+         "alimentos, regenerar suelos y restaurar biodiversidad. Incluye huertos, "
+         "compostaje, captación de agua lluvia y corredores de polinizadores.\n\n"
+         "📚 Referencias: Holmgren, D. (2002). *Permacultura: Principios y senderos más allá "
+         "de la sustentabilidad*. Hepburn: Holmgren Design Services. "
+         "Mollison, B. (1988). *Permaculture: A Designers' Manual*. Tagari Publications.\n"
+         "🔗 [Holmgren Design](https://holmgren.com.au) · "
+         "[Permaculture Research Institute](https://www.permaculturenews.org)"),
     "Ambiente construido":
-        "Diseño de edificaciones, infraestructuras y espacios construidos con criterios "
-        "bioclimáticos y de bajo impacto. Incluye energía pasiva, materiales naturales, "
-        "techos y muros verdes. Las decisiones en este pétalo tienen impacto por décadas. "
-        "(Holmgren, 2002; Reed, *Regenerative Development*, 2007)",
+        ("Edificaciones e infraestructuras diseñadas con criterios bioclimáticos y bajo "
+         "impacto ambiental. Incluye energía pasiva, materiales naturales, techos y muros "
+         "verdes. Las decisiones en este pétalo tienen impacto durante décadas.\n\n"
+         "📚 Referencias: Minke, G. (2006). *Building with Earth*. Birkhäuser. "
+         "Reed, B. & Moff, S. (2007). *Regenerative Development and Design*. Wiley.\n"
+         "🔗 [Living Future Institute](https://living-future.org) · "
+         "[Passive House Institute](https://passipedia.org)"),
     "Herramientas y tecnologías apropiadas":
-        "Selección crítica de herramientas y tecnologías que sirven a las personas y al "
-        "planeta. Prioriza tecnologías simples, reparables y de bajo consumo energético. "
-        "Incluye energía solar, biodigestores y sistemas de riego eficiente. "
-        "(Schumacher, *Small is Beautiful*, 1973; Holmgren, 2002)",
+        ("Selección crítica de tecnologías que sirven a las personas y al planeta. "
+         "Prioriza herramientas simples, reparables y de bajo consumo energético: "
+         "energía solar, biodigestores, sistemas de riego eficiente.\n\n"
+         "📚 Referencias: Schumacher, E.F. (1973). *Small is Beautiful*. Harper & Row. "
+         "ITDG (2016). *Practical Action — Technology challenging poverty*.\n"
+         "🔗 [Practical Action](https://practicalaction.org) · "
+         "[Appropriate Technology Library](https://www.villageearth.org/appropriate-technology)"),
     "Educación y cultura":
-        "Transmisión de saberes, valores y prácticas que sostienen culturas regenerativas. "
-        "Abarca educación formal e informal, arte, intercambio de semillas y redes de "
-        "conocimiento local. Sin cultura regenerativa, las técnicas no persisten. "
-        "(Freire, *Pedagogía del oprimido*, 1968; Holmgren, 2002)",
+        ("Transmisión de saberes, valores y prácticas que sostienen culturas regenerativas. "
+         "Abarca educación formal e informal, arte, intercambio de semillas y redes de "
+         "conocimiento local. Sin cultura regenerativa, las técnicas no persisten.\n\n"
+         "📚 Referencias: Freire, P. (1968). *Pedagogía del oprimido*. Siglo XXI. "
+         "Illich, I. (1971). *Deschooling Society*. Harper & Row.\n"
+         "🔗 [Permaculture Research Institute Education](https://www.permaculturenews.org) · "
+         "[Transition Network](https://transitionnetwork.org)"),
     "Salud y bienestar":
-        "Sistemas de salud preventivos basados en alimentación viva, movimiento, plantas "
-        "medicinales y comunidad. La jardinería terapéutica, los baños de naturaleza y el "
-        "bienestar colectivo son dimensiones centrales de este pétalo. "
-        "(IPES-Food, 2017; Holmgren, 2002)",
+        ("Sistemas de salud preventivos basados en alimentación viva, movimiento, plantas "
+         "medicinales y comunidad. La jardinería terapéutica, los baños de naturaleza "
+         "y el bienestar colectivo son dimensiones centrales.\n\n"
+         "📚 Referencias: IPES-Food (2017). *Too big to feed*. IPES-Food. "
+         "Pretty, J. et al. (2017). *Nature contact and human health*. "
+         "International Journal of Environmental Research.\n"
+         "🔗 [IPES-Food](https://www.ipes-food.org) · "
+         "[Ecotherapy Research](https://www.ecotherapy.org)"),
     "Economía y finanzas":
-        "Sistemas económicos que circulan la riqueza localmente: mercados agroecológicos, "
-        "cooperativas, trueque, monedas locales y finanzas éticas. Reduce la dependencia "
-        "del sistema extractivo y fortalece la soberanía alimentaria. "
-        "(Gibson-Graham, *A Postcapitalist Politics*, 2006; Holmgren, 2002)",
+        ("Sistemas económicos que circulan la riqueza localmente: mercados agroecológicos, "
+         "cooperativas, trueque, monedas locales y finanzas éticas. Reduce la dependencia "
+         "del sistema extractivo y fortalece la soberanía alimentaria.\n\n"
+         "📚 Referencias: Gibson-Graham, J.K. (2006). *A Postcapitalist Politics*. "
+         "Univ. of Minnesota Press. Raworth, K. (2017). *Doughnut Economics*. Chelsea Green.\n"
+         "🔗 [Doughnut Economics Action Lab](https://doughnuteconomics.org) · "
+         "[P2P Foundation](https://p2pfoundation.net)"),
     "Tenencia de la tierra y gobernanza":
-        "Marcos legales y comunitarios para el acceso y cuidado colectivo de la tierra. "
-        "Incluye cooperativas de vivienda, huertos comunitarios, asambleas barriales y "
-        "participación ciudadana en el diseño urbano. "
-        "(Ostrom, *Governing the Commons*, 1990; Holmgren, 2002)",
+        ("Marcos legales y comunitarios para el acceso y cuidado colectivo de la tierra. "
+         "Incluye cooperativas de vivienda, huertos comunitarios, asambleas barriales "
+         "y participación ciudadana en el diseño urbano.\n\n"
+         "📚 Referencias: Ostrom, E. (1990). *Governing the Commons*. Cambridge Univ. Press. "
+         "De Angelis, M. (2017). *Omnia Sunt Communia*. Zed Books.\n"
+         "🔗 [Community Land Trust Network](https://www.communitylandtrusts.org.uk) · "
+         "[P2P Foundation Commons](https://p2pfoundation.net/commons)"),
     "Prácticas cotidianas de sustentabilidad":
-        "Las acciones diarias del hogar y la vida cotidiana que acumulan impacto sistémico: "
-        "reducir, reutilizar, reparar, consumir local, conectar con vecinos. "
-        "Este pétalo reconoce que los pequeños actos transforman la cultura. "
-        "(Shove, *Comfort, Cleanliness and Convenience*, 2003; Holmgren, 2002)",
+        ("Las acciones diarias del hogar y la vida cotidiana que acumulan impacto sistémico: "
+         "reducir, reutilizar, reparar, consumir local, conectar con vecinos. "
+         "Los pequeños actos transforman la cultura cuando se vuelven hábito colectivo.\n\n"
+         "📚 Referencias: Shove, E. (2003). *Comfort, Cleanliness and Convenience*. "
+         "Berg Publishers. Jackson, T. (2009). *Prosperity Without Growth*. Earthscan.\n"
+         "🔗 [Ellen MacArthur Foundation](https://ellenmacarthurfoundation.org) · "
+         "[Zero Waste International Alliance](https://zwia.org)"),
 }
 
-# ── Scoring simplificado ─────────────────────────────────────────────────────
-def _score_level(n: int) -> tuple[str, str, str]:
-    """n = number of actions. Returns (level_name, emoji, color)"""
-    if n == 0:   return "Sin inicio",    "○",  "#BDBDBD"
-    if n == 1:   return "Iniciando",     "🌱", "#74C69D"
-    if n == 2:   return "Avanzando",     "🌿", "#52B788"
-    if n == 3:   return "Consolidado",   "🌳", "#40916C"
-    if n <= 5:   return "Destacado",     "🌸", "#2D6A4F"
-    return               "Referente",    "✨", "#1B4332"
+# ── Scoring ───────────────────────────────────────────────────────────────────
+def _score_level(n: int) -> tuple:
+    if n == 0: return "Sin inicio",  "○",  "#BDBDBD"
+    if n == 1: return "Iniciando",   "🌱", "#74C69D"
+    if n == 2: return "Avanzando",   "🌿", "#52B788"
+    if n == 3: return "Consolidado", "🌳", "#40916C"
+    if n <= 5: return "Destacado",   "🌸", "#2D6A4F"
+    return           "Referente",   "✨", "#1B4332"
 
-def _petal_narrative(petal_name: str, n_obs: int, n_pot: int) -> str:
+def _petal_narrative(petal_name: str, n_obs: int, n_new: int) -> str:
     lev_obs, em_obs, _ = _score_level(n_obs)
-    lev_pot, em_pot, _ = _score_level(n_pot)
-    gap = n_pot - n_obs
+    total_pot = n_obs + n_new
+    lev_tot,  em_tot,  _ = _score_level(total_pot)
     parts = []
     if n_obs == 0:
-        parts.append(f"Este espacio está en etapa inicial en **{petal_name}**.")
+        parts.append(f"Este espacio está en etapa inicial en **{petal_name}**. Cada primera acción es el paso más importante.")
     else:
-        parts.append(f"{em_obs} **{lev_obs}** — {n_obs} práctica(s) activa(s) en este pétalo.")
-    if gap > 0:
-        parts.append(f"El facilitador identifica **{gap} práctica(s) adicional(es)** con alto potencial para este espacio.")
+        parts.append(f"{em_obs} **{lev_obs}** — {n_obs} práctica(s) activa(s) registradas.")
+    if n_new > 0:
+        parts.append(f"El facilitador identifica **{n_new} práctica(s) adicional(es)** con potencial concreto para este espacio.")
+        parts.append(f"Con esas incorporaciones, el pétalo alcanzaría nivel {em_tot} **{lev_tot}** ({total_pot} prácticas).")
     elif n_obs > 0:
-        parts.append("El potencial reconocido está alineado con lo que ya se hace — ¡excellent sintonía!")
+        parts.append("El facilitador no identifica nuevas incorporaciones inmediatas — el nivel actual está bien consolidado.")
     return " ".join(parts)
-
 
 def _get_petalos():
     if isinstance(_PETALOS_DATA, list):
@@ -96,7 +121,7 @@ def render():
 
     st.markdown("## 🌸 Flor de la Permacultura")
     st.markdown(
-        '<p class="module-subtitle">Observado · Potencial · IPR por pétalo</p>',
+        '<p class="module-subtitle">Índice de Potencial Regenerativo (IPR) · Observado + Potencial adicional</p>',
         unsafe_allow_html=True)
 
     st.markdown("**Estado de este módulo:**")
@@ -115,210 +140,272 @@ def render():
 
     petalos = _get_petalos()
     if not petalos:
-        st.error("❌ No se pudieron cargar los datos de pétalos.")
+        st.error("❌ No se pudieron cargar los datos.")
         return
+
+    # ── Info IPR ──────────────────────────────────────────────────────────
+    with st.expander("ℹ️ ¿Qué es el Índice de Potencial Regenerativo (IPR)?", expanded=False):
+        st.markdown("""
+**El IPR** mide la diversidad y profundidad de prácticas regenerativas activas en un espacio,
+organizadas según los 8 pétalos de la Flor de la Permacultura de David Holmgren (2002).
+
+**¿Cómo leer el IPR?**
+| Nivel | Prácticas | Significado |
+|-------|-----------|-------------|
+| ○ Sin inicio | 0 | Área por explorar — gran potencial latente |
+| 🌱 Iniciando | 1 | El primer paso ya está dado — ¡fundamental! |
+| 🌿 Avanzando | 2 | Dos prácticas muestran intención sostenida |
+| 🌳 Consolidado | 3 | Sistema estable, genera rendimientos constantes |
+| 🌸 Destacado | 4–5 | Alta integración, inspira a otros |
+| ✨ Referente | 6+ | Sistema autónomo, comparte excedentes |
+
+**Observado** = lo que ya existe en el espacio hoy.
+**Potencial adicional** = nuevas prácticas que el facilitador identifica como viables dado el contexto del espacio. No requiere re-ingresar lo observado.
+
+📚 *Holmgren, D. (2002). Permacultura: Principios y senderos más allá de la sustentabilidad.*
+        """)
 
     # ── Tabs ─────────────────────────────────────────────────────────────
     tab_labels = [f"{PETAL_ICONS[i]} {p['nombre'][:20]}" for i, p in enumerate(petalos)]
-    tab_labels.append("📊 Resumen")
+    tab_labels.append("📊 Resumen IPR")
     tabs = st.tabs(tab_labels)
 
     scores_obs = []
-    scores_pot = []
+    scores_new = []
 
     for i, (tab, petalo) in enumerate(zip(tabs[:-1], petalos)):
         with tab:
             icon = PETAL_ICONS[i]
             st.markdown(f"### {icon} {petalo['nombre']}")
 
-            # ── Descripción oficial ───────────────────────────────────────
-            with st.expander("📖 ¿Qué es este pétalo?", expanded=False):
+            with st.expander("📖 ¿Qué es este pétalo? · Referencias", expanded=False):
                 st.markdown(PETAL_DESC.get(petalo['nombre'], ""))
 
             kp = f"p{i}"
-            saved_obs = data.get(f"petalo_{i}_obs", {})
-            saved_pot = data.get(f"petalo_{i}_pot", {})
+            saved_obs  = data.get(f"petalo_{i}_obs",      {})
+            saved_new  = data.get(f"petalo_{i}_pot_new",  {})
             saved_otros_obs = data.get(f"petalo_{i}_otros_obs", [])
-            saved_otros_pot = data.get(f"petalo_{i}_otros_pot", [])
+            saved_otros_new = data.get(f"petalo_{i}_otros_new", [])
 
-            # ── Two columns: Observado | Potencial ───────────────────────
-            col_obs, col_pot = st.columns(2)
-
-            new_obs  = {}
-            new_pot  = {}
+            new_obs = {}
+            new_new = {}
             sel_obs_all = []
-            sel_pot_all = []
+            sel_new_all = []
 
-            with col_obs:
-                st.markdown(
-                    '<div style="background:#E8F5E9;border-radius:8px;padding:0.5rem 0.8rem;'                    'border-left:4px solid #40916C;margin-bottom:0.5rem;">'                    '<strong>✅ Observado</strong><br>'                    '<span style="font-size:0.78rem;color:#2D6A4F;">Lo que ya ocurre en el espacio</span></div>',
-                    unsafe_allow_html=True)
+            # ── OBSERVADO ────────────────────────────────────────────────
+            st.markdown(
+                '<div style="background:#E8F5E9;border-radius:8px;padding:0.5rem 0.8rem;'
+                'border-left:4px solid #40916C;margin:0.5rem 0;">'
+                '<strong>✅ Observado</strong> — '
+                '<span style="font-size:0.8rem;color:#2D6A4F;">'
+                'Lo que ya ocurre en el espacio hoy</span></div>',
+                unsafe_allow_html=True)
 
-                for cat_key, acciones in petalo["categorias"].items():
-                    cat_label = cat_key.replace("_"," ").title()
-                    opts = ["(Ninguno)"] + acciones
-                    prev = [a for a in saved_obs.get(cat_key, []) if a in acciones]
-                    sel = st.multiselect(
-                        cat_label, options=opts,
-                        default=prev,
-                        key=f"{kp}_obs_{cat_key}",
-                        placeholder="Selecciona…")
-                    sel_clean = [s for s in sel if s != "(Ninguno)"]
-                    new_obs[cat_key] = sel_clean
-                    sel_obs_all.extend(sel_clean)
+            for cat_key, acciones in petalo["categorias"].items():
+                cat_label = cat_key.replace("_"," ").title()
+                opts  = ["(Ninguno)"] + acciones
+                prev  = [a for a in saved_obs.get(cat_key, []) if a in acciones]
+                sel   = st.multiselect(cat_label, options=opts, default=prev,
+                                       key=f"{kp}_obs_{cat_key}", placeholder="Selecciona…")
+                clean = [s for s in sel if s != "(Ninguno)"]
+                new_obs[cat_key] = clean
+                sel_obs_all.extend(clean)
 
-                # Otros observados
-                st.markdown("**➕ Otros (observados)**")
-                otros_obs = list(saved_otros_obs)
-                for j, otro in enumerate(otros_obs):
-                    cc1, cc2 = st.columns([4,1])
-                    with cc1: st.caption(f"• {otro}")
-                    with cc2:
-                        if st.button("✕", key=f"{kp}_del_otro_obs_{j}"):
+            # Otros observados
+            otros_obs = list(saved_otros_obs)
+            if otros_obs:
+                for j, txt in enumerate(otros_obs):
+                    c1, c2 = st.columns([5,1])
+                    with c1: st.caption(f"✅ {txt}")
+                    with c2:
+                        if st.button("✕", key=f"{kp}_del_obs_{j}"):
                             otros_obs.pop(j); st.rerun()
-                nuevo_otro_obs = st.text_input("Agregar otro (observado)",
-                    key=f"{kp}_new_otro_obs", placeholder="Describe la práctica…")
-                if st.button("+ Agregar", key=f"{kp}_add_otro_obs"):
-                    if nuevo_otro_obs.strip():
-                        otros_obs.append(nuevo_otro_obs.strip()); st.rerun()
-                data[f"petalo_{i}_otros_obs"] = otros_obs
-                sel_obs_all.extend(otros_obs)
-
-            with col_pot:
-                st.markdown(
-                    '<div style="background:#FFF8E1;border-radius:8px;padding:0.5rem 0.8rem;'                    'border-left:4px solid #F9A825;margin-bottom:0.5rem;">'                    '<strong>🌟 Potencial</strong><br>'                    '<span style="font-size:0.78rem;color:#E65100;">Lo que podría implementarse (criterio facilitador)</span></div>',
-                    unsafe_allow_html=True)
-
-                for cat_key, acciones in petalo["categorias"].items():
-                    cat_label = cat_key.replace("_"," ").title()
-                    opts = ["(Ninguno)"] + acciones
-                    prev = [a for a in saved_pot.get(cat_key, []) if a in acciones]
-                    sel = st.multiselect(
-                        cat_label, options=opts,
-                        default=prev,
-                        key=f"{kp}_pot_{cat_key}",
-                        placeholder="Selecciona…")
-                    sel_clean = [s for s in sel if s != "(Ninguno)"]
-                    new_pot[cat_key] = sel_clean
-                    sel_pot_all.extend(sel_clean)
-
-                # Otros potencial
-                st.markdown("**➕ Otros (potencial)**")
-                otros_pot = list(saved_otros_pot)
-                for j, otro in enumerate(otros_pot):
-                    cc1, cc2 = st.columns([4,1])
-                    with cc1: st.caption(f"• {otro}")
-                    with cc2:
-                        if st.button("✕", key=f"{kp}_del_otro_pot_{j}"):
-                            otros_pot.pop(j); st.rerun()
-                nuevo_otro_pot = st.text_input("Agregar otro (potencial)",
-                    key=f"{kp}_new_otro_pot", placeholder="Describe la práctica…")
-                if st.button("+ Agregar", key=f"{kp}_add_otro_pot"):
-                    if nuevo_otro_pot.strip():
-                        otros_pot.append(nuevo_otro_pot.strip()); st.rerun()
-                data[f"petalo_{i}_otros_pot"] = otros_pot
-                sel_pot_all.extend(otros_pot)
-
-            # Save selections
+            with st.container():
+                nc1, nc2 = st.columns([4,1])
+                with nc1:
+                    nuevo_obs = st.text_input("Otra práctica observada",
+                        key=f"{kp}_new_otro_obs", placeholder="Describe la práctica…",
+                        label_visibility="collapsed")
+                with nc2:
+                    if st.button("+ Añadir", key=f"{kp}_add_obs", use_container_width=True):
+                        if nuevo_obs.strip():
+                            otros_obs.append(nuevo_obs.strip()); st.rerun()
+            data[f"petalo_{i}_otros_obs"] = otros_obs
+            sel_obs_all.extend(otros_obs)
             data[f"petalo_{i}_obs"] = new_obs
-            data[f"petalo_{i}_pot"] = new_pot
 
-            # ── Score bar ─────────────────────────────────────────────────
             n_obs = len(sel_obs_all)
-            n_pot = len(sel_pot_all)
-            scores_obs.append(n_obs)
-            scores_pot.append(n_pot)
-
-            lev_obs, em_obs, c_obs = _score_level(n_obs)
-            lev_pot, em_pot, c_pot = _score_level(n_pot)
+            lv_o, em_o, co = _score_level(n_obs)
+            st.markdown(
+                f'<div style="background:{co};border-radius:6px;padding:0.3rem 0.8rem;'
+                f'color:white;display:inline-block;margin:0.3rem 0;">'
+                f'{em_o} <strong>{lv_o}</strong> — {n_obs} práctica(s) observada(s)</div>',
+                unsafe_allow_html=True)
 
             st.markdown("---")
-            m1, m2 = st.columns(2)
+
+            # ── POTENCIAL ADICIONAL ───────────────────────────────────────
+            st.markdown(
+                '<div style="background:#FFF8E1;border-radius:8px;padding:0.5rem 0.8rem;'
+                'border-left:4px solid #F9A825;margin:0.5rem 0;">'
+                '<strong>🌟 Potencial adicional</strong> — '
+                '<span style="font-size:0.8rem;color:#E65100;">'
+                'Nuevas prácticas viables para este espacio (criterio facilitador). '
+                'Las ya observadas no se repiten aquí.</span></div>',
+                unsafe_allow_html=True)
+
+            for cat_key, acciones in petalo["categorias"].items():
+                cat_label = cat_key.replace("_"," ").title()
+                # Exclude already observed to avoid double entry
+                ya_obs  = new_obs.get(cat_key, [])
+                opts_pot = ["(Ninguno)"] + [a for a in acciones if a not in ya_obs]
+                if len(opts_pot) == 1:
+                    continue  # all actions already observed in this category
+                prev = [a for a in saved_new.get(cat_key, [])
+                        if a in acciones and a not in ya_obs]
+                sel  = st.multiselect(cat_label, options=opts_pot, default=prev,
+                                      key=f"{kp}_pot_{cat_key}",
+                                      placeholder="Nuevas acciones a sumar…")
+                clean = [s for s in sel if s != "(Ninguno)"]
+                new_new[cat_key] = clean
+                sel_new_all.extend(clean)
+
+            # Otros potencial
+            otros_new = list(saved_otros_new)
+            if otros_new:
+                for j, txt in enumerate(otros_new):
+                    c1, c2 = st.columns([5,1])
+                    with c1: st.caption(f"🌟 {txt}")
+                    with c2:
+                        if st.button("✕", key=f"{kp}_del_new_{j}"):
+                            otros_new.pop(j); st.rerun()
+            with st.container():
+                nc1, nc2 = st.columns([4,1])
+                with nc1:
+                    nuevo_new = st.text_input("Otra práctica potencial",
+                        key=f"{kp}_new_otro_new", placeholder="Nueva acción concreta…",
+                        label_visibility="collapsed")
+                with nc2:
+                    if st.button("+ Añadir", key=f"{kp}_add_new", use_container_width=True):
+                        if nuevo_new.strip():
+                            otros_new.append(nuevo_new.strip()); st.rerun()
+            data[f"petalo_{i}_otros_new"] = otros_new
+            sel_new_all.extend(otros_new)
+            data[f"petalo_{i}_pot_new"] = new_new
+
+            scores_obs.append(n_obs)
+            scores_new.append(len(sel_new_all))
+
+            # Score summary
+            n_new = len(sel_new_all)
+            n_tot = n_obs + n_new
+            lv_t, em_t, ct = _score_level(n_tot)
+            lv_n, em_n, cn = _score_level(n_new)
+
+            m1, m2, m3 = st.columns(3)
             with m1:
                 st.markdown(
-                    f'<div style="background:{c_obs};border-radius:8px;padding:0.5rem 1rem;'                    f'color:white;text-align:center;">'                    f'<div style="font-size:1.4rem;">{em_obs}</div>'                    f'<div style="font-weight:700;">{lev_obs}</div>'                    f'<div style="font-size:0.8rem;">{n_obs} práctica(s) observada(s)</div></div>',
+                    f'<div style="background:{co};border-radius:8px;padding:0.4rem 0.7rem;'
+                    f'color:white;text-align:center;">'
+                    f'<div style="font-size:1.1rem;">{em_o}</div>'
+                    f'<div style="font-size:0.8rem;font-weight:700;">{lv_o}</div>'
+                    f'<div style="font-size:0.72rem;">Observado: {n_obs}</div></div>',
                     unsafe_allow_html=True)
             with m2:
                 st.markdown(
-                    f'<div style="background:{c_pot};border-radius:8px;padding:0.5rem 1rem;'                    f'color:white;text-align:center;">'                    f'<div style="font-size:1.4rem;">{em_pot}</div>'                    f'<div style="font-weight:700;">{lev_pot}</div>'                    f'<div style="font-size:0.8rem;">{n_pot} práctica(s) con potencial</div></div>',
+                    f'<div style="background:#F9A825;border-radius:8px;padding:0.4rem 0.7rem;'
+                    f'color:white;text-align:center;">'
+                    f'<div style="font-size:1.1rem;">+{n_new}</div>'
+                    f'<div style="font-size:0.8rem;font-weight:700;">Potencial adicional</div>'
+                    f'<div style="font-size:0.72rem;">nuevas prácticas</div></div>',
+                    unsafe_allow_html=True)
+            with m3:
+                st.markdown(
+                    f'<div style="background:{ct};border-radius:8px;padding:0.4rem 0.7rem;'
+                    f'color:white;text-align:center;">'
+                    f'<div style="font-size:1.1rem;">{em_t}</div>'
+                    f'<div style="font-size:0.8rem;font-weight:700;">{lv_t}</div>'
+                    f'<div style="font-size:0.72rem;">Total con potencial: {n_tot}</div></div>',
                     unsafe_allow_html=True)
 
-            st.markdown(f"*{_petal_narrative(petalo['nombre'], n_obs, n_pot)}*")
+            st.markdown(f"*{_petal_narrative(petalo['nombre'], n_obs, n_new)}*")
 
-            # Notes
             data[f"petalo_{i}_notas"] = st.text_area(
-                "📝 Notas del facilitador para este pétalo",
-                value=data.get(f"petalo_{i}_notas",""),
-                height=70, key=f"{kp}_notas",
-                placeholder="Observaciones, contexto, oportunidades específicas…")
+                "📝 Notas del facilitador",
+                value=data.get(f"petalo_{i}_notas",""), height=70,
+                key=f"{kp}_notas",
+                placeholder="Contexto, condiciones específicas, oportunidades concretas…")
 
     # ══════════════════════════════════════════════════════════════════════
     with tabs[-1]:
-        st.markdown("### 📊 Resumen — Observado vs Potencial")
+        st.markdown("### 📊 Resumen — Índice de Potencial Regenerativo (IPR)")
 
-        data["ipr_obs"]     = scores_obs
-        data["ipr_pot"]     = scores_pot
+        data["ipr_obs"] = scores_obs
+        data["ipr_new"] = scores_new
+        data["ipr_tot"] = [o + n for o, n in zip(scores_obs, scores_new)]
         data["ipr_petalos"] = [p["nombre"] for p in petalos]
 
-        # ── Dual radar chart ──────────────────────────────────────────────
+        # Dual radar
         try:
             import plotly.graph_objects as go
             labels = [f"{PETAL_ICONS[i]} {p['nombre'][:18]}"
                       for i, p in enumerate(petalos)]
-            # Normalize to 0-10 scale for radar readability
-            max_v = max(max(scores_obs + scores_pot, default=1), 1)
-            norm_obs = [min(s / max_v * 10, 10) for s in scores_obs]
-            norm_pot = [min(s / max_v * 10, 10) for s in scores_pot]
+            scores_tot = data["ipr_tot"]
+            max_v = max(max(scores_obs + scores_tot, default=1), 1)
 
+            norm_obs = [min(s/max_v*10, 10) for s in scores_obs]
+            norm_tot = [min(s/max_v*10, 10) for s in scores_tot]
             lbls_c = labels + [labels[0]]
-            obs_c  = norm_obs + [norm_obs[0]]
-            pot_c  = norm_pot + [norm_pot[0]]
 
             fig = go.Figure()
             fig.add_trace(go.Scatterpolar(
-                r=pot_c, theta=lbls_c, name="🌟 Potencial",
-                fill="toself",
-                fillcolor="rgba(249,168,37,0.15)",
-                line=dict(color="#F9A825", width=2, dash="dash"),
-            ))
+                r=norm_tot + [norm_tot[0]], theta=lbls_c,
+                name="🌟 Con potencial adicional",
+                fill="toself", fillcolor="rgba(249,168,37,0.12)",
+                line=dict(color="#F9A825", width=2, dash="dash")))
             fig.add_trace(go.Scatterpolar(
-                r=obs_c, theta=lbls_c, name="✅ Observado",
-                fill="toself",
-                fillcolor="rgba(64,145,108,0.3)",
-                line=dict(color="#2D6A4F", width=2.5),
-            ))
+                r=norm_obs + [norm_obs[0]], theta=lbls_c,
+                name="✅ Observado hoy",
+                fill="toself", fillcolor="rgba(64,145,108,0.28)",
+                line=dict(color="#2D6A4F", width=2.5)))
             fig.update_layout(
                 polar=dict(radialaxis=dict(visible=True, range=[0,10],
                            tickfont=dict(size=8))),
                 legend=dict(orientation="h", yanchor="bottom", y=1.05),
                 height=450, margin=dict(l=60,r=60,t=50,b=30),
-                paper_bgcolor="rgba(0,0,0,0)",
-            )
+                paper_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
         except Exception as e:
             st.caption(f"Gráfico no disponible: {e}")
 
-        # ── Per-petal summary table ───────────────────────────────────────
         st.markdown("**Detalle por pétalo:**")
         for i, p in enumerate(petalos):
             n_o = scores_obs[i] if i < len(scores_obs) else 0
-            n_p = scores_pot[i] if i < len(scores_pot) else 0
+            n_n = scores_new[i] if i < len(scores_new) else 0
+            n_t = n_o + n_n
             lv_o, em_o, co = _score_level(n_o)
-            lv_p, em_p, cp = _score_level(n_p)
-            gap = n_p - n_o
-            gap_txt = f"+{gap} potencial" if gap > 0 else ("= alineado" if n_o > 0 else "")
+            lv_t, em_t, ct = _score_level(n_t)
             st.markdown(
-                f'<div style="display:flex;align-items:center;gap:0.5rem;'                f'padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'                f'<span style="width:26px;">{PETAL_ICONS[i]}</span>'                f'<span style="flex:1;font-size:0.8rem;color:#1B4332;">{p["nombre"][:32]}</span>'                f'<span style="background:{co};color:white;border-radius:5px;'                f'padding:0.1rem 0.5rem;font-size:0.75rem;min-width:90px;text-align:center;">'                f'{em_o} {lv_o} ({n_o})</span>'                f'<span style="font-size:0.7rem;color:#888;min-width:80px;">{gap_txt}</span>'                f'</div>', unsafe_allow_html=True)
+                f'<div style="display:flex;align-items:center;gap:0.5rem;'
+                f'padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
+                f'<span style="width:26px;">{PETAL_ICONS[i]}</span>'
+                f'<span style="flex:1;font-size:0.8rem;color:#1B4332;">{p["nombre"][:34]}</span>'
+                f'<span style="background:{co};color:white;border-radius:5px;'
+                f'padding:0.1rem 0.4rem;font-size:0.72rem;min-width:95px;text-align:center;">'
+                f'{em_o} {lv_o} ({n_o})</span>'
+                f'<span style="color:#F9A825;font-size:0.75rem;min-width:60px;">+{n_n} pot.</span>'
+                f'<span style="background:{ct};color:white;border-radius:5px;'
+                f'padding:0.1rem 0.4rem;font-size:0.72rem;min-width:75px;text-align:center;">'
+                f'{em_t} {lv_t}</span>'
+                f'</div>', unsafe_allow_html=True)
 
-        # ── Single open field ─────────────────────────────────────────────
         st.markdown("---")
         data["pot_practicas_destacadas"] = st.text_area(
             "✨ Prácticas más destacadas del espacio",
-            value=data.get("pot_practicas_destacadas",""),
-            height=100, key="pot_destacadas",
+            value=data.get("pot_practicas_destacadas",""), height=100,
+            key="pot_destacadas",
             placeholder="¿Qué es lo más valioso que ya está ocurriendo en este espacio?")
 
-    # ── Guardar ───────────────────────────────────────────────────────────
     st.markdown("---")
     if st.button("💾 Guardar Flor de la Permacultura", use_container_width=True,
                  type="primary", key="save_potencial"):

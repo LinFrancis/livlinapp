@@ -169,7 +169,7 @@ def generate_docx(data: dict) -> bytes:
 
     p_subtitle = doc.add_paragraph()
     p_subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    rs = p_subtitle.add_run("Diagnóstico de Permacultura Urbana — LivLin v2.0  ·  www.livlin.com")
+    rs = p_subtitle.add_run("Diagnóstico de Permacultura Urbana — LivLin v2.1  ·  www.livlin.com")
     rs.font.size = Pt(13); rs.font.color.rgb = C_MED; rs.italic = True
 
     doc.add_paragraph()
@@ -370,7 +370,8 @@ def generate_docx(data: dict) -> bytes:
     # IPR scores
     ipr_obs = data.get("ipr_obs", [])
     ipr_pot = data.get("ipr_pot", [])
-    _para(doc, "Observado vs Potencial por pétalo:", bold=True, color=C_MAIN, size=12)
+    _para(doc, "Índice de Potencial Regenerativo (IPR) — Observado + Potencial adicional", bold=True, color=C_MAIN, size=12)
+    _para(doc, "OBSERVADO: prácticas activas hoy · POTENCIAL ADICIONAL: nuevas prácticas identificadas por el facilitador (no requiere re-ingresar lo observado)", italic=True, color=C_GRAY, size=9)
     doc.add_paragraph()
 
     import json as _json2
@@ -394,17 +395,17 @@ def generate_docx(data: dict) -> bytes:
         score_txt = f"✅ Observado: {n_o} práctica(s)   |   🌟 Potencial: {n_p} práctica(s)"
         _para(doc, score_txt, bold=True, color=C_MAIN, size=10)
 
-        obs_data = data.get(f"petalo_{i}_obs", {})
-        pot_data = data.get(f"petalo_{i}_pot", {})
+        obs_data  = data.get(f"petalo_{i}_obs",      {})
+        new_data  = data.get(f"petalo_{i}_pot_new",  {})
         otros_obs = data.get(f"petalo_{i}_otros_obs", [])
-        otros_pot = data.get(f"petalo_{i}_otros_pot", [])
+        otros_new = data.get(f"petalo_{i}_otros_new", [])
 
         obs_rows = [(cat_key.replace("_"," ").title(), ", ".join(v))
                     for cat_key, v in obs_data.items() if v]
         if otros_obs: obs_rows.append(("Otros observados", ", ".join(otros_obs)))
         pot_rows = [(cat_key.replace("_"," ").title(), ", ".join(v))
-                    for cat_key, v in pot_data.items() if v]
-        if otros_pot: pot_rows.append(("Otros potencial", ", ".join(otros_pot)))
+                    for cat_key, v in new_data.items() if v]
+        if otros_new: pot_rows.append(("Otros potencial", ", ".join(otros_new)))
 
         if obs_rows:
             _para(doc, "✅ Prácticas observadas:", bold=True, color=RGBColor(0x1B,0x43,0x32), size=9)
