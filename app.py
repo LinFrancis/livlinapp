@@ -1,4 +1,4 @@
-"""Indagación Regenerativa v2.1 — LivLin · Multi-usuario + Google Drive."""
+"""Indagación Regenerativa v2.2 — LivLin · Multi-usuario + Google Drive."""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
@@ -48,7 +48,7 @@ def _login_page():
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
                 # Invalidate visit cache to force reload from Drive on login
-                st.session_state.pop("_visits_cache_v2.1", None)
+                st.session_state.pop("_visits_cache_v2.2", None)
                 st.session_state.pop("_sb_status_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
@@ -62,7 +62,7 @@ def _login_page():
                 st.rerun()
             else:
                 st.error("⚠️ Usuario o contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v2.1 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v2.2 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
 
 
 def _sidebar():
@@ -79,7 +79,7 @@ def _sidebar():
                 '<span style="font-family:Georgia;font-size:1.3rem;font-weight:800;color:#1B4332;">🌿 LivLin</span></div>',
                 unsafe_allow_html=True)
         st.markdown('<div style="text-align:center;padding:0 0 0.4rem;">'
-            '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Indagación Regenerativa v2.1</span></div>',
+            '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Indagación Regenerativa v2.2</span></div>',
             unsafe_allow_html=True)
         st.markdown("---")
 

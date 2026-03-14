@@ -10,78 +10,9 @@ from utils.tab_nav import show_drive_save_status
 # ── Datos embebidos ───────────────────────────────────────────────────────────
 _PETALOS_DATA = [{"nombre": "Manejo de la tierra y la naturaleza (urbano)", "categorias": {"produccion_alimentaria_urbana": ["Huertos en balcones y terrazas", "Huertos en macetas recicladas", "Huertos verticales en muros o cercos", "Jardines comestibles en patios pequeños", "Huertos en azoteas o techos planos", "Microhuertos en ventanas", "Cultivo hidropónico doméstico", "Cultivo acuapónico doméstico", "Cultivo en bolsas de cultivo o contenedores textiles", "Huertos en patios comunitarios", "Huertos escolares", "Huertos en centros culturales", "Huertos en espacios públicos recuperados", "Guerrilla gardening", "Cultivo de microgreens", "Germinados en casa", "Cultivo de hongos comestibles", "Cultivo de setas en café reciclado"], "suelo_vivo": ["Vermicompostaje doméstico", "Compostaje en baldes", "Compostaje bokashi", "Compostaje comunitario en el barrio", "Compostaje en departamentos usando lombrices", "Creación de suelo vivo en macetas", "Uso de microorganismos eficientes", "Uso de bioles y biofertilizantes", "Producción de biochar", "Fabricación de té de compost"], "biodiversidad_urbana": ["Plantación de árboles frutales urbanos", "Corredores de polinizadores", "Jardines para abejas nativas", "Jardines de mariposas", "Jardines medicinales urbanos", "Jardines aromáticos", "Refugios para insectos", "Casas para murciélagos", "Bebederos para aves", "Restauración de pequeños espacios degradados", "Plantación de especies nativas en jardines"], "agua": ["Captación de agua lluvia en casas", "Captación de agua lluvia en edificios", "Barriles recolectores de agua", "Sistemas de infiltración en patios", "Micro zanjas de infiltración", "Reutilización de aguas grises para riego", "Riego por goteo casero", "Jardines de lluvia urbanos", "Micro humedales artificiales"], "semillas": ["Guardar semillas en casa", "Intercambio de semillas entre vecinos", "Bibliotecas de semillas", "Bancos comunitarios de semillas", "Cultivo de variedades locales", "Multiplicación de plantas por esquejes", "Propagación de plantas nativas"]}}, {"nombre": "Ambiente construido", "categorias": {"vivienda_ecologica": ["Bioconstrucción en ampliaciones", "Uso de materiales naturales en remodelaciones", "Muros interiores de tierra o barro", "Pinturas naturales", "Aislación con materiales naturales"], "energia_pasiva": ["Diseño solar pasivo", "Ventilación cruzada en viviendas", "Uso de masas térmicas", "Sombreamiento natural con plantas", "Pérgolas verdes", "Enredaderas en fachadas"], "naturaleza_en_edificios": ["Techos verdes", "Muros verdes", "Jardines verticales comestibles", "Patios interiores con vegetación", "Balcones verdes"], "espacios_multifuncionales": ["Cocinas comunitarias", "Talleres compartidos", "Huertos en condominios", "Bodegas para alimentos comunitarios", "Espacios de compostaje en edificios"], "reutilizacion_materiales": ["Uso de pallets para jardinería", "Construcción con materiales reciclados", "Uso de ventanas recicladas para invernaderos", "Construcción de mini invernaderos", "Reutilización de contenedores"]}}, {"nombre": "Herramientas y tecnologías apropiadas", "categorias": {"energia": ["Paneles solares domésticos", "Calentadores solares de agua", "Cocinas solares", "Secadores solares de alimentos", "Sistemas solares portátiles"], "tecnologias_simples": ["Estufas rocket", "Hornos de barro urbanos", "Biodigestores domésticos pequeños", "Sistemas de riego automatizado de bajo consumo", "Sensores de humedad del suelo"], "agua": ["Filtros de agua domésticos", "Biofiltros de aguas grises", "Sistemas de captación de condensación", "Sistemas de almacenamiento de agua"], "movilidad": ["Uso de bicicleta", "Bicicletas de carga", "Carros para transportar cosechas", "Talleres comunitarios de reparación de bicicletas"], "alimentos": ["Fermentación de alimentos", "Deshidratación solar", "Conservas caseras", "Almacenamiento natural de alimentos", "Refrigeración pasiva"]}}, {"nombre": "Educación y cultura", "categorias": {"educacion_comunitaria": ["Talleres de agroecología urbana", "Talleres de compostaje", "Talleres de huertos urbanos", "Cursos de diseño regenerativo", "Intercambio de saberes tradicionales"], "educacion_practica": ["Aprendizaje basado en huertos", "Programas educativos en jardines escolares", "Programas de voluntariado ambiental", "Programas de mentoría en agroecología"], "cultura_regenerativa": ["Festivales de semillas", "Ferias de agricultura urbana", "Intercambio de plantas", "Cine ambiental comunitario", "Bibliotecas ecológicas"], "arte_y_comunidad": ["Murales ecológicos", "Música comunitaria", "Arte con materiales reciclados", "Teatro ambiental"], "redes": ["Redes de huertos urbanos", "Redes de semillas", "Redes de consumo local", "Redes de economía solidaria"]}}, {"nombre": "Salud y bienestar", "categorias": {"salud_fisica": ["Alimentación basada en plantas", "Consumo de alimentos locales", "Dietas agroecológicas", "Cocina saludable comunitaria"], "salud_mental": ["Jardinería terapéutica", "Baños de bosque urbanos", "Meditación en huertos", "Espacios de contemplación"], "medicina_natural": ["Cultivo de plantas medicinales", "Preparación de tinturas", "Preparación de pomadas", "Preparación de infusiones"], "comunidad": ["Grupos de apoyo comunitario", "Espacios de cuidado colectivo", "Redes de cuidado mutuo"], "movimiento": ["Yoga comunitario", "Tai chi en parques", "Caminatas ecológicas", "Bicicleteadas comunitarias"]}}, {"nombre": "Economía y finanzas", "categorias": {"economia_local": ["Mercados agroecológicos", "Ferias de intercambio", "Canastas comunitarias", "Agricultura apoyada por la comunidad (CSA)"], "economias_solidarias": ["Cooperativas de producción", "Cooperativas de consumo", "Cooperativas de vivienda", "Bancos de tiempo"], "sistemas_alternativos": ["Monedas locales", "Plataformas de trueque", "Redes de intercambio de servicios"], "emprendimientos_regenerativos": ["Producción de alimentos locales", "Viveros urbanos", "Diseño de huertos urbanos", "Educación ambiental", "Consultoría regenerativa"], "consumo_responsable": ["Compras a productores locales", "Reducción de consumo", "Reparación de objetos", "Reutilización de materiales", "Compras colectivas de alimentos", "Comprar a granel", "Evitar plásticos de un solo uso"]}}, {"nombre": "Tenencia de la tierra y gobernanza", "categorias": {"organizacion_comunitaria": ["Asambleas barriales", "Consejos comunitarios", "Mesas ambientales locales"], "gestion_espacios": ["Recuperación de sitios eriazos", "Creación de huertos comunitarios", "Parques comestibles urbanos", "Jardines comunitarios"], "participacion_ciudadana": ["Participación en planificación urbana", "Presupuestos participativos", "Defensa de áreas verdes"], "modelos_propiedad": ["Cooperativas de vivienda", "Comunidades intencionales urbanas", "Fideicomisos de tierra comunitaria"], "redes_territoriales": ["Redes de agroecología urbana", "Redes de transición urbana", "Redes de resiliencia comunitaria"]}}, {"nombre": "Prácticas cotidianas de sustentabilidad", "categorias": {"energia_domestica": ["Apagar luces cuando no se usan", "Usar ampolletas LED", "Usar electrodomésticos de bajo consumo", "Desconectar cargadores", "Usar regletas con interruptor"], "agua_domestica": ["Duchas cortas", "Cerrar la llave al lavar platos", "Reparar fugas de agua", "Reutilizar agua para riego"], "consumo_consciente": ["Comprar productos locales", "Comprar colectivamente", "Evitar envases innecesarios", "Reparar antes de comprar", "Compartir herramientas"], "vida_comunitaria": ["Conectar con vecinos", "Participar en organizaciones locales", "Participar en huertos comunitarios", "Organizar actividades de barrio"], "desarrollo_personal_regenerativo": ["Estudiar sobre regeneración", "Practicar agroecología", "Practicar meditación", "Practicar tai chi", "Practicar yoga", "Participar en talleres de regeneración"]}}]
 
-PETAL_ICONS = ["🌳","🏡","🛠️","📚","🧘","💚","🤝","🌿"]
 
-# ── Descripciones oficiales ───────────────────────────────────────────────────
-PETAL_DESC = {
-    "Manejo de la tierra y la naturaleza (urbano)":
-        ("Corazón de la permacultura urbana: diseñar con la naturaleza para producir "
-         "alimentos, regenerar suelos y restaurar biodiversidad. Incluye huertos, "
-         "compostaje, captación de agua lluvia y corredores de polinizadores.\n\n"
-         "📚 Referencias: Holmgren, D. (2002). *Permacultura: Principios y senderos más allá "
-         "de la sustentabilidad*. Hepburn: Holmgren Design Services. "
-         "Mollison, B. (1988). *Permaculture: A Designers' Manual*. Tagari Publications.\n"
-         "🔗 [Holmgren Design](https://holmgren.com.au) · "
-         "[Permaculture Research Institute](https://www.permaculturenews.org)"),
-    "Ambiente construido":
-        ("Edificaciones e infraestructuras diseñadas con criterios bioclimáticos y bajo "
-         "impacto ambiental. Incluye energía pasiva, materiales naturales, techos y muros "
-         "verdes. Las decisiones en este pétalo tienen impacto durante décadas.\n\n"
-         "📚 Referencias: Minke, G. (2006). *Building with Earth*. Birkhäuser. "
-         "Reed, B. & Moff, S. (2007). *Regenerative Development and Design*. Wiley.\n"
-         "🔗 [Living Future Institute](https://living-future.org) · "
-         "[Passive House Institute](https://passipedia.org)"),
-    "Herramientas y tecnologías apropiadas":
-        ("Selección crítica de tecnologías que sirven a las personas y al planeta. "
-         "Prioriza herramientas simples, reparables y de bajo consumo energético: "
-         "energía solar, biodigestores, sistemas de riego eficiente.\n\n"
-         "📚 Referencias: Schumacher, E.F. (1973). *Small is Beautiful*. Harper & Row. "
-         "ITDG (2016). *Practical Action — Technology challenging poverty*.\n"
-         "🔗 [Practical Action](https://practicalaction.org) · "
-         "[Appropriate Technology Library](https://www.villageearth.org/appropriate-technology)"),
-    "Educación y cultura":
-        ("Transmisión de saberes, valores y prácticas que sostienen culturas regenerativas. "
-         "Abarca educación formal e informal, arte, intercambio de semillas y redes de "
-         "conocimiento local. Sin cultura regenerativa, las técnicas no persisten.\n\n"
-         "📚 Referencias: Freire, P. (1968). *Pedagogía del oprimido*. Siglo XXI. "
-         "Illich, I. (1971). *Deschooling Society*. Harper & Row.\n"
-         "🔗 [Permaculture Research Institute Education](https://www.permaculturenews.org) · "
-         "[Transition Network](https://transitionnetwork.org)"),
-    "Salud y bienestar":
-        ("Sistemas de salud preventivos basados en alimentación viva, movimiento, plantas "
-         "medicinales y comunidad. La jardinería terapéutica, los baños de naturaleza "
-         "y el bienestar colectivo son dimensiones centrales.\n\n"
-         "📚 Referencias: IPES-Food (2017). *Too big to feed*. IPES-Food. "
-         "Pretty, J. et al. (2017). *Nature contact and human health*. "
-         "International Journal of Environmental Research.\n"
-         "🔗 [IPES-Food](https://www.ipes-food.org) · "
-         "[Ecotherapy Research](https://www.ecotherapy.org)"),
-    "Economía y finanzas":
-        ("Sistemas económicos que circulan la riqueza localmente: mercados agroecológicos, "
-         "cooperativas, trueque, monedas locales y finanzas éticas. Reduce la dependencia "
-         "del sistema extractivo y fortalece la soberanía alimentaria.\n\n"
-         "📚 Referencias: Gibson-Graham, J.K. (2006). *A Postcapitalist Politics*. "
-         "Univ. of Minnesota Press. Raworth, K. (2017). *Doughnut Economics*. Chelsea Green.\n"
-         "🔗 [Doughnut Economics Action Lab](https://doughnuteconomics.org) · "
-         "[P2P Foundation](https://p2pfoundation.net)"),
-    "Tenencia de la tierra y gobernanza":
-        ("Marcos legales y comunitarios para el acceso y cuidado colectivo de la tierra. "
-         "Incluye cooperativas de vivienda, huertos comunitarios, asambleas barriales "
-         "y participación ciudadana en el diseño urbano.\n\n"
-         "📚 Referencias: Ostrom, E. (1990). *Governing the Commons*. Cambridge Univ. Press. "
-         "De Angelis, M. (2017). *Omnia Sunt Communia*. Zed Books.\n"
-         "🔗 [Community Land Trust Network](https://www.communitylandtrusts.org.uk) · "
-         "[P2P Foundation Commons](https://p2pfoundation.net/commons)"),
-    "Prácticas cotidianas de sustentabilidad":
-        ("Las acciones diarias del hogar y la vida cotidiana que acumulan impacto sistémico: "
-         "reducir, reutilizar, reparar, consumir local, conectar con vecinos. "
-         "Los pequeños actos transforman la cultura cuando se vuelven hábito colectivo.\n\n"
-         "📚 Referencias: Shove, E. (2003). *Comfort, Cleanliness and Convenience*. "
-         "Berg Publishers. Jackson, T. (2009). *Prosperity Without Growth*. Earthscan.\n"
-         "🔗 [Ellen MacArthur Foundation](https://ellenmacarthurfoundation.org) · "
-         "[Zero Waste International Alliance](https://zwia.org)"),
-}
-
+# ── Contenido compartido (misma fuente que Excel y Word) ────────────────────
+from utils.petal_content import PETAL_DESC, PETAL_ICONS, IPR_SCALE, IPR_WHAT_IS, IPR_OBS_VS_POT
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_level(n: int) -> tuple:
     if n == 0: return "Sin inicio",  "○",  "#BDBDBD"
@@ -145,25 +76,15 @@ def render():
 
     # ── Info IPR ──────────────────────────────────────────────────────────
     with st.expander("ℹ️ ¿Qué es el Índice de Potencial Regenerativo (IPR)?", expanded=False):
-        st.markdown("""
-**El IPR** mide la diversidad y profundidad de prácticas regenerativas activas en un espacio,
-organizadas según los 8 pétalos de la Flor de la Permacultura de David Holmgren (2002).
-
-**¿Cómo leer el IPR?**
-| Nivel | Prácticas | Significado |
-|-------|-----------|-------------|
-| ○ Sin inicio | 0 | Área por explorar — gran potencial latente |
-| 🌱 Iniciando | 1 | El primer paso ya está dado — ¡fundamental! |
-| 🌿 Avanzando | 2 | Dos prácticas muestran intención sostenida |
-| 🌳 Consolidado | 3 | Sistema estable, genera rendimientos constantes |
-| 🌸 Destacado | 4–5 | Alta integración, inspira a otros |
-| ✨ Referente | 6+ | Sistema autónomo, comparte excedentes |
-
-**Observado** = lo que ya existe en el espacio hoy.
-**Potencial adicional** = nuevas prácticas que el facilitador identifica como viables dado el contexto del espacio. No requiere re-ingresar lo observado.
-
-📚 *Holmgren, D. (2002). Permacultura: Principios y senderos más allá de la sustentabilidad.*
-        """)
+        st.markdown(f"**¿Qué es el IPR?** {IPR_WHAT_IS}")
+        st.markdown(f"**Observado vs Potencial:** {IPR_OBS_VS_POT}")
+        st.markdown("**Escala de niveles:**")
+        rows = []
+        for lvl, n, color, meaning in IPR_SCALE:
+            rows.append(f"| {lvl} | {n} | {meaning} |")
+        table_md = "| Nivel | N° prácticas | Significado |\n|-------|-------------|-------------|\n" + "\n".join(rows)
+        st.markdown(table_md)
+        st.markdown("📚 *Holmgren, D. (2002). Permacultura: Principios y senderos. · www.livlin.com*")
 
     # ── Tabs ─────────────────────────────────────────────────────────────
     tab_labels = [f"{PETAL_ICONS[i]} {p['nombre'][:20]}" for i, p in enumerate(petalos)]
@@ -179,7 +100,17 @@ organizadas según los 8 pétalos de la Flor de la Permacultura de David Holmgre
             st.markdown(f"### {icon} {petalo['nombre']}")
 
             with st.expander("📖 ¿Qué es este pétalo? · Referencias", expanded=False):
-                st.markdown(PETAL_DESC.get(petalo['nombre'], ""))
+                desc = PETAL_DESC.get(petalo["nombre"], {})
+                if isinstance(desc, dict):
+                    st.markdown(f"**{desc.get('resumen','')}**")
+                    st.markdown(desc.get("detalle",""))
+                    refs = desc.get("referencias", [])
+                    if refs:
+                        st.markdown("📚 **Referencias:**")
+                        for author, title, url in refs:
+                            st.markdown(f"- {author} — *{title}* · [{url}]({url})")
+                else:
+                    st.markdown(str(desc))
 
             kp = f"p{i}"
             saved_obs  = data.get(f"petalo_{i}_obs",      {})
