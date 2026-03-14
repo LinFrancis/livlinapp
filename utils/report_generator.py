@@ -1,4 +1,4 @@
-"""Excel export v3.1 — LivLin Indagación Regenerativa.
+"""Excel export v3.2 — LivLin Indagación Regenerativa.
 Auto-explicativo, narrativa regenerativa alineada con Mason (2025).
 Logo LivLin embebido en portada.
 """
@@ -16,7 +16,7 @@ from utils.petal_content import (
 )
 
 C1="1B4332"; C2="2D6A4F"; C3="40916C"; C4="52B788"; C5="D8F3DC"
-WHITE="FFFFFF"; GRAY="F5F5F5"; GOLD="FFF8DC"; AMBER="FFF3E0"; AMBER_D="E65100"
+WHITE="FFFFFF"; GRAY="F5F5F5"; GOLD="FFF8DC"; AMBER="FFF3E0"; AMBER_D="2D6A4F"
 
 def _f(h): return PatternFill("solid", fgColor=h)
 def _s(c=C2): return Side(style="thin", color=c)
@@ -124,7 +124,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Título principal (col 2 en adelante para dar espacio al logo)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.1"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v3.2"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55

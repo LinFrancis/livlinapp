@@ -181,6 +181,10 @@ def render():
         st.markdown("---")
         st.markdown("**📅 Patrones Climáticos Anuales**")
         st.caption("Promedios históricos (últimos 5 años). Cargando datos…")
+        st.caption(
+            "📡 **Fuente de datos climáticos:** Open-Meteo Historical Weather API "
+            "(https://open-meteo.com) — promedio histórico 5 años. "
+            "Nominatim OpenStreetMap para geocodificación.")
         with st.spinner("Obteniendo clima anual…"):
             from utils.geo_api import get_annual_climate, get_solar_radiation
             climate = get_annual_climate(lat, lon)

@@ -10,48 +10,87 @@ from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, ge
 
 
 TAO_REFLEXION = """
+**Lo deseado y lo no deseado** *(Tao Te Ching, Cap. 2)*
+
 Lo que buscas también está aquí. Y aquello que no buscas, también.
-Lo deseado y lo no deseado coexisten en el mismo mundo, como el yin y el yang. La regeneración comienza cuando aprendemos a habitar esa realidad con serenidad.
+Lo deseado y lo no deseado coexisten en el mismo mundo, como el yin y el yang.
+El ser y el no-ser se generan mutuamente. Lo difícil y lo fácil se complementan.
+La regeneración comienza cuando aprendemos a habitar esa realidad con serenidad.
 
-A veces parece que todo está perdido. Que los suelos están degradados. Que los ecosistemas están colapsando. Que las sociedades han olvidado su relación con la tierra.
-Sin embargo, la vida sigue latiendo.
-Siempre queda una semilla. Siempre queda suelo vivo en algún lugar. Siempre hay personas que escuchan el llamado.
+*(Tao Te Ching, Cap. 15-16: «¿Quién puede hacer que lo turbio se aclare con quietud?
+Quién puede permanecer quieto para que el movimiento aparezca lentamente?»)*
 
-La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando aprendemos a cooperar con ella.
+---
 
-Durante mucho tiempo la humanidad ha intentado resolver los problemas que ella misma ha creado utilizando los mismos métodos que los generaron: más control, más tecnología, más producción. Pero el camino regenerativo invita a otra cosa.
+**Sobre la triple crisis planetaria** *(Tao Te Ching, Cap. XLVI)*
 
-Invita a escuchar primero.
-Escuchar al suelo. Escuchar al agua. Escuchar al viento.
+A veces parece que todo está perdido. Que los suelos están degradados.
+Que los ecosistemas están colapsando. Que las sociedades han olvidado su relación con la tierra.
+El capítulo 46 del Tao nos recuerda: «Cuando el Tao prevalece en el mundo, los caballos
+abonan los campos. Cuando el Tao no prevalece, los caballos de guerra nacen en las fronteras.»
+No hay mayor calamidad que no estar satisfecho. No hay mayor culpa que el deseo de tener más.
+Sin embargo, la vida sigue latiendo. Siempre queda una semilla. Siempre hay personas que escuchan el llamado.
 
-Los árboles antiguos nos recuerdan que la vida tiene escalas de tiempo mucho más largas que las nuestras. Un bosque de mil años simplemente está viviendo. Nosotros somos apenas un instante en ese ciclo.
-Regenerar es recordar esa pertenencia.
+---
 
-No se trata de salvar la naturaleza como si fuera algo externo a nosotros. Somos naturaleza.
-Cuando cuidamos nuestra propia vida, nuestro cuerpo, nuestra mente y nuestras relaciones, también estamos cuidando la red de vida de la cual formamos parte.
+**Ser parte de la naturaleza** *(Tao Te Ching, Cap. 5 y 25)*
+
+La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando cooperamos con ella.
+El cielo y la tierra no favorecen a nadie: tratan a todos los seres como ofrendas de paja.
+*(Cap. 5)*
+Existe algo que fue antes que el cielo y la tierra, silencioso e informe.
+Único, inmutable, presente en todo. Se le llama la madre del mundo.
+La humanidad sigue la tierra. La tierra sigue el cielo. El cielo sigue el Tao.
+El Tao sigue su propia naturaleza.
+*(Cap. 25)*
+No se trata de salvar la naturaleza como si fuera algo externo — somos naturaleza.
+Cuando cuidamos nuestra propia vida, también cuidamos la red de vida de la cual formamos parte.
+
+---
+
+**Conocerse a uno mismo** *(Tao Te Ching, Cap. 33)*
+
+El capítulo 33 enseña: «Conocer a los demás es sabiduría. Conocerse a uno mismo es iluminación.
+Dominar a los demás requiere fuerza. Dominarse a sí mismo requiere verdadera fortaleza.»
 Por eso el camino regenerativo también es un camino interior.
-
 Mente abierta. Corazón abierto. Voluntad abierta.
 
-La regeneración no se impone a otros. No se fuerza.
-Como enseña el Tao, el agua transforma la roca no por violencia, sino por persistencia.
-El mundo cambia cuando las personas comienzan a vivir de otra manera.
+---
 
-Cuando alguien cultiva alimentos. Cuando alguien cuida el suelo. Cuando una comunidad aprende a compartir.
-Pequeños gestos, repetidos muchas veces, pueden cambiar territorios enteros.
+**Cultivarse a través del lugar** *(Tao Te Ching, Cap. LIV)*
 
-Hoy, en distintos lugares del mundo, están emergiendo respuestas locales frente a desafíos globales. Personas que deciden vivir con mayor simplicidad. Reducir el consumo. Regenerar la tierra. Reconstruir comunidad.
-Estas respuestas no siempre se conocen entre sí, pero comparten un mismo pulso.
-Podríamos llamarlo el pulso de la regeneración.
-Un latido profundo que atraviesa culturas, geografías y generaciones.
+El capítulo 54 nos dice: «Lo que está bien plantado no se arranca.
+Lo que está bien abrazado no se pierde. Sus descendientes lo honrarán generación tras generación.
+Cultivado en uno mismo, su virtud es genuina.
+Cultivado en la familia, su virtud se desborda.
+Cultivado en la comunidad, su virtud crece.
+Cultivado en el reino, su virtud abunda.
+Cultivado en el mundo, su virtud es universal.»
+Cada huerto que cultivas es una semilla de cultura. Cada comunidad que cuidas, un territorio que florece.
 
-Seguir ese pulso implica disciplina, humildad y atención.
-Implica reconocer cuándo avanzar y cuándo detenerse. Cuándo hablar y cuándo escuchar. Cuándo actuar y cuándo dejar que las cosas encuentren su propio equilibrio.
+---
 
-En ese sentido, regenerar no es solo un conjunto de técnicas.
-Es una forma de vida.
-Una forma de caminar con respeto por la tierra, por las personas y por los ciclos de la vida.
+**El descenso creativo y la sabiduría del agua** *(Tao Te Ching, Cap. 8)*
+
+El capítulo 8 enseña: «El supremo bien es como el agua, que beneficia a todos los seres
+sin competir con ninguno. Se establece en los lugares que los hombres rechazan.
+Por eso se acerca al Tao.»
+El descenso creativo no es una caída — es una bajada consciente hacia donde la vida florece:
+simplificar, reducir consumo, ganar en salud, vínculos y comunidad.
+La regeneración no se impone. Como el agua, transforma la roca no por violencia, sino por persistencia.
+
+---
+
+**Sobre el bien fundado** *(Tao Te Ching, Cap. XXXIX)*
+
+El capítulo 39 nos recuerda el valor de lo que sostiene: «Lo que antaño adquirió el Uno:
+el cielo adquirió el Uno y quedó limpio, la tierra adquirió el Uno y quedó firme,
+los espíritus adquirieron el Uno y quedaron plenos, los valles adquirieron el Uno y se llenaron.»
+Un espacio regenerativo es aquel que ha recuperado su Uno — su esencia, su vitalidad,
+su capacidad de sostener vida. Ese es el trabajo que hacemos juntos.
 """
+
+
 
 TAO_INVITACION = """
 Este diagnóstico es solo un momento dentro de un proceso mucho más amplio.

@@ -1,4 +1,4 @@
-"""Contenido LivLin v3.1 — 7 pétalos Holmgren + marco regenerativo.
+"""Contenido LivLin v3.2 — 7 pétalos Holmgren + marco regenerativo.
 Fuentes: Holmgren (2002, 2020), Mason (2025), Mang & Reed (2012).
 """
 
@@ -10,7 +10,7 @@ LIVLIN_TAGLINE = "Potencial para una vida regenerativa"
 TOOL_NAME      = "Indagación Regenerativa"
 
 LIVLIN_DESC = (
-    "LivLin acompaña procesos de transformación regenerativa de espacios urbanos, "
+    "LivLin acompaña procesos de transformación regenerativa de espacios — urbanos, periurbanos y rurales —, "
     "guiando a personas, familias y comunidades hacia formas de vida más conectadas "
     "con los ciclos naturales, más autónomas y más significativas. "
     "A través de diagnósticos participativos, diseño regenerativo y acompañamiento "
@@ -74,7 +74,7 @@ PETAL_DESC = {
         "subtitulo": "Agricultura urbana · suelo vivo · biodiversidad · agua",
         "resumen": (
             "Punto de partida de la permacultura: diseñar sistemas productivos que "
-            "imitan los patrones naturales. En el contexto urbano incluye huertos, "
+            "imitan los patrones naturales. Incluye huertos, "
             "compostaje, captación de agua lluvia y creación de hábitat para fauna "
             "benéfica. Históricamente es el pétalo central de la práctica permacultural "
             "(Holmgren, 2002; Mollison, 1988)."
@@ -315,3 +315,24 @@ GLOBAL_REFS = [
     ("Recursos climáticos", "Clima y Permacultura — videos", "https://www.youtube.com/results?search_query=clima+permacultura"),
     ("LivLin", "Potencial para una vida regenerativa", "https://www.livlin.cl"),
 ]
+
+LIVLIN_NARRATIVE_INTRO = (
+    "¿Te abruma lo que está pasando en el mundo? "
+    "Contaminación, pérdida de biodiversidad, cambio climático, conflictos. "
+    "Si sientes angustia frente a esto, no estás exagerando — estás prestando atención. "
+    "El problema no es sentir preocupación. El problema es quedarnos paralizados.\n\n"
+    "La angustia crece cuando vemos el problema pero no vemos el siguiente paso. "
+    "No podemos arreglar el mundo entero ahora. "
+    "Pero sí podemos transformar el ecosistema que habitamos: nuestra casa, "
+    "nuestra organización, nuestra comunidad.\n\n"
+    "La acción regenerativa comienza con tres preguntas:\n"
+    "¿Qué impacto estoy generando hoy?\n"
+    "¿Cómo puedo reducir daño?\n"
+    "¿Cómo puedo empezar a regenerar?\n\n"
+    "En LivLin acompañamos ese proceso. "
+    "Transformamos la angustia en diseño. La preocupación en estrategia. "
+    "Y la intención en impacto medible.\n\n"
+    "Sentir no es debilidad. Es conciencia. "
+    "Lo importante es qué hacemos con ella. "
+    "Empieza a regenerar donde estás. www.livlin.cl"
+)

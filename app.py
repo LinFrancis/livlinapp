@@ -1,11 +1,11 @@
-"""Indagación Regenerativa v3.1 — LivLin · Multi-usuario · www.livlin.cl"""
+"""Indagación Regenerativa v3.2 — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin v3.1",
+    page_title="Indagación Regenerativa · LivLin v3.2",
     page_icon="🌿", layout="wide",
     initial_sidebar_state="expanded")
 
@@ -48,7 +48,7 @@ def _login_page():
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
                 # Invalidate visit cache to force reload from Drive on login
-                st.session_state.pop("_visits_cache_v3.1", None)
+                st.session_state.pop("_visits_cache_v3.2", None)
                 st.session_state.pop("_sb_status_cache", None)
                 # Load user's visit if linked
                 if user.get("visit_id"):
@@ -62,7 +62,7 @@ def _login_page():
                 st.rerun()
             else:
                 st.error("⚠️ Usuario o contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v3.1 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v3.2 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
 
 
 def _sidebar():
@@ -129,9 +129,24 @@ def _sidebar():
                         if v: st.session_state.visit_data = v; st.session_state.page = "client"; st.rerun()
                 with dl:
                     if st.button("🗑️ Borrar", use_container_width=True, key="btn_del"):
+                        st.session_state["_confirm_del"] = sel
+                        st.rerun()
+
+            if st.session_state.get("_confirm_del") == sel:
+                st.warning(f"⚠️ ¿Confirmar eliminación de **{visit_names.get(sel,'?')}**?")
+                cc1, cc2 = st.columns(2)
+                with cc1:
+                    if st.button("✅ Sí, eliminar", key="btn_del_confirm", type="primary",
+                                 use_container_width=True):
                         delete_visit(sel)
+                        st.session_state.pop("_confirm_del", None)
                         if st.session_state.get("visit_data",{}).get("id") == sel:
                             st.session_state.visit_data = {}
+                        st.rerun()
+                with cc2:
+                    if st.button("❌ Cancelar", key="btn_del_cancel",
+                                 use_container_width=True):
+                        st.session_state.pop("_confirm_del", None)
                         st.rerun()
                 if st.button("➕ Nuevo diagnóstico", use_container_width=True, key="btn_new"):
                     st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
@@ -181,7 +196,7 @@ def _home():
     st.markdown(
         '<div class="app-header">'
         '<h1>Indagación Regenerativa</h1>'
-        '<p>Potencial para una vida regenerativa  ·  LivLin v3.1  ·  www.livlin.cl</p>'
+        '<p>Potencial para una vida regenerativa  ·  LivLin v3.2  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
 
     _, cc, _ = st.columns([1, 3, 1])
@@ -226,6 +241,12 @@ def _home():
         '— Mason, F. (2025). Introducción al enfoque de la regeneración. LivLin. '
         '· www.livlin.cl</span></div>',
         unsafe_allow_html=True)
+
+    with st.expander("💚 ¿Por qué LivLin? — Nuestra propuesta", expanded=False):
+        from utils.petal_content import LIVLIN_NARRATIVE_INTRO
+        st.markdown(
+            f'<div class="tao-quote" style="white-space:pre-line;">{LIVLIN_NARRATIVE_INTRO}</div>',
+            unsafe_allow_html=True)
 
     _, cb, _ = st.columns([2, 1, 2])
     with cb:

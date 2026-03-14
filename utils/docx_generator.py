@@ -1,4 +1,4 @@
-"""Generador Word v3.1 — LivLin Indagación Regenerativa.
+"""Generador Word v3.2 — LivLin Indagación Regenerativa.
 Narrativa regenerativa alineada con Mason (2025). Logo embebido.
 """
 import io, base64, json, tempfile
@@ -24,7 +24,7 @@ except ImportError:
 C1 = RGBColor(0x00,0x59,0x54) if DOCX_OK else None  # #005954
 C2 = RGBColor(0x33,0x8B,0x85) if DOCX_OK else None  # #338B85
 C3 = RGBColor(0x5D,0xC1,0xB9) if DOCX_OK else None  # #5DC1B9
-CA = RGBColor(0xE6,0x51,0x00) if DOCX_OK else None  # amber
+CA = RGBColor(0x2D,0x6A,0x4F) if DOCX_OK else None  # amber
 CG = RGBColor(0x44,0x44,0x44) if DOCX_OK else None  # gray
 
 MODULE_STATUS = {
@@ -152,7 +152,7 @@ def generate_docx(data:dict)->bytes:
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
 
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v3.1  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v3.2  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
 
     doc.add_paragraph()
@@ -370,7 +370,7 @@ def generate_docx(data:dict)->bytes:
 
     # ── PIE ───────────────────────────────────────────────────────────────
     p_pie=doc.add_paragraph(); p_pie.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.1  ·  {str(datetime.now())[:10]}")
+    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v3.2  ·  {str(datetime.now())[:10]}")
     r_pie.font.size=Pt(8); r_pie.font.color.rgb=CG; r_pie.italic=True
 
     buf=io.BytesIO(); doc.save(buf); buf.seek(0)

@@ -51,10 +51,10 @@ h1, h2, h3, h4, h5, h6, p, span, div, label,
     border: 1px solid rgba(27,67,50,0.15) !important;
     border-radius: 6px !important;
     text-align: left !important;
-    font-size: 0.8rem !important;
+    font-size: 0.72rem !important;
     font-weight: 500 !important;
-    letter-spacing: 0.025em !important;
-    padding: 0.45rem 0.8rem !important;
+    letter-spacing: 0.02em !important;
+    padding: 0.35rem 0.65rem !important;
     margin: 1px 0 !important;
     transition: all 0.2s ease !important;
 }
