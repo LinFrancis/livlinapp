@@ -22,11 +22,22 @@
 }
 
 /* ── Global typography ──────────────────────────────────────────────────── */
-html, body, .stApp,
-h1, h2, h3, h4, h5, h6, p, span, div, label,
-.stMarkdown, .stText, .stButton, .stSelectbox,
-.stTextInput, .stTextArea, .stRadio, .stCheckbox,
-.stMultiSelect, .stTabs, button {
+html, body, .stApp {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.stMarkdown,
+.stText,
+.stButton,
+.stSelectbox,
+.stTextInput input,
+.stTextArea textarea,
+.stRadio label,
+.stCheckbox label,
+.stMultiSelect,
+.stTabs,
+button,
+label {
     font-family: 'Montserrat', sans-serif !important;
 }
 
