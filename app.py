@@ -132,24 +132,25 @@ def _sidebar():
                         st.session_state["_confirm_del"] = sel
                         st.rerun()
 
-            if st.session_state.get("_confirm_del") == sel:
-                st.warning(f"⚠️ ¿Confirmar eliminación de **{visit_names.get(sel,'?')}**?")
-                cc1, cc2 = st.columns(2)
-                with cc1:
-                    if st.button("✅ Sí, eliminar", key="btn_del_confirm", type="primary",
-                                 use_container_width=True):
-                        delete_visit(sel)
-                        st.session_state.pop("_confirm_del", None)
-                        if st.session_state.get("visit_data",{}).get("id") == sel:
-                            st.session_state.visit_data = {}
-                        st.rerun()
-                with cc2:
-                    if st.button("❌ Cancelar", key="btn_del_cancel",
-                                 use_container_width=True):
-                        st.session_state.pop("_confirm_del", None)
-                        st.rerun()
-                if st.button("➕ Nuevo diagnóstico", use_container_width=True, key="btn_new"):
-                    st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
+                if st.session_state.get("_confirm_del") == sel:
+                    st.warning(f"⚠️ ¿Confirmar eliminación de **{visit_names.get(sel,'?')}**?")
+                    cc1, cc2 = st.columns(2)
+                    with cc1:
+                        if st.button("✅ Sí, eliminar", key="btn_del_confirm", type="primary",
+                                     use_container_width=True):
+                            delete_visit(sel)
+                            st.session_state.pop("_confirm_del", None)
+                            if st.session_state.get("visit_data",{}).get("id") == sel:
+                                st.session_state.visit_data = {}
+                            st.rerun()
+                    with cc2:
+                        if st.button("❌ Cancelar", key="btn_del_cancel",
+                                     use_container_width=True):
+                            st.session_state.pop("_confirm_del", None)
+                            st.rerun()
+
+            if st.button("➕ Nuevo diagnóstico", use_container_width=True, key="btn_new"):
+                st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
 
         space = user.get("space_name", "")
         st.markdown("---")
