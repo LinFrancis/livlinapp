@@ -15,6 +15,71 @@ COMPOSICION_GRUPO = [
     "Comunidad intencional","Grupo comunitario / vecinos","Organización o institución","Otro",
 ]
 
+
+def _render_folium_map(lat: float, lon: float, data: dict, sat_mode: bool = False):
+    """Render an interactive Folium map with the space location and nearby places."""
+    try:
+        import folium
+        from streamlit_folium import st_folium
+    except ImportError:
+        # Fallback: use st.map if folium not available
+        import pandas as pd
+        st.map(pd.DataFrame({"lat": [lat], "lon": [lon]}), zoom=15)
+        st.caption("Para mapa interactivo, instala: folium streamlit-folium")
+        return
+
+    # Choose tile layer
+    tile = "CartoDB positron"
+    if sat_mode:
+        tile = "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+
+    m = folium.Map(location=[lat, lon], zoom_start=16,
+                   tiles=tile,
+                   attr="© OpenStreetMap contributors" if not sat_mode else "© Google")
+
+    # Main marker
+    folium.Marker(
+        [lat, lon],
+        popup=folium.Popup(
+            f"<b>{data.get('proyecto_nombre','Espacio')}</b><br>"
+            f"{data.get('proyecto_cliente','')}<br>"
+            f"Lat: {lat:.6f}<br>Lon: {lon:.6f}",
+            max_width=250),
+        tooltip=data.get("proyecto_nombre", "Espacio diagnóstico"),
+        icon=folium.Icon(color="green", icon="leaf", prefix="fa"),
+    ).add_to(m)
+
+    # Add nearby places if saved
+    nearby_raw = data.get("entorno_lugares_cercanos")
+    if nearby_raw:
+        try:
+            import ast
+            places = ast.literal_eval(nearby_raw) if isinstance(nearby_raw, str) else nearby_raw
+            color_map = {"parques":"green","ferias":"orange","mercados":"blue",
+                         "bibliotecas":"purple","escuelas":"red","huertas":"darkgreen"}
+            for p in places[:12]:
+                cat_key = p.get("categoria","").split()[1].lower() if p.get("categoria") else ""
+                c = "gray"
+                for k, v in color_map.items():
+                    if k in cat_key or k in p.get("categoria","").lower():
+                        c = v; break
+                folium.CircleMarker(
+                    [p["lat"], p["lon"]],
+                    radius=8,
+                    color=c, fill=True, fill_color=c, fill_opacity=0.7,
+                    popup=folium.Popup(
+                        f"<b>{p['name']}</b><br>{p.get('categoria','')}<br>{p['dist_m']} m",
+                        max_width=200),
+                    tooltip=f"{p['name']} ({p['dist_m']}m)",
+                ).add_to(m)
+        except Exception:
+            pass
+
+    # Render
+    map_data = st_folium(m, width="100%", height=400, returned_objects=[])
+    return map_data
+
+
 def render():
     from utils.module_status import is_readonly as _is_ro, render_readonly_notice
     _readonly = _is_ro()
@@ -96,41 +161,51 @@ def render():
             from utils.geo_api import geocode_address, get_weather_now, wmo_weather_description, wind_direction_label, get_lunar_phase
             geo = geocode_address(addr_display)
         if geo:
-            data.update({"geo_lat": geo["lat"], "geo_lon": geo["lon"],
+            data.update({"geo_lat": float(geo["lat"]), "geo_lon": float(geo["lon"]),
                          "geo_display": geo["display_name"],
                          "geo_city": geo["city"], "geo_country": geo["country"]})
+            # Save immediately so coords survive rerun
+            st.session_state.visit_data = data
+            save_visit(data)
             st.success(f"📍 {geo['display_name']}")
+            st.rerun()
         else:
-            st.warning("No se encontró la dirección. Intenta ser más específico/a.")
+            st.warning("No se encontró la dirección. Intenta con ciudad y país: 'Los Aromos 234, Ñuñoa, Santiago, Chile'")
 
     if data.get("geo_lat"):
-        lat, lon = data["geo_lat"], data["geo_lon"]
-        import pandas as pd
-        map_df = pd.DataFrame({"lat": [lat], "lon": [lon]})
+        lat, lon = float(data["geo_lat"]), float(data["geo_lon"])
 
-        if sat_mode:
-            # Satellite tile via stacked info
-            st.markdown(f'<div class="geo-info-box">📍 {data.get("geo_display","")}<br>'
-                f'🌐 Lat: {lat:.5f}  Lon: {lon:.5f}<br>'
-                f'<a href="https://www.google.com/maps/@{lat},{lon},17z/data=!3m1!1e3" target="_blank">'
-                f'🛰️ Ver en Google Maps Satélite</a> &nbsp;|&nbsp; '
-                f'<a href="https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=17/{lat}/{lon}" target="_blank">'
-                f'🗺️ Ver en OpenStreetMap</a></div>', unsafe_allow_html=True)
-        else:
-            st.map(map_df, zoom=15)
-            st.caption(f'🛰️ [Ver en satélite Google Maps](https://www.google.com/maps/@{lat},{lon},17z/data=!3m1!1e3) | [OpenStreetMap](https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=17/{lat}/{lon})')
+        # Coordinates info box
+        st.markdown(
+            f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
+            f'border-left:3px solid #52B788;margin-bottom:0.5rem;font-size:0.85rem;">'
+            f'<strong>📍 {data.get("geo_display","")}</strong><br>'
+            f'Latitud: <code>{lat:.6f}</code> &nbsp;·&nbsp; Longitud: <code>{lon:.6f}</code><br>'
+            f'<a href="https://www.google.com/maps/@{lat},{lon},17z/data=!3m1!1e3" target="_blank">'
+            f'Ver en Google Maps satélite</a> &nbsp;|&nbsp;'
+            f'<a href="https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=17/{lat}/{lon}" target="_blank">'
+            f'OpenStreetMap</a> &nbsp;|&nbsp;'
+            f'<a href="https://shademap.app/@{lat},{lon},15z" target="_blank">ShadowMap</a>'
+            f'</div>', unsafe_allow_html=True)
+
+        # Interactive Folium map
+        _render_folium_map(lat, lon, data, sat_mode)
 
         # ── Buscar lugares cercanos ──────────────────────────────────────
-        st.markdown("**🔎 Buscar en el entorno:**")
+        st.markdown("**Buscar lugares y servicios cercanos:**")
         from utils.geo_api import search_nearby_places
         cat_options = ["parques","ferias","mercados","bibliotecas","escuelas","huertas"]
-        cat_labels  = ["🌳 Parques","🛒 Ferias/Mercados","🏪 Tiendas alimentos","📚 Bibliotecas","🏫 Escuelas","🌱 Huertas"]
-        sel_cats = st.multiselect("Buscar categorías:", cat_options,
-            format_func=lambda x: dict(zip(cat_options,cat_labels)).get(x, x), key="nearby_cats")
-        radius_km = st.slider("Radio de búsqueda (km)", 1, 20, 3, step=1, key="nearby_radius")
-        if sel_cats and st.button("🔍 Buscar lugares cercanos", key="nearby_btn"):
+        cat_labels  = ["Parques y áreas verdes","Ferias y mercados","Tiendas de alimentos","Bibliotecas","Escuelas","Huertas comunitarias"]
+        col_near1, col_near2 = st.columns([2, 1])
+        with col_near1:
+            sel_cats = st.multiselect("Categorías a buscar:", cat_options,
+                format_func=lambda x: dict(zip(cat_options,cat_labels)).get(x, x),
+                key="nearby_cats")
+        with col_near2:
+            radius_km = st.slider("Radio (km)", 1, 10, 2, step=1, key="nearby_radius")
+        if sel_cats and st.button("Buscar lugares cercanos", key="nearby_btn", type="secondary"):
             all_places = []
-            with st.spinner("Buscando…"):
+            with st.spinner("Buscando en OpenStreetMap…"):
                 for cat in sel_cats:
                     places = search_nearby_places(lat, lon, cat, radius_km*1000)
                     for p in places:
@@ -138,11 +213,30 @@ def render():
                         all_places.append(p)
             if all_places:
                 all_places.sort(key=lambda x: x["dist_m"])
-                for p in all_places[:12]:
-                    st.markdown(f"- {p['categoria']} **{p['name']}** — {p['dist_m']} m")
                 data["entorno_lugares_cercanos"] = str(all_places[:12])
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.rerun()
             else:
-                st.info("No se encontraron lugares en ese radio.")
+                st.info("No se encontraron lugares en ese radio. Prueba con un radio mayor.")
+        # Show nearby places list if saved
+        nearby_raw = data.get("entorno_lugares_cercanos")
+        if nearby_raw:
+            try:
+                import ast as _ast_n
+                places = _ast_n.literal_eval(nearby_raw) if isinstance(nearby_raw, str) else nearby_raw
+                if places:
+                    st.markdown(f"**{len(places)} lugares encontrados:**")
+                    for p in places:
+                        dist = p.get("dist_m", 0)
+                        dist_str = f"{dist} m" if dist < 1000 else f"{dist/1000:.1f} km"
+                        st.markdown(
+                            f'<div style="padding:0.2rem 0;font-size:0.83rem;">'
+                            f'<span style="color:#2D6A4F;font-weight:600;">{p.get("categoria","")}</span> &nbsp;'
+                            f'<strong>{p["name"]}</strong> — {dist_str}</div>',
+                            unsafe_allow_html=True)
+            except Exception:
+                pass
 
         # ── Clima actual ─────────────────────────────────────────────────
         with st.spinner("Cargando datos climáticos…"):

@@ -119,6 +119,41 @@ def _dual_radar(domain_obs, domain_tot, height=400):
     return fig
 
 
+def _render_report_map(lat: float, lon: float, data: dict):
+    """Folium map for the report — shows space + nearby places."""
+    try:
+        import folium
+        from streamlit_folium import st_folium
+        m = folium.Map(location=[lat, lon], zoom_start=16, tiles="CartoDB positron")
+        folium.Marker(
+            [lat, lon],
+            popup=folium.Popup(
+                f"<b>{data.get('proyecto_nombre','Espacio')}</b><br>"
+                f"Lat: {lat:.6f}  Lon: {lon:.6f}", max_width=250),
+            tooltip=data.get("proyecto_nombre","Espacio diagnóstico"),
+            icon=folium.Icon(color="green", icon="leaf", prefix="fa"),
+        ).add_to(m)
+        nearby_raw = data.get("entorno_lugares_cercanos")
+        if nearby_raw:
+            try:
+                import ast as _a
+                places = _a.literal_eval(nearby_raw) if isinstance(nearby_raw, str) else nearby_raw
+                for p in (places or [])[:12]:
+                    folium.CircleMarker(
+                        [p["lat"], p["lon"]], radius=7,
+                        color="#1565C0", fill=True, fill_color="#1565C0", fill_opacity=0.6,
+                        popup=f"{p['name']} ({p.get('dist_m',0)} m)",
+                        tooltip=p["name"],
+                    ).add_to(m)
+            except Exception:
+                pass
+        st_folium(m, width="100%", height=380, returned_objects=[])
+    except ImportError:
+        import pandas as pd
+        st.map(pd.DataFrame({"lat": [lat], "lon": [lon]}), zoom=15)
+        st.caption("Para mapa interactivo instala: folium y streamlit-folium")
+
+
 def render():
     from utils.data_manager import get_visit
     visit_id = st.session_state.get("visit_data", {}).get("id")
@@ -354,10 +389,47 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
             except Exception:
                 pass
 
-    # Herramientas recomendadas según geolocalización
+    # Mapa interactivo + coordenadas + herramientas
     if lat and lon:
-        lat_r = round(float(lat), 2)
-        lon_r = round(float(lon), 2)
+        lat_f = float(lat)
+        lon_f = float(lon)
+        lat_r = round(lat_f, 4)
+        lon_r = round(lon_f, 4)
+
+        # Coordinates card
+        st.markdown(
+            f'<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 1rem;'
+            f'border-left:3px solid #52B788;margin-bottom:0.5rem;font-size:0.85rem;">'
+            f'<strong>Coordenadas del espacio:</strong> &nbsp;'
+            f'Latitud: <code>{lat_f:.6f}</code> &nbsp;&nbsp; Longitud: <code>{lon_f:.6f}</code>'
+            f'</div>',
+            unsafe_allow_html=True)
+
+        # Interactive map
+        st.markdown("**Mapa del espacio:**")
+        _render_report_map(lat_f, lon_f, data)
+
+        # Nearby places
+        nearby_raw = data.get("entorno_lugares_cercanos")
+        if nearby_raw:
+            try:
+                import ast as _ast_rep
+                places = _ast_rep.literal_eval(nearby_raw) if isinstance(nearby_raw, str) else nearby_raw
+                if places:
+                    st.markdown(f"**{len(places)} lugares cercanos registrados:**")
+                    cols_pl = st.columns(2)
+                    for i, p in enumerate(places):
+                        dist = p.get("dist_m", 0)
+                        dist_str = f"{dist} m" if dist < 1000 else f"{dist/1000:.1f} km"
+                        with cols_pl[i % 2]:
+                            st.markdown(
+                                f'<div style="padding:0.2rem 0;font-size:0.82rem;border-bottom:1px solid #E8F5E9;">'
+                                f'<span style="color:#2D6A4F;">{p.get("categoria","")}</span> '
+                                f'<strong>{p.get("name","")}</strong> — {dist_str}</div>',
+                                unsafe_allow_html=True)
+            except Exception:
+                pass
+
         st.markdown("**Herramientas de análisis solar recomendadas para este espacio:**")
         st.markdown(
             f'<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem 1rem;'

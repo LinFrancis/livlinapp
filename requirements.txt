@@ -10,3 +10,7 @@ python-docx>=1.1.0
 # Google Drive — opcional, solo si se configura para backup adicional
 google-auth>=2.28.0
 google-api-python-client>=2.118.0
+
+# Mapas interactivos
+folium>=0.17.0
+streamlit-folium>=0.23.0
