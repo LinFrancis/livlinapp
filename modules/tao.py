@@ -147,6 +147,37 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
 
     data = st.session_state.visit_data
 
+    # ── Estado del módulo ─────────────────────────────────────────────────
+    st.markdown("**Estado de este módulo:**")
+    _mod_status = render_module_status(data, "mod_tao")
+    if not is_module_active(_mod_status):
+        save_col1, save_col2 = st.columns([1,1])
+        with save_col1:
+            if not _readonly:
+                if st.button("💾 Guardar como No Abordado", key="save_na_mod_tao",
+                             use_container_width=True):
+                    st.session_state.visit_data = data
+                    save_visit(data)
+                    st.success("✅ Módulo marcado como No Abordado.")
+                    show_drive_save_status()
+        return
+    if _mod_status == "inferido":
+        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
+    st.markdown("---")
+
+    # ── Reflexiones desde el Tao de la Regeneración ──────────────────────
+    with st.expander("🌿 Reflexiones desde el Tao de la Regeneración", expanded=False):
+        st.markdown(
+            '<div class="tao-quote">' +
+            TAO_REFLEXION.replace("\n\n", "</div><div class='tao-quote'>") +
+            '</div>', unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown(
+            '<div class="info-box">' + TAO_INVITACION + '</div>',
+            unsafe_allow_html=True)
+
+    st.markdown("---")
+
     # ── T.1 Presencia y relación con el espacio ───────────────────────────
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown("### 🌿 T.1 · Presencia y Relación con el Espacio")
@@ -360,38 +391,6 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
 
     data["tao_notas"]= st.text_area("📝 Notas del Tao de la Regeneración", value=data.get("tao_notas",""), height=80)
     st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # ── Estado del módulo ─────────────────────────────────────────────────
-    st.markdown("**Estado de este módulo:**")
-    _mod_status = render_module_status(data, "mod_tao")
-    if not is_module_active(_mod_status):
-        # Limpiar valores por defecto si el módulo no fue abordado
-        save_col1, save_col2 = st.columns([1,1])
-        with save_col1:
-            if not _readonly:
-                if st.button("💾 Guardar como No Abordado", key="save_na_mod_tao",
-                             use_container_width=True):
-                    st.session_state.visit_data = data
-                    save_visit(data)
-                    st.success("✅ Módulo marcado como No Abordado.")
-                    show_drive_save_status()
-        return
-    if _mod_status == "inferido":
-        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
-    st.markdown("---")
-
-    # ── Reflexión: Tao de la Regeneración ────────────────────────────────
-    with st.expander("🌿 Reflexiones desde el Tao de la Regeneración", expanded=False):
-        st.markdown(
-            '<div class="tao-quote">' +
-            TAO_REFLEXION.replace("\n\n", "</div><div class='tao-quote'>") +
-            '</div>', unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown(
-            '<div class="info-box">' + TAO_INVITACION + '</div>',
-            unsafe_allow_html=True)
 
     st.markdown("---")
     _, col_b, _ = st.columns([2,1,2])
