@@ -284,9 +284,16 @@ padding:0.8rem;text-align:center;">
             cat_label = cat_key.replace("_"," ").title()
             opts  = ["(Ninguno)"] + acciones
             prev  = [a for a in saved_obs.get(cat_key, []) if a in acciones]
-            # NO rerun on change - collect all at once
+            def _on_change_obs(ck=cat_key, k=f"{kp}_obs_{cat_key}"):
+                vals = [s for s in (st.session_state.get(k) or []) if s != "(Ninguno)"]
+                d = st.session_state.get("visit_data", {})
+                if f"petalo_{active}_obs" not in d:
+                    d[f"petalo_{active}_obs"] = {}
+                d[f"petalo_{active}_obs"][ck] = vals
+                st.session_state.visit_data = d
             sel = st.multiselect(cat_label, options=opts, default=prev,
                                  key=f"{kp}_obs_{cat_key}",
+                                 on_change=_on_change_obs,
                                  placeholder="Selecciona las que aplican…")
             new_obs[cat_key] = [s for s in sel if s != "(Ninguno)"]
         data[f"petalo_{active}_obs"] = new_obs
@@ -332,8 +339,16 @@ padding:0.8rem;text-align:center;">
             if len(opts_pot) == 1: continue
             prev = [a for a in saved_new.get(cat_key, [])
                     if a in acciones and a not in ya_obs]
+            def _on_change_pot(ck=cat_key, k=f"{kp}_pot_{cat_key}"):
+                vals = [s for s in (st.session_state.get(k) or []) if s != "(Ninguno)"]
+                d = st.session_state.get("visit_data", {})
+                if f"petalo_{active}_pot_new" not in d:
+                    d[f"petalo_{active}_pot_new"] = {}
+                d[f"petalo_{active}_pot_new"][ck] = vals
+                st.session_state.visit_data = d
             sel = st.multiselect(cat_label, options=opts_pot, default=prev,
                                  key=f"{kp}_pot_{cat_key}",
+                                 on_change=_on_change_pot,
                                  placeholder="Nuevas acciones a sumar…")
             new_new[cat_key] = [s for s in sel if s != "(Ninguno)"]
         data[f"petalo_{active}_pot_new"] = new_new

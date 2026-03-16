@@ -196,9 +196,75 @@ def render():
 
     # IPR methodology explanation (collapsible)
     with st.expander("Como se calcula el Indice de Potencial Regenerativo (IPR)", expanded=False):
-        st.markdown(f'<div style="background:#F0FFF4;border-radius:8px;padding:1rem;'
-                    f'font-size:0.85rem;color:#1B4332;white-space:pre-line;">{IPR_METODOLOGIA}</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:12px;padding:1.2rem 1.5rem;">',
+            unsafe_allow_html=True)
+
+        st.markdown("#### Indice de Potencial Regenerativo (IPR) v6.0")
+        st.markdown("""
+El IPR mide el nivel de actividad regenerativa del espacio. Se expresa en una escala de **0 a 5** con 5 niveles:
+
+| Nivel | Nombre | Prácticas activas |
+|-------|--------|-------------------|
+| 0 | Sin inicio | 0 prácticas |
+| 1 | Semilla | 1-2 prácticas |
+| 2 | Brote | 3-5 prácticas |
+| 3 | Crecimiento | 6-9 prácticas |
+| 4 | Florecimiento | 10-14 prácticas |
+| 5 | Abundancia | 15 o más prácticas |
+""")
+
+        st.markdown("#### Dos perspectivas complementarias")
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.markdown(
+                '<div style="background:#D8F3DC;border-radius:8px;padding:0.8rem;border-left:3px solid #1B4332;">' +
+                '<strong style="color:#1B4332;">Estado actual</strong><br>' +
+                '<span style="font-size:0.85rem;color:#333;">Refleja lo que ya está ocurriendo en el espacio hoy. ' +
+                'Solo cuenta las prácticas observadas directamente durante el diagnóstico. ' +
+                'Un puntaje bajo no indica carencia — indica el enorme potencial de transformación disponible.</span></div>',
+                unsafe_allow_html=True)
+        with col_b:
+            st.markdown(
+                '<div style="background:#FFFDE7;border-radius:8px;padding:0.8rem;border-left:3px dashed #52B788;">' +
+                '<strong style="color:#2D6A4F;">Potencial proyectado</strong><br>' +
+                '<span style="font-size:0.85rem;color:#333;">Describe lo que el espacio podría llegar a ser ' +
+                'incorporando las prácticas adicionales identificadas por el facilitador. ' +
+                'No es una promesa — es el horizonte posible si se avanza en el camino regenerativo.</span></div>',
+                unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("#### Composición del IPR Global")
+        st.markdown("""
+El IPR global integra dos componentes con distinto peso:
+
+**70% — Modelo Flor de la Permacultura (MFP)**
+Promedio de los 7 pétalos de Holmgren (2002). Cada pétalo recibe un puntaje 0-5 según la cantidad de prácticas activas o identificadas en las categorías de ese pétalo.
+
+**30% — Sub-indicadores de módulos 2 a 6**
+Información cuantitativa y cualitativa del espacio registrada en otros módulos del diagnóstico:
+- Calidad del suelo (materia orgánica, compactación, drenaje) — M2
+- Biodiversidad observada (tipos de vegetación, fauna del suelo, aves) — M2
+- Potencial productivo (área cultivable, producción actual) — M3
+- Gestión del agua (captación lluvia, grises, eficiencia de riego) — M5
+- Eficiencia energética (fuente energética, LED, consumo estimado) — M6
+- Contexto comunitario (relaciones vecinales, participación barrial) — M4
+
+Cuando estos módulos no han sido completados, el IPR global se calcula solo con el MFP.
+""")
+
+        st.markdown("#### Las 10 dimensiones del potencial regenerativo")
+        from utils.scoring import DIM_WHAT_MEASURES
+        for dim, info in DIM_WHAT_MEASURES.items():
+            st.markdown(
+                f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">' +
+                f'<span style="font-weight:700;color:#1B4332;">{info["icono"]} {dim}</span> — ' +
+                f'<span style="font-size:0.82rem;color:#555;">{info["que_mide"]}</span>' +
+                f'<br><span style="font-size:0.72rem;color:#999;">{info["fuentes"]}</span></div>',
+                unsafe_allow_html=True)
+
+        st.markdown(
+            '</div>', unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -231,6 +297,43 @@ def render():
         _show_field("Descripción del grupo", data.get("proyecto_habitantes"))
     if data.get("geo_display"):
         _show_field("Ubicación geolocalizada", data.get("geo_display"))
+
+    # Datos climáticos si están disponibles
+    if data.get("agua_prec_anual") or data.get("clima_t_max_abs"):
+        st.markdown("**Datos climáticos del sitio:**")
+        c1c, c2c, c3c, c4c = st.columns(4)
+        with c1c: _show_field("Precipitación anual (mm)", data.get("agua_prec_anual"))
+        with c2c: _show_field("T° máxima histórica", data.get("clima_t_max_abs"))
+        with c3c: _show_field("Mes más cálido", data.get("clima_mes_caluroso"))
+        with c4c: _show_field("Mes más frío", data.get("clima_mes_frio"))
+
+    # Intención del grupo habitante
+    intencion_fields = [
+        ("intencion_motivo",      "Motivo para realizar este diagnóstico"),
+        ("intencion_cambios",     "Cambios que desean ver en el espacio"),
+        ("intencion_vision5",     "Visión del espacio en 5 años"),
+        ("intencion_intentado",   "Lo que han intentado antes y sus resultados"),
+        ("intencion_mejor",       "Lo que funciona mejor actualmente"),
+        ("intencion_frustracion", "Lo que genera más frustración"),
+        ("intencion_recursos",    "Recursos con que cuenta el grupo"),
+        ("intencion_suenos",      "Sueños específicos que quieren realizar"),
+        ("intencion_notas",       "Observaciones adicionales del facilitador"),
+    ]
+    has_intencion = any(data.get(k) for k,_ in intencion_fields)
+    if has_intencion:
+        st.markdown("**Intención del grupo habitante:**")
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:8px;padding:0.5rem 0.8rem;'
+            'margin-bottom:0.5rem;font-size:0.82rem;color:#2D6A4F;">'
+            'Las siguientes respuestas fueron registradas durante la conversación con el grupo. '
+            'Expresan la motivación, visión y aspiraciones del espacio.</div>',
+            unsafe_allow_html=True)
+        c1i, c2i = st.columns(2)
+        for i, (key, label) in enumerate(intencion_fields):
+            v = data.get(key, "")
+            if v and str(v).strip():
+                with (c1i if i % 2 == 0 else c2i):
+                    _card(label, str(v).strip(), "#F0FFF4", "#1B4332", "#40916C")
 
     st.markdown("---")
 
@@ -362,9 +465,10 @@ def render():
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-        'Registro de las características físicas y ecológicas del espacio: suelo, vegetación, flujos naturales '
-        '(sol, viento, agua) y potencial productivo. Sigue el principio de Holmgren: observar e interactuar '
-        'antes de diseñar.</div>',
+        'Registro de las características físicas y ecológicas del espacio. '
+        'Sigue el primer principio de Holmgren: "Observar e interactuar antes de diseñar." '
+        'La lectura del sitio revela las condiciones reales de suelo, agua, sol, viento y vida '
+        'que definirán todas las decisiones de diseño regenerativo.</div>',
         unsafe_allow_html=True)
 
     # Superficie y cultivo — actual vs futuro, 2 decimales
@@ -455,11 +559,45 @@ def render():
     # Fauna
     fauna_fields = [("fauna_lombrices","Lombrices / organismos del suelo"),("fauna_plagas","Plagas observadas"),("fauna_aves_especies","Aves identificadas")]
     if any(data.get(k) for k,_ in fauna_fields):
-        st.markdown("**Fauna**")
+        st.markdown("**Fauna observada**")
         cf1, cf2, cf3 = st.columns(3)
         for col, (k, l) in zip([cf1,cf2,cf3], fauna_fields):
             with col:
                 _card(l, str(data.get(k,"")) if data.get(k) else "", "#F0FFF4","#1B4332","#40916C")
+
+    # Bancales detallados
+    bancales = data.get("bancales", [])
+    if isinstance(bancales, list) and bancales:
+        st.markdown("**Zonas de cultivo registradas:**")
+        total_area_b = sum(b.get("area",0) for b in bancales)
+        st.markdown(f'<div style="font-size:0.82rem;color:#2D6A4F;margin-bottom:0.3rem;">Total: {total_area_b:.2f} m² en {len(bancales)} zona(s)</div>', unsafe_allow_html=True)
+        cols_b = st.columns(min(len(bancales), 3))
+        for i, b in enumerate(bancales):
+            with cols_b[i % 3]:
+                st.markdown(
+                    f'<div style="background:#F0FFF4;border-radius:8px;padding:0.5rem;margin-bottom:0.4rem;">'
+                    f'<div style="font-weight:700;font-size:0.82rem;color:#1B4332;">{b.get("nombre","Zona")}</div>'
+                    f'<div style="font-size:0.78rem;color:#40916C;">{b.get("tipo","")} · {b.get("area",0)} m²</div>'
+                    f'<div style="font-size:0.75rem;color:#666;">{b.get("litros",0):,} L sustrato</div></div>',
+                    unsafe_allow_html=True)
+
+    # Espacios construidos (departamentos/terrazas)
+    esp_fields = [
+        ("esp_tipo_piso",    "Tipo de superficie"),
+        ("esp_exposicion",   "Orientación del espacio"),
+        ("esp_sol_horas",    "Horas de sol directo"),
+        ("esp_viento",       "Exposición al viento"),
+        ("esp_estructura",   "Estructuras existentes para cultivo"),
+        ("esp_contenedores", "Contenedores disponibles"),
+    ]
+    if any(data.get(k) for k,_ in esp_fields):
+        st.markdown("**Características del espacio construido:**")
+        ce1, ce2 = st.columns(2)
+        for i, (k, l) in enumerate(esp_fields):
+            v = data.get(k)
+            if v:
+                with (ce1 if i % 2 == 0 else ce2):
+                    _card(l, str(v), "#E3F2FD", "#1B4332", "#1565C0")
 
     st.markdown("---")
 
@@ -495,11 +633,26 @@ def render():
 
     with c2:
         st.markdown("**Gestión del agua**")
-        _card("Percepción del agua", data.get("agua_ind_general",""), "#E3F2FD","#1B4332","#1565C0")
-        for k, l in [("agua_fuente","Fuente de agua"),("agua_captacion_lluvia","Captación lluvia"),
-                     ("agua_grises","Reutilización de grises"),("agua_riego_sistema","Sistema de riego"),
-                     ("agua_fugas","Fugas o pérdidas")]:
-            _card(l, str(data.get(k,"")) if data.get(k) else "", "#E3F2FD","#1B4332","#1565C0")
+        _card("Percepción general del agua", data.get("agua_ind_general",""), "#E3F2FD","#1B4332","#1565C0")
+        for k, l in [
+            ("agua_fuente",           "Fuente de agua principal"),
+            ("agua_captacion_lluvia", "Captación de agua lluvia"),
+            ("agua_grises",           "Reutilización de aguas grises"),
+            ("agua_riego_sistema",    "Sistema de riego"),
+            ("agua_fugas",            "Fugas o pérdidas"),
+            ("agua_sequias",          "Experiencia con sequías"),
+            ("agua_sequias_impacto",  "Impacto de las sequías"),
+        ]:
+            v = data.get(k)
+            if v: _card(l, str(v), "#E3F2FD","#1B4332","#1565C0")
+        # Fuentes de agua registradas
+        fuentes = data.get("fuentes_agua", [])
+        if isinstance(fuentes, list) and fuentes:
+            fuentes_text = "; ".join(f"{f.get('nombre','')} ({f.get('lit_dia',0)} L/día)" for f in fuentes)
+            _card("Fuentes de agua registradas", fuentes_text, "#E3F2FD","#1B4332","#1565C0")
+            consumo_tot = sum(f.get("lit_dia",0) for f in fuentes)
+            if consumo_tot > 0:
+                _card("Consumo total estimado", f"{consumo_tot:,} L/día · {round(consumo_tot*365/1000):,} m³/año", "#E3F2FD","#1B4332","#1565C0")
         prec = _safe_float(data.get("agua_prec_anual"))
         techo = _safe_float(data.get("agua_techo_m2"))
         cap = round(prec * techo * 0.8) if prec > 0 and techo > 0 else 0
@@ -508,18 +661,87 @@ def render():
 
         st.markdown("**Energía**")
         _card("Percepción del uso energético", data.get("ene_ind_general",""), "#FFF8E1","#1B4332","#F57C00")
-        for k, l in [("ene_fuente","Fuente de energía"),("ene_led","Iluminación LED"),("ene_solar_interes","Interés en solar")]:
-            _card(l, str(data.get(k,"")) if data.get(k) else "", "#FFF8E1","#1B4332","#F57C00")
+        for k, l in [
+            ("ene_fuente",        "Fuente de energía principal"),
+            ("ene_led",           "Iluminación LED"),
+            ("ene_solar_interes", "Interés en instalar energía solar"),
+        ]:
+            v = data.get(k)
+            if v: _card(l, str(v), "#FFF8E1","#1B4332","#F57C00")
         kwh = _safe_float(data.get("ene_kwh_dia_calc"))
         if kwh > 0:
-            _card("Consumo estimado (kWh/día)", f"{kwh}", "#FFF8E1","#1B4332","#F57C00")
+            _card("Consumo estimado", f"{kwh} kWh/día · {round(kwh*365):,} kWh/año", "#FFF8E1","#1B4332","#F57C00")
+        equipos = data.get("equipos_electricos", [])
+        if isinstance(equipos, list) and equipos:
+            equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh',0)} kWh/día)" for e in equipos)
+            _card("Equipos eléctricos registrados", equip_text, "#FFF8E1","#1B4332","#F57C00")
+
+        st.markdown("**Residuos y materiales**")
+        _card("Percepción de residuos", data.get("res_ind_general",""), "#F3E5F5","#1B4332","#6A1B9A")
+        for k, l in [
+            ("res_compostan",        "Compostaje"),
+            ("res_compost_tipo",     "Sistema de compostaje"),
+            ("res_intentos_fallidos","Intentos previos de compostar"),
+            ("res_separan",          "Separación de reciclables"),
+            ("res_reutilizan",       "Reutilización de materiales"),
+            ("res_segunda_mano",     "Compras de segunda mano"),
+            ("mat_notas",            "Notas de materiales"),
+        ]:
+            v = data.get(k)
+            if v and str(v) not in ["No","Ninguno"]: _card(l, str(v), "#F3E5F5","#1B4332","#6A1B9A")
 
     st.markdown("---")
 
     # ══════════════════════════════════════════════════════════════════════
-    # SECCIÓN 5 — FLOR DE LA PERMACULTURA + IPR DUAL
+    # SECCIÓN 5 — REGISTRO FOTOGRÁFICO
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 5. Flor de la Permacultura — Indice de Potencial Regenerativo")
+    st.markdown("### 5. Registro Fotográfico")
+    st.markdown(
+        '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
+        'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
+        'Fotografías registradas durante el diagnóstico del espacio. '
+        'Documentan el estado actual, las condiciones ecológicas y las oportunidades identificadas.</div>',
+        unsafe_allow_html=True)
+
+    visit_id = data.get("id", "")
+    _photos_shown = False
+    if visit_id:
+        try:
+            from utils.supabase_db import is_configured
+            import base64
+            use_sb = is_configured()
+            if use_sb:
+                from modules.media_manager import _sb_load_photos
+                photos = _sb_load_photos(visit_id)
+            else:
+                from modules.media_manager import _tmp_photos
+                photos = _tmp_photos(visit_id)
+            if photos:
+                _photos_shown = True
+                st.markdown(f"**{len(photos)} foto(s) del diagnóstico:**")
+                n_cols = min(3, len(photos))
+                cols_ph = st.columns(n_cols)
+                for idx, ph in enumerate(photos):
+                    try:
+                        raw = base64.b64decode(ph["data"])
+                        with cols_ph[idx % n_cols]:
+                            st.image(raw, caption=ph.get("label",""), use_container_width=True)
+                            created = str(ph.get("created_at",""))[:16].replace("T"," ")
+                            if created:
+                                st.caption(f"{created}")
+                    except Exception:
+                        pass
+        except Exception as e:
+            st.caption(f"No se pudieron cargar las fotos: {e}")
+    if not _photos_shown:
+        st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">No hay fotos registradas para este diagnóstico.</div>', unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # SECCIÓN 6 — FLOR DE LA PERMACULTURA + IPR DUAL
+    # ══════════════════════════════════════════════════════════════════════
+    st.markdown("### 6. Flor de la Permacultura — Indice de Potencial Regenerativo")
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -640,7 +862,7 @@ def render():
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 6 — POTENCIALES DEL SITIO + SUB-INDICADORES
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 6. Potenciales del Sitio")
+    st.markdown("### 7. Potenciales del Sitio")
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -763,7 +985,7 @@ def render():
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 7 — SÍNTESIS NARRATIVA
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 7. Sintesis del Diagnóstico")
+    st.markdown("### 8. Sintesis del Diagnóstico")
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -798,7 +1020,7 @@ def render():
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 8 — PLAN DE ACCIÓN
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 8. Plan de Accion")
+    st.markdown("### 9. Plan de Accion")
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -838,7 +1060,7 @@ def render():
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 9 — CIERRE Y CONTACTO
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 9. Continuar el camino regenerativo")
+    st.markdown("### 10. Continuar el camino regenerativo")
     st.markdown(
         '<div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:1px solid #A8D5B5;'
         'border-radius:12px;padding:1.2rem 1.5rem;font-size:0.88rem;color:#1B4332;line-height:1.7;">'

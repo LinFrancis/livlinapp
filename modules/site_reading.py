@@ -124,7 +124,8 @@ def _render_suelo_veg(data, only_containers):
                      "Plantas colgantes","Trepadoras","Sin vegetación actual"]
     veg_opts = veg_opts_cont if only_containers else veg_opts_soil
     data["veg_tipos"]   = st.multiselect("Tipos de vegetación presentes", veg_opts,
-        default=[v for v in data.get("veg_tipos",[]) if v in veg_opts])
+        default=[v for v in data.get("veg_tipos",[]) if v in veg_opts],
+        key="veg_tipos_sel")
     c3, c4 = st.columns(2)
     with c3:
         data["veg_especies"]  = st.text_area("Especies identificadas", value=data.get("veg_especies",""), height=80,
@@ -217,7 +218,8 @@ def _render_cultivo(data, only_containers):
         areas_opts = ["Suelo directo","Macetas","Bancales elevados","Terrazas","Balcones","Azoteas",
                       "Muros / cultivo vertical","Growbags / sacos"]
         data["cultivo_areas_tipo"]   = st.multiselect("Áreas potenciales para cultivo", areas_opts,
-            default=[v for v in data.get("cultivo_areas_tipo",[]) if v in areas_opts])
+            default=[v for v in data.get("cultivo_areas_tipo",[]) if v in areas_opts],
+            key="cultivo_areas_sel")
         data["cultivo_riego_acceso"] = st.select_slider("Acceso al agua para riego",
             options=["Difícil","Moderado","Fácil"], value=data.get("cultivo_riego_acceso","Moderado"))
         data["cultivo_produce_hoy"]  = st.radio("¿Se producen alimentos actualmente?",
