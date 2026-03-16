@@ -207,8 +207,8 @@ exista al menos una práctica activa ya es un avance significativo.
             fig.update_layout(
                 polar=dict(
                     bgcolor="rgba(240,255,244,0.4)",
-                    radialaxis=dict(visible=True, range=[0,10],
-                        tickvals=[2,4,6,8,10],
+                    radialaxis=dict(visible=True, range=[0,5],
+                        tickvals=[1,2,3,4,5],
                         tickfont=dict(size=8, color="#2D6A4F"),
                         gridcolor="rgba(45,106,79,0.2)")),
                 legend=dict(orientation="h", yanchor="bottom", y=1.05, font=dict(size=10)),
@@ -224,7 +224,7 @@ exista al menos una práctica activa ya es un avance significativo.
 padding:0.8rem;text-align:center;margin-bottom:0.5rem;">
 <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">IPR Estado actual</div>
 <div style="font-size:2.8rem;font-weight:900;color:#1B4332;line-height:1;">{regen_obs_v5}</div>
-<div style="color:#52B788;font-size:0.75rem;">/10</div>
+<div style="color:#52B788;font-size:0.75rem;">/5</div>
 <div style="font-size:0.75rem;color:{color_obs_v5};font-weight:600;">{label_obs_v5}</div></div>''',
                     unsafe_allow_html=True)
                 st.markdown(
@@ -232,7 +232,7 @@ padding:0.8rem;text-align:center;margin-bottom:0.5rem;">
 padding:0.8rem;text-align:center;">
 <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">IPR Con potencial</div>
 <div style="font-size:2.8rem;font-weight:900;color:#52B788;line-height:1;">{regen_pot_v5}</div>
-<div style="color:#52B788;font-size:0.75rem;">/10</div>
+<div style="color:#52B788;font-size:0.75rem;">/5</div>
 <div style="font-size:0.75rem;color:{color_pot_v5};font-weight:600;">{label_pot_v5}</div></div>''',
                     unsafe_allow_html=True)
         except Exception as e:

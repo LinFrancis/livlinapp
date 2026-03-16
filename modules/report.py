@@ -104,8 +104,8 @@ def _dual_radar(domain_obs, domain_tot, height=400):
         polar=dict(
             bgcolor="rgba(240,255,244,0.4)",
             radialaxis=dict(
-                visible=True, range=[0, 10],
-                tickvals=[2, 4, 6, 8, 10],
+                visible=True, range=[0, 5],
+                tickvals=[1, 2, 3, 4, 5],
                 tickfont=dict(size=9, color="#2D6A4F"),
                 gridcolor="rgba(45,106,79,0.2)"),
             angularaxis=dict(tickfont=dict(size=10, color="#1B4332")),
@@ -178,14 +178,14 @@ def render():
                                 padding:0.8rem 1.2rem;border:2px solid #D8F3DC;min-width:120px;">
                         <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">Estado actual</div>
                         <div style="font-size:2.8rem;font-weight:900;color:#1B4332;line-height:1;">{regen_obs}</div>
-                        <div style="color:#52B788;font-size:0.75rem;">/10</div>
+                        <div style="color:#52B788;font-size:0.75rem;">/5</div>
                         <div style="font-size:0.75rem;color:{color_obs};font-weight:600;margin-top:0.2rem;">{label_obs}</div>
                     </div>
                     <div style="text-align:center;background:white;border-radius:12px;
                                 padding:0.8rem 1.2rem;border:2px dashed #52B788;min-width:120px;">
                         <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">Con potencial</div>
                         <div style="font-size:2.8rem;font-weight:900;color:#52B788;line-height:1;">{regen_pot}</div>
-                        <div style="color:#52B788;font-size:0.75rem;">/10</div>
+                        <div style="color:#52B788;font-size:0.75rem;">/5</div>
                         <div style="font-size:0.75rem;color:{color_pot};font-weight:600;margin-top:0.2rem;">{label_pot}</div>
                     </div>
                 </div>
@@ -563,7 +563,7 @@ def render():
             f'<div style="font-size:0.68rem;color:#888;text-transform:uppercase;">'
             f'IPR {"actual" if perspective=="actual" else "proyectado"}</div>'
             f'<div style="font-size:3rem;font-weight:900;color:#1B4332;line-height:1;">{score_actual}</div>'
-            f'<div style="color:#52B788;font-size:0.8rem;">/10</div>'
+            f'<div style="color:#52B788;font-size:0.8rem;">/5</div>'
             f'<div style="font-size:0.78rem;color:{color_curr};font-weight:600;margin-top:0.2rem;">{label_curr}</div></div>',
             unsafe_allow_html=True)
 
@@ -604,7 +604,7 @@ def render():
             with col_a:
                 st.markdown(
                     f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;border-left:3px solid #1B4332;">'
-                    f'<div style="font-size:0.72rem;font-weight:700;color:#1B4332;margin-bottom:0.3rem;">Estado actual · {s_o:.0f}/10</div>'
+                    f'<div style="font-size:0.72rem;font-weight:700;color:#1B4332;margin-bottom:0.3rem;">Estado actual · {s_o:.0f}/5</div>'
                     f'<div style="font-size:0.85rem;color:#333;">{interp_actual}</div>'
                     f'</div>',
                     unsafe_allow_html=True)
@@ -619,7 +619,7 @@ def render():
             with col_p:
                 st.markdown(
                     f'<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;border-left:3px dashed #52B788;">'
-                    f'<div style="font-size:0.72rem;font-weight:700;color:#2D6A4F;margin-bottom:0.3rem;">Potencial proyectado · {s_t:.0f}/10</div>'
+                    f'<div style="font-size:0.72rem;font-weight:700;color:#2D6A4F;margin-bottom:0.3rem;">Potencial proyectado · {s_t:.0f}/5</div>'
                     f'<div style="font-size:0.85rem;color:#333;">{interp_pot}</div>'
                     f'</div>',
                     unsafe_allow_html=True)
@@ -677,7 +677,7 @@ def render():
                 orientation="h",
                 color=list(pot_show.values()),
                 color_continuous_scale=["#D8F3DC","#52B788","#2D6A4F","#1B4332"],
-                range_color=[0, 10],
+                range_color=[0, 5],
                 text=[f"{v:.1f}" for v in pot_show.values()],
             )
             fig2.update_traces(textposition="outside", textfont_size=12)
@@ -685,7 +685,7 @@ def render():
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(240,255,244,0.3)",
                 showlegend=False, coloraxis_showscale=False,
-                xaxis=dict(range=[0, 12], tickfont=dict(size=10)),
+                xaxis=dict(range=[0, 6], tickfont=dict(size=10)),
                 yaxis=dict(tickfont=dict(size=11)),
                 margin=dict(l=10, r=40, t=10, b=10),
                 height=320,
@@ -701,7 +701,7 @@ def render():
                 lv, col_lv = _score_to_level(val)
                 st.markdown(
                     f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
-                    f'<span style="font-size:0.72rem;font-weight:700;color:{col_lv};">{dim} · {val:.0f}/10 · {lv}</span><br>'
+                    f'<span style="font-size:0.72rem;font-weight:700;color:{col_lv};">{dim} · {val:.0f}/5 · {lv}</span><br>'
                     f'<span style="font-size:0.82rem;color:#333;">{interp}</span></div>',
                     unsafe_allow_html=True)
 
@@ -735,7 +735,7 @@ def render():
                     f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
                     f'<div style="display:flex;justify-content:space-between;font-size:0.78rem;">'
                     f'<span style="color:#1B4332;">{name}</span>'
-                    f'<span style="background:{cl};color:white;border-radius:4px;padding:1px 5px;font-size:0.7rem;">{s}/10</span>'
+                    f'<span style="background:{cl};color:white;border-radius:4px;padding:1px 5px;font-size:0.7rem;">{s}/5</span>'
                     f'</div>'
                     f'<div style="font-size:0.7rem;color:#666;">{info["fuente"]}</div></div>',
                     unsafe_allow_html=True)
@@ -750,34 +750,34 @@ def render():
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 7 — SÍNTESIS DEL DIAGNÓSTICO
     # ══════════════════════════════════════════════════════════════════════
+    # ══════════════════════════════════════════════════════════════════════
+    # SECCIÓN 7 — SÍNTESIS NARRATIVA
+    # ══════════════════════════════════════════════════════════════════════
     st.markdown("### 7. Sintesis del Diagnóstico")
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-        'La síntesis narrativa integra los hallazgos del diagnóstico en cuatro dimensiones clave: '
-        'fortalezas del espacio, oportunidades de mejora, desafíos a enfrentar y primeros pasos concretos. '
-        'Cada dimensión se presenta como lista de ítems separados por punto y coma en el proceso de registro.</div>',
+        'La síntesis narrativa integra los hallazgos del diagnóstico en cuatro dimensiones clave. '
+        'Fue elaborada por el facilitador tras la visita y el análisis del espacio. '
+        'Cada dimensión resume los aspectos más relevantes identificados.</div>',
         unsafe_allow_html=True)
 
     s_items = [
-        ("sint_fortalezas",    "Fortalezas",         "#D8F3DC", "#1B4332"),
-        ("sint_oportunidades", "Oportunidades",      "#E3F2FD", "#1565C0"),
-        ("sint_limitaciones",  "Desafios",           "#FFF3E0", "#E65100"),
-        ("sint_quick_wins",    "Primeros pasos",      "#F3E5F5", "#6A1B9A"),
+        ("sint_fortalezas",    "Fortalezas del espacio",     "#D8F3DC", "#1B4332"),
+        ("sint_oportunidades", "Oportunidades de mejora",    "#E3F2FD", "#1565C0"),
+        ("sint_limitaciones",  "Desafios a enfrentar",       "#FFF3E0", "#E65100"),
+        ("sint_quick_wins",    "Primeros pasos concretos",   "#F3E5F5", "#6A1B9A"),
     ]
-    c1s, c2s = st.columns(2)
-    for i, (key, label, bg, fg) in enumerate(s_items):
-        with (c1s if i % 2 == 0 else c2s):
-            content = data.get(key, "")
-            if content:
-                _render_sintesis_list(content, label, bg, fg)
-            else:
-                st.markdown(
-                    f'<div style="background:{bg};border-radius:8px;padding:0.7rem;'
-                    f'border-left:3px solid {fg};margin-bottom:0.5rem;">'
-                    f'<div style="font-size:0.8rem;font-weight:700;color:{fg};">{label}</div>'
-                    f'<div style="font-size:0.82rem;color:#999;font-style:italic;">Sin información registrada</div></div>',
-                    unsafe_allow_html=True)
+    has_sintesis = any(data.get(k) for k,_,_,_ in s_items)
+    if has_sintesis:
+        c1s, c2s = st.columns(2)
+        for i, (key, label, bg, fg) in enumerate(s_items):
+            txt = data.get(key, "")
+            if txt:
+                with (c1s if i % 2 == 0 else c2s):
+                    _render_sintesis_list(txt, label, bg, fg)
+    else:
+        st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">La síntesis del diagnóstico aún no ha sido registrada.</div>', unsafe_allow_html=True)
 
     obs = data.get("sint_observaciones","")
     if obs:
@@ -792,9 +792,10 @@ def render():
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-        'La hoja de ruta regenerativa organiza las acciones en tres horizontes temporales: '
-        'acciones inmediatas (0-3 meses), estacionales (3-12 meses) y estructurales (1-5 años). '
-        'Cada acción tiene un estado de avance asociado.</div>',
+        'La hoja de ruta regenerativa organiza las acciones en tres horizontes temporales. '
+        'Las acciones inmediatas (0-3 meses) son los primeros pasos concretos que se pueden tomar hoy. '
+        'Las estacionales (3-12 meses) requieren planificación y seguimiento. '
+        'Las estructurales (1-5 años) son las transformaciones de fondo que definen el perfil regenerativo del espacio a largo plazo.</div>',
         unsafe_allow_html=True)
 
     fases = [
@@ -815,7 +816,7 @@ def render():
                     estado = a.get("estado","") if isinstance(a,dict) else ""
                     titulo = a.get("titulo","") if isinstance(a,dict) else str(a)
                     rows += (f'<div style="padding:0.3rem 0;border-bottom:1px solid rgba(82,183,136,0.2);'
-                             f'font-size:0.82rem;color:#333;">{estado} {titulo[:80]}</div>')
+                             f'font-size:0.82rem;color:#333;">{estado} {titulo[:100]}</div>')
                 st.markdown(header + rows + "</div>", unsafe_allow_html=True)
             else:
                 st.markdown(
@@ -825,66 +826,26 @@ def render():
     st.markdown("---")
 
     # ══════════════════════════════════════════════════════════════════════
-    # SECCIÓN 9 — EXPORTAR
+    # SECCIÓN 9 — CIERRE Y CONTACTO
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 9. Descargar Informe")
+    st.markdown("### 9. Continuar el camino regenerativo")
     st.markdown(
-        '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
-        'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-        'Descarga el informe completo en formato Excel (.xlsx) con todas las secciones del diagnóstico, '
-        'o en Word (.docx) con texto formateado, gráficos e imágenes. El informe incluye toda la '
-        'información registrada con explicaciones de contexto y las interpretaciones del IPR.</div>',
+        '<div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:1px solid #A8D5B5;'
+        'border-radius:12px;padding:1.2rem 1.5rem;font-size:0.88rem;color:#1B4332;line-height:1.7;">'
+        '<strong>Este diagnóstico es el primer paso de un proceso mayor.</strong><br><br>'
+        'Con él tienes claridad sobre dónde está el potencial regenerativo de tu espacio y qué prácticas '
+        'pueden transformarlo. Algunas puedes comenzarlas hoy mismo con tus propios recursos.<br><br>'
+        'Para las transformaciones más profundas — diseño integral, bioconstrucción, sistemas de captación '
+        'de agua, instalaciones solares, formación comunitaria — el equipo de LivLin puede acompañarte '
+        'con servicios especializados de diseño, implementación y seguimiento.<br><br>'
+        'Si tienes preguntas sobre este informe, quieres corregir alguna información o deseas avanzar en '
+        'el proceso regenerativo, contáctanos:<br>'
+        '<strong><a href="https://www.livlin.cl" target="_blank">www.livlin.cl</a></strong></div>',
         unsafe_allow_html=True)
 
-    _, cdl, _ = st.columns([1, 2, 1])
-    with cdl:
-        if not data.get("proyecto_nombre"):
-            st.warning("Completa al menos el Módulo 1 antes de exportar.")
-        else:
-            safe_n = data.get("proyecto_nombre","Diagnostico").replace(" ","_")
-
-            facilitador = st.text_input(
-                "Nombre del facilitador",
-                value=data.get("proyecto_facilitador",""),
-                placeholder="Nombre completo del facilitador",
-                key="facilitador_dl")
-            if facilitador:
-                data["proyecto_facilitador"] = facilitador
-
-            fecha_emision = st.date_input("Fecha de emisión", key="fecha_emision_dl")
-            if fecha_emision:
-                data["informe_fecha_emision"] = str(fecha_emision)
-
-            st.markdown("---")
-            col_xl, col_wd = st.columns(2)
-            with col_xl:
-                try:
-                    xlsx_bytes = generate_excel(data)
-                    st.download_button(
-                        "Descargar Excel (.xlsx)", data=xlsx_bytes,
-                        file_name=f"LivLin_IR_{safe_n}.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        use_container_width=True, type="primary")
-                except Exception as e:
-                    st.error(f"Excel: {e}")
-            with col_wd:
-                try:
-                    from utils.docx_generator import generate_docx
-                    docx_bytes = generate_docx(data)
-                    st.download_button(
-                        "Descargar Word (.docx)", data=docx_bytes,
-                        file_name=f"LivLin_IR_{safe_n}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        use_container_width=True)
-                except Exception as e:
-                    st.caption(f"Word: {e}")
-
-            st.markdown(
-                '<div style="margin-top:0.8rem;background:#F0FFF4;border-radius:8px;'
-                'padding:0.8rem;font-size:0.82rem;color:#1B4332;">'
-                'Este diagnóstico es el primer paso de un proceso mayor. Con él tienes claridad sobre '
-                'dónde está el potencial regenerativo de tu espacio y qué prácticas pueden transformarlo. '
-                'Para las transformaciones más profundas, el equipo de LivLin puede acompañarte con servicios '
-                'especializados de diseño, implementación y seguimiento. '
-                '<a href="https://www.livlin.cl" target="_blank">www.livlin.cl</a></div>',
-                unsafe_allow_html=True)
+    st.markdown(
+        '<div style="margin-top:0.8rem;background:#F0FFF4;border-radius:8px;padding:0.8rem;'
+        'font-size:0.82rem;color:#40916C;text-align:center;">'
+        'Los botones de descarga (Excel y Word) están disponibles en el panel lateral izquierdo.'
+        '</div>',
+        unsafe_allow_html=True)

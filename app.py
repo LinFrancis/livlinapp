@@ -15,7 +15,7 @@ if CSS_FILE.exists():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ── Pages ──────────────────────────────────────────────────────────────────
-PAGES_ALL = {
+PAGES_ADMIN = {
     "🌿 Inicio":                               "home",
     "📋 M1 · Información + Intención":         "client",
     "☯️ Tao de la Regeneración":               "tao",
@@ -25,10 +25,12 @@ PAGES_ALL = {
     "🌸 M7 · Flor de la Permacultura":         "regenerative_potential",
     "🗺️ M9 · Síntesis + Plan":                "action_plan",
     "📊 Informe Final":                        "report",
+    "⚙️ Administración":                       "admin",
 }
-PAGES_ADMIN = {**PAGES_ALL, "⚙️ Administración": "admin"}
-# Cliente ve las mismas páginas pero en modo solo lectura
-PAGES_CLIENT = PAGES_ALL
+# Cliente SOLO ve el informe final
+PAGES_CLIENT = {
+    "📊 Informe Final":  "report",
+}
 
 
 def _login_page():
@@ -58,8 +60,7 @@ def _login_page():
                     st.session_state.visit_data = {}
                 st.session_state.pop("_visits_cache", None)
                 st.session_state.pop("_db_status_cache", None)
-                # Clientes van directo al informe, admins al home
-                role = user.get("role","user")
+                role = user.get("role", "user")
                 st.session_state.page = "home" if role == "admin" else "report"
                 st.rerun()
             else:
@@ -67,17 +68,11 @@ def _login_page():
         st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v5.0 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
 
 
-def _is_readonly() -> bool:
-    """Returns True if current user is in read-only mode (role=user/client)."""
-    user = st.session_state.get("current_user", {})
-    return user.get("role", "user") != "admin"
-
-
 def _sidebar():
     user     = st.session_state.get("current_user", {})
     is_admin = user.get("role") == "admin"
-    readonly = not is_admin
     PAGES    = PAGES_ADMIN if is_admin else PAGES_CLIENT
+    data     = st.session_state.get("visit_data", {})
 
     with st.sidebar:
         logo_path = Path(__file__).parent / "assets" / "logolivlin.png"
@@ -90,18 +85,8 @@ def _sidebar():
         st.markdown('<div style="text-align:center;padding:0 0 0.4rem;">'
             '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Potencial para una vida regenerativa</span></div>',
             unsafe_allow_html=True)
-
-        # Badge de modo lectura para clientes
-        if readonly:
-            st.markdown(
-                '<div style="background:#E8F5E9;border:1px solid #A8D5B5;border-radius:6px;'
-                'padding:0.3rem 0.7rem;margin-bottom:0.5rem;text-align:center;'
-                'font-size:0.72rem;color:#2D6A4F;">Vista de resultados · Solo lectura</div>',
-                unsafe_allow_html=True)
-
         st.markdown("---")
 
-        data = st.session_state.get("visit_data", {})
         if data.get("proyecto_nombre"):
             st.markdown(
                 f'<div style="padding:0.4rem 0.7rem;background:rgba(82,183,136,0.15);'
@@ -111,11 +96,8 @@ def _sidebar():
                 f'<div style="font-size:0.7rem;color:#2D6A4F;">{data.get("proyecto_cliente","")}</div></div>',
                 unsafe_allow_html=True)
 
-        # Progress solo para admin
-        if is_admin:
-            progress = _module_progress(st.session_state.get("visit_data", {}))
-        else:
-            progress = {}
+        # Progreso solo para admin
+        progress = _module_progress(data) if is_admin else {}
 
         for label, key in PAGES.items():
             is_active = st.session_state.get("page") == key
@@ -135,6 +117,33 @@ def _sidebar():
                 st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("---")
+
+        # ── Descargas: visibles cuando está en la página de informe ──────
+        current_page = st.session_state.get("page", "")
+        if current_page == "report" and data.get("proyecto_nombre"):
+            st.markdown('<div style="font-size:0.75rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">Descargar informe</div>', unsafe_allow_html=True)
+            safe_n = data.get("proyecto_nombre", "Diagnostico").replace(" ", "_")
+            try:
+                from utils.report_generator import generate_excel
+                xlsx_bytes = generate_excel(data)
+                st.download_button(
+                    "Excel (.xlsx)", data=xlsx_bytes,
+                    file_name=f"LivLin_IR_{safe_n}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True, type="primary", key="dl_xlsx_sidebar")
+            except Exception as e:
+                st.caption(f"Excel no disponible: {e}")
+            try:
+                from utils.docx_generator import generate_docx
+                docx_bytes = generate_docx(data)
+                st.download_button(
+                    "Word (.docx)", data=docx_bytes,
+                    file_name=f"LivLin_IR_{safe_n}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True, key="dl_docx_sidebar")
+            except Exception as e:
+                st.caption(f"Word no disponible: {e}")
+            st.markdown("---")
 
         # Visit management: solo admin
         if is_admin:
@@ -175,9 +184,9 @@ def _sidebar():
 
             if st.button("Nuevo diagnóstico", use_container_width=True, key="btn_new"):
                 st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
+            st.markdown("---")
 
         space = user.get("space_name", "")
-        st.markdown("---")
         st.markdown(f'<div style="font-size:0.75rem;color:#40916C;">Usuario: {user.get("display_name","")}'
                     + (f'<br>Espacio: {space}' if space else '')
                     + '</div>', unsafe_allow_html=True)
@@ -195,12 +204,6 @@ def _sidebar():
                         '<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
                         'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
                         'Supabase conectado</div>', unsafe_allow_html=True)
-                else:
-                    err_short = str(sb_status.get("error",""))[:55]
-                    st.markdown(
-                        f'<div style="background:#FFE0E0;border-radius:8px;padding:0.35rem 0.6rem;'
-                        f'font-size:0.7rem;color:#B00020;margin-top:0.5rem;">'
-                        f'DB: {err_short}</div>', unsafe_allow_html=True)
         except Exception:
             pass
 
@@ -218,56 +221,26 @@ def _home():
         '<h1>Indagación Regenerativa</h1>'
         '<p>Potencial para una vida regenerativa  ·  LivLin v5.0  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
-
     _, cc, _ = st.columns([1, 3, 1])
     with cc:
         st.markdown(
-            '<p style="text-align:center;font-size:0.95rem;color:#338B85;line-height:1.8;'
-            'font-family:Montserrat,sans-serif;margin:1rem 0;">'
+            '<p style="text-align:center;font-size:0.95rem;color:#338B85;line-height:1.8;">'
             'Cada espacio urbano alberga un <strong>potencial regenerativo</strong> que todavía no ha sido activado. '
-            'Esta herramienta co-diseñada con el enfoque de la permacultura y el diseño regenerativo '
-            'te ayuda a reconocer lo que ya está floreciendo en tu espacio '
+            'Esta herramienta te ayuda a reconocer lo que ya está floreciendo en tu espacio '
             'y a trazar una ruta hacia lo que puede llegar a ser.'
             '</p>', unsafe_allow_html=True)
-
     cols = st.columns(3)
     for col, (icon, title, desc) in zip(cols, [
-        ("🌸", "Flor de la Permacultura",
-         "Mapea las prácticas activas de tu espacio y el potencial adicional en los 7 pétalos de Holmgren. "
-         "Genera el Índice de Potencial Regenerativo (IPR)."),
-        ("🌍", "Observación Ecológica",
-         "Lee el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad y clima histórico. "
-         "La base de todo proceso regenerativo bien fundamentado."),
-        ("🗺️", "Plan de Acción",
-         "Hoja de ruta en 3 horizontes temporales: acciones inmediatas, estacionales y estructurales "
-         "para el descenso creativo de tu espacio."),
+        ("🌸", "Flor de la Permacultura", "Mapea las prácticas activas y el potencial en los 7 pétalos de Holmgren. Genera el IPR."),
+        ("🌍", "Observación Ecológica",   "Lee el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad."),
+        ("🗺️", "Plan de Acción",          "Hoja de ruta en 3 horizontes: acciones inmediatas, estacionales y estructurales."),
     ]):
         with col:
-            st.markdown(
-                f'<div class="section-card" style="text-align:center;min-height:150px;">'
-                f'<div style="font-size:2rem;margin-bottom:0.5rem;">{icon}</div>'
-                f'<strong style="color:#005954;font-size:0.88rem;font-family:Montserrat,sans-serif;">{title}</strong>'
-                f'<p style="font-size:0.78rem;color:#338B85;margin-top:0.4rem;line-height:1.5;">{desc}</p></div>',
-                unsafe_allow_html=True)
-
-    st.markdown(
-        '<div class="tao-quote" style="max-width:720px;margin:1.2rem auto;text-align:center;">'
-        '<strong style="font-size:1.05rem;color:#1B4332;display:block;margin-bottom:0.5rem;">'
-        '«Cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida.»</strong>'
-        'Frente a los desafíos globales del cambio climático, la pérdida de biodiversidad '
-        'y la contaminación, ofrecemos soluciones locales y prácticas que regeneran los '
-        'ecosistemas que sostienen la vida de las presentes y futuras generaciones.<br><br>'
-        '<span style="font-size:0.78rem;color:#40916C;font-style:normal;font-weight:600;">'
-        '— Mason, F. (2025). Introducción al enfoque de la regeneración. LivLin. '
-        '· www.livlin.cl</span></div>',
-        unsafe_allow_html=True)
-
-    with st.expander("Por qué LivLin — Nuestra propuesta", expanded=False):
-        from utils.petal_content import LIVLIN_NARRATIVE_INTRO
-        st.markdown(
-            f'<div class="tao-quote" style="white-space:pre-line;">{LIVLIN_NARRATIVE_INTRO}</div>',
-            unsafe_allow_html=True)
-
+            st.markdown(f'<div class="section-card" style="text-align:center;min-height:140px;">'
+                        f'<div style="font-size:2rem;margin-bottom:0.5rem;">{icon}</div>'
+                        f'<strong style="color:#005954;font-size:0.88rem;">{title}</strong>'
+                        f'<p style="font-size:0.78rem;color:#338B85;margin-top:0.4rem;">{desc}</p></div>',
+                        unsafe_allow_html=True)
     _, cb, _ = st.columns([2, 1, 2])
     with cb:
         if st.button("Comenzar diagnóstico", use_container_width=True, type="primary"):
@@ -281,7 +254,7 @@ def _module_progress(data: dict) -> dict:
         "media":     [("media_count", 0)],
         "site_reading": [("suelo_tipo",""), ("sol_horas",None), ("cultivo_m2",None)],
         "systems":   [("ctx_cuenca",""), ("agua_consumo",None), ("ene_kwh_dia_calc",None)],
-        "regenerative_potential": [("fl_p1_conocimiento",None), ("fl_p7_biodiversidad",None)],
+        "regenerative_potential": [("ipr_obs",None)],
         "action_plan": [("sint_fortalezas",""), ("plan_inmediatas",None)],
         "report":    [],
     }
@@ -293,28 +266,6 @@ def _module_progress(data: dict) -> dict:
     return result
 
 
-def _render_readonly(page: str):
-    """Render a module in read-only mode for client users."""
-    data = st.session_state.get("visit_data", {})
-    if not data.get("id"):
-        st.warning("No hay diagnóstico cargado.")
-        return
-
-    # For most pages, render the actual module — the modules check _is_readonly
-    dispatch = {
-        "home":                   _home,
-        "client":                 lambda: __import__("modules.client",             fromlist=["render"]).render(),
-        "tao":                    lambda: __import__("modules.tao",                fromlist=["render"]).render(),
-        "media":                  lambda: __import__("modules.media_manager",      fromlist=["render"]).render(),
-        "site_reading":           lambda: __import__("modules.site_reading",       fromlist=["render"]).render(),
-        "systems":                lambda: __import__("modules.systems",            fromlist=["render"]).render(),
-        "regenerative_potential": lambda: __import__("modules.regenerative_potential", fromlist=["render"]).render(),
-        "action_plan":            lambda: __import__("modules.action_plan",        fromlist=["render"]).render(),
-        "report":                 lambda: __import__("modules.report",             fromlist=["render"]).render(),
-    }
-    dispatch.get(page, _home)()
-
-
 def main():
     if "page"          not in st.session_state: st.session_state.page = "home"
     if "visit_data"    not in st.session_state: st.session_state.visit_data = {}
@@ -324,8 +275,16 @@ def main():
     if not st.session_state.authenticated:
         _login_page(); return
 
+    user     = st.session_state.get("current_user", {})
+    is_admin = user.get("role") == "admin"
+
     _sidebar()
     page = st.session_state.get("page", "home")
+
+    # Clients can ONLY access the report page
+    if not is_admin and page != "report":
+        page = "report"
+        st.session_state.page = "report"
 
     dispatch = {
         "home":                   _home,

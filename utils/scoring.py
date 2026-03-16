@@ -1,4 +1,4 @@
-"""scoring.py v5.0 — IPR dual (observado / potencial), escala 0-10, 5 niveles."""
+"""scoring.py v5.0 — IPR dual (observado / potencial), escala 0-5, 5 niveles."""
 import json
 from pathlib import Path
 
@@ -21,22 +21,23 @@ FLOWER_DOMAINS = {
 }
 PETAL_ORDER = list(FLOWER_DOMAINS.keys())
 
-# Umbrales v5.0: 0=0, 1-2=2, 3-5=4, 6-9=6, 10-14=8, 15+=10
+# Escala 0-5: 5 niveles, máximo 5.
+# Umbrales: 0=0, 1-2=1, 3-5=2, 6-9=3, 10-14=4, 15+=5
 def _count_to_score(n: int) -> float:
     if n == 0:  return 0.0
-    if n <= 2:  return 2.0
-    if n <= 5:  return 4.0
-    if n <= 9:  return 6.0
-    if n <= 14: return 8.0
-    return 10.0
+    if n <= 2:  return 1.0
+    if n <= 5:  return 2.0
+    if n <= 9:  return 3.0
+    if n <= 14: return 4.0
+    return 5.0
 
 def _score_to_level(score: float) -> tuple:
-    if score == 0:  return "Sin inicio",    "#9E9E9E"
-    if score <= 2:  return "Semilla",       "#74C69D"
-    if score <= 4:  return "Brote",         "#52B788"
-    if score <= 6:  return "Crecimiento",   "#40916C"
-    if score <= 8:  return "Florecimiento", "#2D6A4F"
-    return              "Abundancia",       "#1B4332"
+    if score == 0:    return "Sin inicio",    "#9E9E9E"
+    if score <= 1:    return "Semilla",       "#74C69D"
+    if score <= 2:    return "Brote",         "#52B788"
+    if score <= 3:    return "Crecimiento",   "#40916C"
+    if score <= 4:    return "Florecimiento", "#2D6A4F"
+    return                "Abundancia",       "#1B4332"
 
 def _ipr_obs_counts(data: dict) -> list:
     ipr_obs = data.get("ipr_obs", [])
@@ -79,7 +80,7 @@ def compute_wellbeing_score(data: dict) -> float:
     return _count_to_score(counts[4]) if len(counts) > 4 else 0.0
 
 def compute_cross_module_score(data: dict) -> dict:
-    """Sub-indicadores de módulos 2-6 que aportan al IPR global."""
+    """Sub-indicadores de módulos 2-6 que aportan al IPR global. Escala 0-5."""
     scores = {}
     # Suelo (M2)
     suelo_mo = data.get("suelo_materia_organica","")
@@ -93,7 +94,7 @@ def compute_cross_module_score(data: dict) -> dict:
         elif suelo_cp == "Media": pts += 1
         if suelo_dr == "Bueno": pts += 3
         elif suelo_dr == "Moderado": pts += 1
-        scores["Calidad del suelo"] = {"score": min(pts,10), "desc":"Materia orgánica, compactación y drenaje observados.", "fuente":"M2 · Ecología"}
+        scores["Calidad del suelo"] = {"score": min(round(pts/2.0, 1), 5), "desc":"Materia orgánica, compactación y drenaje observados.", "fuente":"M2 · Ecología"}
     # Agua (M5)
     if any([data.get("agua_captacion_lluvia"), data.get("agua_grises"), data.get("agua_riego_sistema")]):
         pts = 0
@@ -105,7 +106,7 @@ def compute_cross_module_score(data: dict) -> dict:
         elif data.get("agua_riego_sistema") == "Automático": pts += 1
         if data.get("agua_fugas") == "No": pts += 1
         if data.get("agua_fuente") in ["Agua reciclada","Mixta"]: pts += 2
-        scores["Gestión del agua"] = {"score": min(pts,10), "desc":"Captación lluvia, grises y eficiencia de riego.", "fuente":"M5 · Agua"}
+        scores["Gestión del agua"] = {"score": min(round(pts/2.0, 1), 5), "desc":"Captación lluvia, grises y eficiencia de riego.", "fuente":"M5 · Agua"}
     # Energía (M6)
     if any([data.get("ene_fuente"), data.get("ene_led")]):
         pts = 0
@@ -119,7 +120,7 @@ def compute_cross_module_score(data: dict) -> dict:
             if 0 < kwh < 5: pts += 2
             elif kwh < 10: pts += 1
         except Exception: pass
-        scores["Eficiencia energética"] = {"score": min(pts,10), "desc":"Fuente energética, LED y consumo estimado.", "fuente":"M6 · Energía"}
+        scores["Eficiencia energética"] = {"score": min(round(pts/2.0, 1), 5), "desc":"Fuente energética, LED y consumo estimado.", "fuente":"M6 · Energía"}
     # Biodiversidad (M2)
     veg_tipos = data.get("veg_tipos", [])
     if isinstance(veg_tipos, list) and veg_tipos or data.get("fauna_lombrices"):
@@ -127,7 +128,7 @@ def compute_cross_module_score(data: dict) -> dict:
         if data.get("fauna_lombrices") == "Frecuentemente": pts += 2
         elif data.get("fauna_lombrices") == "Ocasionalmente": pts += 1
         if data.get("fauna_aves_especies"): pts += 2
-        scores["Biodiversidad observada"] = {"score": min(pts,10), "desc":"Tipos de vegetación, fauna del suelo y aves.", "fuente":"M2 · Ecología"}
+        scores["Biodiversidad observada"] = {"score": min(round(pts/2.0, 1), 5), "desc":"Tipos de vegetación, fauna del suelo y aves.", "fuente":"M2 · Ecología"}
     # Cultivo (M3)
     if any([data.get("cultivo_m2"), data.get("cultivo_produce_hoy")]):
         pts = 0
@@ -144,7 +145,7 @@ def compute_cross_module_score(data: dict) -> dict:
         elif data.get("cultivo_produce_hoy") == "Algo": pts += 1
         if data.get("cultivo_frutales") == "Sí": pts += 2
         if data.get("cultivo_verticales") == "Sí": pts += 2
-        scores["Potencial productivo"] = {"score": min(pts,10), "desc":"Área cultivable, producción actual y aprovechamiento.", "fuente":"M3 · Cultivo"}
+        scores["Potencial productivo"] = {"score": min(round(pts/2.0, 1), 5), "desc":"Área cultivable, producción actual y aprovechamiento.", "fuente":"M3 · Cultivo"}
     # Contexto comunitario (M4)
     ctx_vecinos = data.get("ctx_vecinos","")
     if ctx_vecinos or data.get("ctx_participacion"):
@@ -155,19 +156,19 @@ def compute_cross_module_score(data: dict) -> dict:
         elif data.get("ctx_participacion") == "A veces": pts += 2
         actores = data.get("ctx_actores",[])
         if isinstance(actores, list) and len(actores) > 0: pts += 2
-        scores["Contexto comunitario"] = {"score": min(pts,10), "desc":"Relaciones vecinales, participación barrial y redes.", "fuente":"M4 · Contexto"}
+        scores["Contexto comunitario"] = {"score": min(round(pts/2.0, 1), 5), "desc":"Relaciones vecinales, participación barrial y redes.", "fuente":"M4 · Contexto"}
     return scores
 
 def compute_regenerative_score(data: dict) -> float:
-    """IPR Global observado: 70% MFP + 30% módulos cruzados. Escala 0-10."""
+    """IPR Global observado: 70% MFP + 30% módulos cruzados. Escala 0-5."""
     ds = compute_domain_scores(data)
     mfp_avg = sum(ds.values()) / 7
     cross = compute_cross_module_score(data)
     cross_vals = [v["score"] for v in cross.values()] if cross else []
     cross_avg = sum(cross_vals) / len(cross_vals) if cross_vals else 0.0
     if cross_vals:
-        return round(mfp_avg * 0.70 + cross_avg * 0.30, 1)
-    return round(mfp_avg, 1)
+        return min(5.0, round(mfp_avg * 0.70 + cross_avg * 0.30, 1))
+    return min(5.0, round(mfp_avg, 1))
 
 def compute_regenerative_score_potential(data: dict) -> float:
     """IPR Potencial: observado+potencial en MFP + módulos cruzados."""
@@ -177,19 +178,19 @@ def compute_regenerative_score_potential(data: dict) -> float:
     cross_vals = [v["score"] for v in cross.values()] if cross else []
     cross_avg = sum(cross_vals) / len(cross_vals) if cross_vals else 0.0
     if cross_vals:
-        return round(mfp_avg * 0.70 + cross_avg * 0.30, 1)
-    return round(mfp_avg, 1)
+        return min(5.0, round(mfp_avg * 0.70 + cross_avg * 0.30, 1))
+    return min(5.0, round(mfp_avg, 1))
 
 def score_label(score: float) -> tuple:
-    if score == 0:  return "Sin inicio — potencial enorme por revelar", "#9E9E9E"
-    if score <= 2:  return "Semilla — el terreno está listo para regenerar", "#74C69D"
-    if score <= 4:  return "Brote — primeros pasos regenerativos en marcha", "#52B788"
-    if score <= 6:  return "Crecimiento — el espacio florece hacia la regeneración", "#40916C"
-    if score <= 8:  return "Florecimiento — espacio regenerativo sólido y activo", "#2D6A4F"
+    if score == 0:    return "Sin inicio — potencial enorme por revelar", "#9E9E9E"
+    if score <= 1:    return "Semilla — el terreno está listo para regenerar", "#74C69D"
+    if score <= 2:    return "Brote — primeros pasos regenerativos en marcha", "#52B788"
+    if score <= 3:    return "Crecimiento — el espacio florece hacia la regeneración", "#40916C"
+    if score <= 4:    return "Florecimiento — espacio regenerativo sólido y activo", "#2D6A4F"
     return "Abundancia — referente vivo de regeneración", "#1B4332"
 
 def compute_synthesis_potentials(data: dict) -> dict:
-    """Síntesis potencial (obs+pot). 0-10."""
+    """Síntesis potencial (obs+pot). 0-5."""
     counts_tot = _ipr_tot_counts(data)
     def _p(mk, pi): 
         v = data.get(mk)
@@ -209,7 +210,7 @@ def compute_synthesis_potentials(data: dict) -> dict:
     }
 
 def compute_synthesis_potentials_obs(data: dict) -> dict:
-    """Síntesis observada. 0-10."""
+    """Síntesis observada. 0-5."""
     counts_obs = _ipr_obs_counts(data)
     def _o(pi): return _count_to_score(counts_obs[pi]) if pi < len(counts_obs) else 0.0
     return {
@@ -291,13 +292,13 @@ PETAL_INTERP_DUAL = {
 }
 
 def get_interp_text(dim: str, score: float, perspective: str = "actual") -> str:
-    idx = min(5, round(score / 2))
+    idx = min(5, round(score))
     texts = DIM_INTERP_DUAL.get(dim, {}).get(perspective, [])
     if not texts: return ""
     return texts[min(idx, len(texts)-1)]
 
 def get_petal_interp(petal_name: str, score: float, perspective: str = "actual") -> str:
-    idx = min(5, round(score / 2))
+    idx = min(5, round(score))
     texts = PETAL_INTERP_DUAL.get(petal_name, {}).get(perspective, [])
     if not texts: return ""
     return texts[min(idx, len(texts)-1)]
@@ -309,7 +310,7 @@ ESTADO ACTUAL: Lo que ya está ocurriendo en el espacio hoy. Refleja las prácti
 
 POTENCIAL PROYECTADO: Lo que el espacio podría llegar a ser incorporando las prácticas adicionales identificadas por el facilitador. Describe el horizonte posible si se avanza en el camino regenerativo.
 
-COMPOSICIÓN DEL IPR GLOBAL (escala 0-10):
+COMPOSICIÓN DEL IPR GLOBAL (escala 0-5):
   70% — Modelo Flor de la Permacultura (MFP): promedio de los 7 pétalos de Holmgren (2002).
   30% — Sub-indicadores de módulos 2-6: calidad del suelo, gestión del agua, eficiencia energética, biodiversidad observada, potencial productivo y contexto comunitario.
 
