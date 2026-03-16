@@ -1,6 +1,6 @@
 """Panel de Administración v6 — Gestión de espacios, primera acción = crear espacio."""
 import streamlit as st
-from utils.users import list_spaces, create_space, delete_space, update_password
+from utils.users import list_spaces, create_space, delete_space, update_password, refresh_from_supabase
 from utils.data_manager import save_visit, load_visits, DATA_FILE, get_visit, _invalidate_cache, _set_cached
 from utils.supabase_db import (is_configured, test_connection, load_all_visits, upsert_visit)
 
@@ -68,6 +68,9 @@ def render():
                         visit_id=vid,
                     )
                     st.success(f"✅ Espacio **{new_space}** creado. Usuario: `{new_user}` · ID: `{vid}`")
+                    # Refresh users cache so new user appears immediately
+                    from utils.users import _invalidate_cache
+                    _invalidate_cache()
                     # Load this new visit
                     st.session_state.visit_data = blank
                     st.markdown(
@@ -85,9 +88,15 @@ def render():
     tab1, tab2, tab3 = st.tabs(["👥 Espacios y Usuarios", "🗄️ Supabase", "📊 Todos los Diagnósticos"])
 
     with tab1:
+        col_refresh, _ = st.columns([1, 3])
+        with col_refresh:
+            if st.button("Recargar usuarios desde Supabase", use_container_width=True, key="btn_refresh_users"):
+                refresh_from_supabase()
+                st.rerun()
         spaces = list_spaces()
         if not spaces:
             st.info("Sin espacios registrados aún. Crea el primero arriba.")
+            st.caption("Si ya tienes usuarios creados y no aparecen, haz clic en 'Recargar usuarios desde Supabase'.")
         else:
             st.markdown(f"**{len(spaces)} espacio(s) registrado(s):**")
             for sp in spaces:
@@ -161,9 +170,24 @@ def render():
                     _set_cached(_fresh)
                     st.success(f"✅ {len(_fresh)} diagnóstico(s) cargados.")
             st.markdown("---")
+            st.markdown("---")
+            st.markdown("**Usuarios en Supabase:**")
+            try:
+                from utils.users import _sb_load_all, _sb_configured
+                if _sb_configured():
+                    sb_users = _sb_load_all()
+                    if sb_users:
+                        st.success(f"✅ {len(sb_users)} usuario(s) en Supabase")
+                        for u in sb_users:
+                            st.caption(f"  · `{u['username']}` — {u.get('space_name','')} (visit: {u.get('visit_id','—')})")
+                    else:
+                        st.warning("No hay usuarios en la tabla users de Supabase. Créalos desde la pestaña Espacios.")
+                        st.caption("Verifica que la tabla users existe con el SQL de SUPABASE_SETUP.sql v6.0")
+            except Exception as e:
+                st.caption(f"No se pudo consultar tabla users: {e}")
             st.markdown(
                 '<div class="info-box">📋 <strong>Estructura de datos:</strong><br>'
-                'Cada diagnóstico se guarda como un registro JSON en la tabla <code>visits</code>.<br>'
+                'Diagnósticos en tabla <code>visits</code> · Usuarios en tabla <code>users</code><br>'
                 'Los archivos Excel y Word se generan al vuelo y se descargan desde el módulo Informe.<br>'
                 'Las fotos se guardan en <code>/tmp</code> durante la sesión activa.</div>',
                 unsafe_allow_html=True)

@@ -1,4 +1,4 @@
-"""Excel export v4.2 — LivLin Indagación Regenerativa.
+"""Excel export v6.0 — LivLin Indagación Regenerativa.
 Auto-explicativo, narrativa regenerativa alineada con Mason (2025).
 Logo LivLin embebido en portada.
 """
@@ -124,7 +124,7 @@ def generate_excel(data: dict) -> bytes:
 
     # Título principal (col 2 en adelante para dar espacio al logo)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v4.2"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v6.0"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55
@@ -444,7 +444,7 @@ def generate_excel(data: dict) -> bytes:
             ws5.add_image(xl_img, ws5.cell(row=r, column=1).coordinate)
             r += 20  # space for image
             r=_expl(ws5,r,"Gráfico radar: verde sólido = Observado hoy · verde punteado = Con potencial adicional. "
-                    "Escala 0–10 normalizada al máximo de prácticas del diagnóstico.",span=5,h=28)
+                    "Escala 0-5 · Niveles: 0=Sin inicio, 1=Semilla, 2=Brote, 3=Crecimiento, 4=Florecimiento, 5=Abundancia",span=5,h=28)
         except Exception as e:
             r=_expl(ws5,r,f"[Gráfico radar no disponible: {e}]",span=5,h=18)
 

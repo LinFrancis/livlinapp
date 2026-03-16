@@ -1,4 +1,4 @@
-"""Contenido LivLin v4.2 — 7 pétalos Holmgren + marco regenerativo.
+"""Contenido LivLin v6.0 — 7 pétalos Holmgren + marco regenerativo.
 Fuentes: Holmgren (2002, 2020), Mason (2025), Mang & Reed (2012).
 """
 
@@ -250,26 +250,26 @@ PETAL_DESC = {
 }
 
 IPR_SCALE = [
-    ("Sin inicio",   "0",   "#9E9E9E",
+    ("Sin inicio",    "0 prácticas",    "#9E9E9E",
      "Este pétalo aún no tiene prácticas activas. Gran potencial latente — todo camino comienza aquí."),
-    ("🌱 Iniciando",   "1",   "#74C69D",
+    ("Semilla",       "1-2 prácticas",  "#74C69D",
      "El primer paso ya está dado. En la permacultura, una primera práctica activa es el acto más importante."),
-    ("🌿 Avanzando",   "2",   "#52B788",
-     "Dos prácticas muestran intención sostenida. El sistema empieza a tomar forma y generar sus primeros resultados."),
-    ("🌳 Consolidado", "3",   "#40916C",
+    ("Brote",         "3-5 prácticas",  "#52B788",
+     "Varias prácticas muestran intención sostenida. El sistema empieza a tomar forma y generar resultados."),
+    ("Crecimiento",   "6-9 prácticas",  "#40916C",
      "Sistema estable con rendimientos constantes. La práctica regenerativa es parte del modo habitual del espacio."),
-    ("🌸 Destacado",   "4–5", "#2D6A4F",
+    ("Florecimiento", "10-14 prácticas","#2D6A4F",
      "Alta integración entre prácticas. El espacio genera abundancia y puede compartir con la comunidad."),
-    ("✨ Referente",   "6+",  "#1B4332",
+    ("Abundancia",    "15+ prácticas",  "#1B4332",
      "Sistema autónomo y resiliente, capaz de compartir excedentes. Modelo de transformación regenerativa urbana."),
 ]
 
 IPR_WHAT_IS = (
-    "El Índice de Potencial Regenerativo (IPR) mide la diversidad de prácticas regenerativas "
-    "activas en un espacio, organizadas según los 7 pétalos de la Flor de la Permacultura "
-    "(Holmgren, 2002). El IPR no es un puntaje punitivo: celebra cada práctica existente "
-    "como un logro real. La pregunta no es '¿cuánto falta?' sino '¿qué ya está floreciendo "
-    "aquí y qué más podría despertar?'"
+    "El Índice de Potencial Regenerativo (IPR) v6.0 mide el nivel de actividad regenerativa "
+    "del espacio en escala de 0 a 5. Se presenta en dos perspectivas: Estado Actual (prácticas "
+    "observadas hoy) y Potencial Proyectado (incorporando prácticas adicionales identificadas). "
+    "El IPR no es un puntaje punitivo: celebra cada práctica como un logro real. "
+    "La pregunta no es '¿cuánto falta?' sino '¿qué ya está floreciendo aquí y qué más podría despertar?'"
 )
 
 IPR_OBS_VS_POT = (

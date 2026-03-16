@@ -16,6 +16,7 @@ from utils.scoring import (
     compute_cross_module_score,
     get_interp_text, get_petal_interp,
     IPR_METODOLOGIA, _ipr_obs_counts, _ipr_tot_counts,
+    DIM_WHAT_MEASURES,
 )
 from utils.report_generator import generate_excel
 
@@ -83,7 +84,7 @@ def _render_sintesis_list(items_text: str, label: str, bg: str, fg: str):
 
 
 def _dual_radar(domain_obs, domain_tot, height=400):
-    """Dual radar chart: observed (dark) + potential (dashed). Escala 0-10."""
+    """Dual radar chart: observed (dark) + potential (dashed). Escala 0-5."""
     labels = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
     r_obs = [domain_obs[p] for p in PETAL_ORDER] + [domain_obs[PETAL_ORDER[0]]]
     r_tot = [domain_tot[p] for p in PETAL_ORDER] + [domain_tot[PETAL_ORDER[0]]]
@@ -155,7 +156,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa del diagnóstico · LivLin v5.0</p>',
+    st.markdown('<p class="module-subtitle">Visión completa del diagnóstico · LivLin v6.0</p>',
                 unsafe_allow_html=True)
 
     st.markdown(f"""
@@ -167,7 +168,7 @@ def render():
                 <div>
                     <div style="font-size:0.72rem;color:#52B788;
                                 text-transform:uppercase;letter-spacing:0.1em;">
-                        Diagnóstico Regenerativo · LivLin v5.0</div>
+                        Diagnóstico Regenerativo · LivLin v6.0</div>
                     <div style="font-size:1.5rem;font-weight:800;
                                 color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">
@@ -525,7 +526,7 @@ def render():
         'Los 7 pétalos de la Flor de la Permacultura (Holmgren, 2002) representan los ámbitos que deben '
         'transformarse para transitar hacia una cultura sostenible. El radar muestra dos perspectivas: '
         'el estado actual (prácticas observadas hoy) y el potencial proyectado (incorporando prácticas adicionales '
-        'identificadas por el facilitador). La escala es de 0 a 10.</div>',
+        'identificadas por el facilitador). La escala es de 0 a 5.</div>',
         unsafe_allow_html=True)
 
     # Botones de perspectiva de interpretación
@@ -643,7 +644,7 @@ def render():
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-        'Ocho dimensiones de potencial regenerativo derivadas de los 7 pétalos del Modelo Flor de la Permacultura, '
+        'Diez dimensiones de potencial regenerativo derivadas de los 7 pétalos del Modelo Flor de la Permacultura, '
         'mostradas en perspectiva dual. Los sub-indicadores integran además información de los módulos 2 a 6.</div>',
         unsafe_allow_html=True)
 
@@ -694,16 +695,25 @@ def render():
         else:
             st.info("Completa el Módulo 7 para ver los potenciales.")
 
-        # Interpretaciones de dimensiones
+        # Interpretaciones de dimensiones con descripción de qué mide
         for dim, val in pot_show.items():
             interp = get_interp_text(dim, val, pot_persp)
-            if interp:
-                lv, col_lv = _score_to_level(val)
-                st.markdown(
-                    f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
-                    f'<span style="font-size:0.72rem;font-weight:700;color:{col_lv};">{dim} · {val:.0f}/5 · {lv}</span><br>'
-                    f'<span style="font-size:0.82rem;color:#333;">{interp}</span></div>',
-                    unsafe_allow_html=True)
+            lv, col_lv = _score_to_level(val)
+            dim_info = DIM_WHAT_MEASURES.get(dim, {})
+            icono     = dim_info.get("icono", "")
+            que_mide  = dim_info.get("que_mide", "")
+            fuentes   = dim_info.get("fuentes", "")
+            st.markdown(
+                f'<div style="padding:0.5rem 0;border-bottom:1px solid #E8F5E9;">'
+                f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.15rem;">'
+                f'<span style="font-size:0.78rem;font-weight:700;color:#1B4332;">{icono} {dim}</span>'
+                f'<span style="background:{col_lv};color:white;border-radius:4px;padding:1px 7px;font-size:0.72rem;">{val}/5 · {lv}</span>'
+                f'</div>'
+                + (f'<div style="font-size:0.75rem;color:#2D6A4F;margin-bottom:0.15rem;font-style:italic;">{que_mide}</div>' if que_mide else '')
+                + (f'<div style="font-size:0.7rem;color:#999;margin-bottom:0.15rem;">{fuentes}</div>' if fuentes else '')
+                + (f'<div style="font-size:0.82rem;color:#333;">{interp}</div>' if interp else '')
+                + f'</div>',
+                unsafe_allow_html=True)
 
     with col_cross:
         # Métricas del sitio

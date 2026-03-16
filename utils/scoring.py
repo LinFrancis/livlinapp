@@ -1,4 +1,4 @@
-"""scoring.py v5.0 — IPR dual (observado / potencial), escala 0-5, 5 niveles."""
+"""scoring.py v6.0 — IPR dual (observado / potencial), escala 0-5, 5 niveles."""
 import json
 from pathlib import Path
 
@@ -190,39 +190,166 @@ def score_label(score: float) -> tuple:
     return "Abundancia — referente vivo de regeneración", "#1B4332"
 
 def compute_synthesis_potentials(data: dict) -> dict:
-    """Síntesis potencial (obs+pot). 0-5."""
+    """
+    10 dimensiones de potencial regenerativo — perspectiva potencial (obs+pot). 0-5.
+    Integra MFP (pétalos) + datos observados de módulos 2-6.
+    """
     counts_tot = _ipr_tot_counts(data)
-    def _p(mk, pi): 
+    counts_obs = _ipr_obs_counts(data)
+
+    def _p(mk, pi):
         v = data.get(mk)
         if v is not None:
-            try: return min(10.0, float(v))
+            try: return min(5.0, float(v))
             except: pass
         return _count_to_score(counts_tot[pi]) if pi < len(counts_tot) else 0.0
-    return {
-        "Producción alimentaria": _p("sint_pot_alimentaria",0),
-        "Biodiversidad urbana":   _p("sint_pot_biodiversidad",0),
-        "Regeneración del suelo": _p("sint_pot_suelo",0),
-        "Captación de agua":      _p("sint_pot_agua",2),
-        "Educación ambiental":    _p("sint_pot_educacion",3),
-        "Bienestar comunitario":  _p("sint_pot_bienestar",6),
-        "Economía regenerativa":  _p("sint_pot_economia",5),
-        "Bienestar interior":     _p("sint_pot_interior",4),
-    }
+
+    def _cross(key_si, key_no, key_pa=None, pts_si=5, pts_no=0, pts_pa=2):
+        """Score from a Yes/No/Partial field."""
+        v = data.get(key_si, "")
+        if v == "Sí": return min(5.0, pts_si / 10 * 5)
+        if key_pa and v == key_pa: return min(5.0, pts_pa / 10 * 5)
+        return 0.0
+
+    # 1. Producción alimentaria — P0 (Tierra) + cultivo M3
+    prod = _p("sint_pot_alimentaria", 0)
+    if data.get("cultivo_produce_hoy") == "Sí": prod = min(5.0, prod + 0.5)
+    result = {"Producción alimentaria": round(min(5.0, prod), 1)}
+
+    # 2. Biodiversidad urbana — P0 (Tierra) + veg/fauna M2
+    bio = _p("sint_pot_biodiversidad", 0)
+    veg_tipos = data.get("veg_tipos", [])
+    if isinstance(veg_tipos, list) and len(veg_tipos) >= 3: bio = min(5.0, bio + 0.5)
+    result["Biodiversidad urbana"] = round(min(5.0, bio), 1)
+
+    # 3. Regeneración del suelo — P0 (Tierra) + suelo M2
+    suelo = _p("sint_pot_suelo", 0)
+    if data.get("suelo_materia_organica") == "Alto": suelo = min(5.0, suelo + 1.0)
+    elif data.get("suelo_materia_organica") == "Medio": suelo = min(5.0, suelo + 0.5)
+    result["Regeneración del suelo"] = round(min(5.0, suelo), 1)
+
+    # 4. Captación y gestión del agua — P2 (Herramientas) + agua M5
+    agua = _p("sint_pot_agua", 2)
+    if data.get("agua_captacion_lluvia") == "Sí": agua = min(5.0, agua + 1.0)
+    elif data.get("agua_captacion_lluvia") == "Parcial": agua = min(5.0, agua + 0.5)
+    if data.get("agua_grises") == "Sí": agua = min(5.0, agua + 0.5)
+    result["Captación y gestión del agua"] = round(min(5.0, agua), 1)
+
+    # 5. Energía y eficiencia — P2 (Herramientas) + energía M6
+    ene_pts = 0
+    if data.get("ene_fuente") == "Panel solar": ene_pts += 5
+    elif data.get("ene_fuente") == "Mixta": ene_pts += 3
+    if data.get("ene_led") == "Sí": ene_pts += 3
+    elif data.get("ene_led") == "Parcialmente": ene_pts += 1
+    if data.get("ene_solar_interes") == "Sí, pronto": ene_pts += 2
+    p2_score = _count_to_score(counts_tot[2]) if len(counts_tot) > 2 else 0.0
+    ene_cross = min(5.0, round(ene_pts / 10 * 5, 1))
+    ene = max(p2_score, ene_cross) if (data.get("ene_fuente") or data.get("ene_led")) else p2_score
+    result["Energía y eficiencia"] = round(min(5.0, ene), 1)
+
+    # 6. Educación ambiental — P3 (Educación)
+    result["Educación ambiental"] = round(_p("sint_pot_educacion", 3), 1)
+
+    # 7. Bienestar comunitario — P6 (Gobernanza) + contexto M4
+    com = _p("sint_pot_bienestar", 6)
+    ctx_vecinos = data.get("ctx_vecinos", "")
+    if ctx_vecinos in ["Buena", "Muy buena", "Excelente"]: com = min(5.0, com + 0.5)
+    if data.get("ctx_participacion") == "Sí, activamente": com = min(5.0, com + 0.5)
+    result["Bienestar comunitario"] = round(min(5.0, com), 1)
+
+    # 8. Economía regenerativa — P5 (Finanzas)
+    result["Economía regenerativa"] = round(_p("sint_pot_economia", 5), 1)
+
+    # 9. Salud y bienestar — P4 (Salud)
+    result["Salud y bienestar"] = round(_p("sint_pot_interior", 4), 1)
+
+    # 10. Entorno construido — P1 (Entorno)
+    result["Entorno construido"] = round(_p("sint_pot_entorno", 1), 1)
+
+    return result
+
 
 def compute_synthesis_potentials_obs(data: dict) -> dict:
-    """Síntesis observada. 0-5."""
+    """10 dimensiones — perspectiva observada. 0-5."""
     counts_obs = _ipr_obs_counts(data)
     def _o(pi): return _count_to_score(counts_obs[pi]) if pi < len(counts_obs) else 0.0
+
+    ene_pts = 0
+    if data.get("ene_fuente") == "Panel solar": ene_pts += 5
+    elif data.get("ene_fuente") == "Mixta": ene_pts += 3
+    if data.get("ene_led") == "Sí": ene_pts += 3
+    elif data.get("ene_led") == "Parcialmente": ene_pts += 1
+    p2_obs = _o(2)
+    ene_cross = min(5.0, round(ene_pts / 10 * 5, 1))
+    ene_obs = max(p2_obs, ene_cross) if (data.get("ene_fuente") or data.get("ene_led")) else p2_obs
+
     return {
-        "Producción alimentaria": _o(0),
-        "Biodiversidad urbana":   _o(0),
-        "Regeneración del suelo": _o(0),
-        "Captación de agua":      _o(2),
-        "Educación ambiental":    _o(3),
-        "Bienestar comunitario":  _o(6),
-        "Economía regenerativa":  _o(5),
-        "Bienestar interior":     _o(4),
+        "Producción alimentaria":       round(_o(0), 1),
+        "Biodiversidad urbana":         round(_o(0), 1),
+        "Regeneración del suelo":       round(_o(0), 1),
+        "Captación y gestión del agua": round(_o(2), 1),
+        "Energía y eficiencia":         round(min(5.0, ene_obs), 1),
+        "Educación ambiental":          round(_o(3), 1),
+        "Bienestar comunitario":        round(_o(6), 1),
+        "Economía regenerativa":        round(_o(5), 1),
+        "Salud y bienestar":            round(_o(4), 1),
+        "Entorno construido":           round(_o(1), 1),
     }
+
+
+# ── Descripción de qué mide cada dimensión ───────────────────────────────────
+DIM_WHAT_MEASURES = {
+    "Producción alimentaria": {
+        "que_mide": "La capacidad del espacio de producir alimentos frescos: hortalizas, hierbas, frutales, hongos y germinados.",
+        "fuentes":  "Módulo 7 · Pétalo 1 (Tierra) + Módulo 3 · Cultivo",
+        "icono":    "🥦",
+    },
+    "Biodiversidad urbana": {
+        "que_mide": "La diversidad de vida presente: plantas nativas, polinizadores, aves, lombrices y cobertura vegetal.",
+        "fuentes":  "Módulo 7 · Pétalo 1 (Tierra) + Módulo 2 · Ecología",
+        "icono":    "🦋",
+    },
+    "Regeneración del suelo": {
+        "que_mide": "La salud biológica del suelo: materia orgánica, compostaje, cobertura y actividad microbiana.",
+        "fuentes":  "Módulo 7 · Pétalo 1 (Tierra) + Módulo 2 · Suelo",
+        "icono":    "🌍",
+    },
+    "Captación y gestión del agua": {
+        "que_mide": "La autonomía hídrica del espacio: captación de lluvia, reutilización de grises, eficiencia de riego.",
+        "fuentes":  "Módulo 7 · Pétalo 3 (Herramientas) + Módulo 5 · Agua",
+        "icono":    "💧",
+    },
+    "Energía y eficiencia": {
+        "que_mide": "El nivel de eficiencia energética y transición hacia renovables: paneles solares, LED, bajo consumo.",
+        "fuentes":  "Módulo 7 · Pétalo 3 (Herramientas) + Módulo 6 · Energía",
+        "icono":    "⚡",
+    },
+    "Educación ambiental": {
+        "que_mide": "Las prácticas de aprendizaje, transmisión de saberes y formación en ecología y vida regenerativa.",
+        "fuentes":  "Módulo 7 · Pétalo 4 (Educación y Cultura)",
+        "icono":    "📚",
+    },
+    "Bienestar comunitario": {
+        "que_mide": "La calidad de los vínculos sociales: relaciones vecinales, participación comunitaria y redes de apoyo.",
+        "fuentes":  "Módulo 7 · Pétalo 7 (Gobernanza) + Módulo 4 · Contexto",
+        "icono":    "🤝",
+    },
+    "Economía regenerativa": {
+        "que_mide": "Las prácticas de economía circular: autosuficiencia, trueque, mercados locales y consumo consciente.",
+        "fuentes":  "Módulo 7 · Pétalo 6 (Finanzas y Economía)",
+        "icono":    "💚",
+    },
+    "Salud y bienestar": {
+        "que_mide": "El cuidado de la salud integral: alimentación viva, plantas medicinales, movimiento y bienestar espiritual.",
+        "fuentes":  "Módulo 7 · Pétalo 5 (Salud y Bienestar Espiritual)",
+        "icono":    "🧘",
+    },
+    "Entorno construido": {
+        "que_mide": "La calidad del espacio físico: bioarquitectura, diseño bioclimático, techos/muros verdes y materiales naturales.",
+        "fuentes":  "Módulo 7 · Pétalo 2 (Entorno Construido)",
+        "icono":    "🏡",
+    },
+}
 
 # ── Textos duales (Español Chileno, tono LivLin) ─────────────────────────────
 DIM_INTERP_DUAL = {
@@ -257,6 +384,22 @@ DIM_INTERP_DUAL = {
     "Bienestar interior":{
         "actual":["El espacio tiene potencial enorme para nutrir la dimensión interior. No se observan prácticas activas de bienestar y conexión.","Hay primeras señales de conexión interior. Este vínculo puede profundizarse y ser fuente de bienestar y propósito.","El espacio ya nutre el bienestar interior. Hay prácticas de conexión con la naturaleza que vale cultivar.","Buen nivel de bienestar interior. El espacio genera conexión, calma y sentido — base de una vida regenerativa.","El espacio es fuente activa de bienestar interior y conexión profunda con la naturaleza.","El espacio es un santuario interior — la conexión del grupo con la naturaleza es profunda y transformadora."],
         "potencial":["Un rincón de silencio, tiempo en contacto con la tierra o prácticas contemplativas pueden transformar la dimensión interior.","Las prácticas identificadas pueden profundizar la conexión interior del grupo con el espacio de manera real.","Sumando lo identificado, este espacio puede convertirse en fuente real de bienestar interior y calma.","El potencial de bienestar interior es alto. Con lo identificado, puede nutrir profundamente al grupo.","Este espacio podría convertirse en un santuario de bienestar interior. Las condiciones están dadas.","El potencial interior es extraordinario — puede ser fuente profunda de conexión y transformación."],
+    },
+    "Captación y gestión del agua":{
+        "actual":["El espacio depende completamente del agua de red. Cada gota que se capture o reutilice es un paso hacia la autonomía hídrica.","Hay conciencia sobre el agua y primeras intenciones. El camino hacia la soberanía hídrica está por empezar.","Existen algunos sistemas de gestión hídrica. El espacio empieza a tomar control de un recurso cada vez más escaso.","Buen manejo del agua. El espacio capta o reutiliza — modelo de eficiencia frente al estrés hídrico.","Sistema hídrico robusto. El espacio gestiona el agua como el recurso precioso que es.","Soberanía hídrica completa. Este espacio es referente de gestión regenerativa del agua."],
+        "potencial":["Un barril bajo la canaleta o reutilizar el agua de la ducha son primeros pasos concretos hacia la autonomía hídrica.","Las prácticas identificadas permiten capturar y reutilizar agua. El potencial hídrico de este espacio es real.","Sumando lo identificado, este espacio puede alcanzar una gestión hídrica significativamente más autónoma.","El potencial hídrico es alto. Con las mejoras identificadas, puede convertirse en modelo de eficiencia.","Este espacio podría lograr soberanía hídrica importante. Las condiciones están dadas para avanzar.","El potencial hídrico es extraordinario — puede ser referente de autonomía hídrica en contexto urbano."],
+    },
+    "Energía y eficiencia":{
+        "actual":["El espacio no ha incorporado tecnologías de eficiencia energética. Hay un gran potencial para mejorar el consumo y avanzar hacia las renovables.","Hay primeras intenciones o pequeñas mejoras en eficiencia. El camino hacia la autonomía energética está comenzando.","El espacio tiene algunas prácticas de eficiencia activas. La LED o el interés en solar son señales de avance concreto.","Buen nivel de eficiencia energética. El espacio reduce su consumo y avanza hacia fuentes renovables.","El espacio tiene energía solar u otras renovables activas. La eficiencia energética es parte de su identidad.","El espacio es referente de eficiencia y autonomía energética — un modelo de transición renovable urbana."],
+        "potencial":["Cambiar a LED, desconectar cargadores o planificar paneles solares son pasos concretos hacia la autonomía energética.","Las prácticas identificadas pueden reducir el consumo y avanzar hacia la independencia energética.","Con lo identificado, este espacio puede alcanzar una eficiencia energética real y comenzar la transición solar.","El potencial energético es alto. Con lo identificado, puede lograr autonomía energética significativa.","Este espacio podría convertirse en modelo de transición energética renovable para su comunidad.","El potencial es extraordinario — puede ser referente de eficiencia y energía renovable en contexto urbano."],
+    },
+    "Salud y bienestar":{
+        "actual":["El espacio todavía no ha activado su dimensión de salud y bienestar. Hay potencial enorme para nutrir el cuerpo, la mente y el espíritu.","Hay primeras prácticas de salud y bienestar activas. El cuidado integral empieza a tener presencia en el espacio.","El espacio ya cuida la salud y el bienestar del grupo. Hay prácticas de alimentación, movimiento o contemplación integradas.","El espacio es fuente real de salud y bienestar. Las prácticas integradas nutren el cuerpo, la mente y el espíritu.","El espacio es referente de salud y bienestar integral — alimentación viva, plantas medicinales y cuidado colectivo.","Este espacio es santuario de salud y bienestar integral — transforma profundamente la calidad de vida del grupo."],
+        "potencial":["Cultivar plantas medicinales, mejorar la alimentación o crear espacios de contemplación pueden transformar el bienestar.","Las prácticas identificadas pueden incorporar elementos de salud y bienestar que nutran al grupo de manera real.","Con lo identificado, el espacio puede convertirse en fuente activa de salud y bienestar integral.","El potencial de salud y bienestar es alto. Con lo identificado, puede transformar profundamente al grupo.","Este espacio puede convertirse en referente de salud y bienestar integral para su comunidad.","El potencial es extraordinario — puede ser santuario de salud y bienestar que inspire a muchos."],
+    },
+    "Entorno construido":{
+        "actual":["El entorno construido todavía no incorpora elementos regenerativos. Hay oportunidades concretas para empezar a transformar el espacio físico.","Hay primeras incorporaciones regenerativas en el entorno construido. El espacio empieza a integrar bioclimática o materiales naturales.","El entorno construido muestra prácticas regenerativas activas — bioarquitectura, energía pasiva o naturaleza integrada.","El entorno construido es activamente regenerativo. El diseño trabaja a favor del bienestar, la eficiencia y la vida.","El espacio construido es ejemplo de diseño regenerativo — integra naturaleza, eficiencia y materiales naturales.","El entorno construido es referente de bioarquitectura y diseño bioclimático regenerativo."],
+        "potencial":["Una pérgola verde, materiales naturales o ventilación cruzada pueden transformar el entorno construido.","Las prácticas identificadas pueden incorporar elementos regenerativos al entorno construido de manera real.","Con lo identificado, el espacio puede avanzar hacia un entorno construido que trabaja en armonía con la naturaleza.","El potencial de transformación del entorno construido es alto. Puede ser modelo de diseño regenerativo.","Este espacio puede convertirse en ejemplo de entorno construido regenerativo para su barrio.","El potencial es extraordinario — puede ser referente de bioarquitectura urbana."],
     },
 }
 
@@ -304,7 +447,7 @@ def get_petal_interp(petal_name: str, score: float, perspective: str = "actual")
     return texts[min(idx, len(texts)-1)]
 
 IPR_METODOLOGIA = """
-El Indice de Potencial Regenerativo (IPR) v5.0 mide el nivel de actividad regenerativa del espacio en dos perspectivas complementarias:
+El Indice de Potencial Regenerativo (IPR) v6.0 mide el nivel de actividad regenerativa del espacio en dos perspectivas complementarias:
 
 ESTADO ACTUAL: Lo que ya está ocurriendo en el espacio hoy. Refleja las prácticas activas observadas. Un puntaje bajo no indica carencia — indica el enorme potencial de transformación disponible.
 

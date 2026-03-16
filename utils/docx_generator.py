@@ -152,7 +152,7 @@ def generate_docx(data:dict)->bytes:
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
 
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v4.2  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v6.0  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
 
     doc.add_paragraph()
