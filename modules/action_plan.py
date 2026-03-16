@@ -281,7 +281,8 @@ def _save_button(data, suffix=""):
     st.markdown("---")
     _, c, _ = st.columns([2, 1, 2])
     with c:
-        if not _readonly:
+        from utils.module_status import is_readonly as _is_ro_sb
+        if not _is_ro_sb():
             if st.button("💾 Guardar módulo 9", use_container_width=True,
                          type="primary", key=f"save_m9_{suffix}"):
                 vid = save_visit(data)

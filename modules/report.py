@@ -245,58 +245,112 @@ def render():
         'Es el punto de partida filosófico y espiritual del diagnóstico.</div>',
         unsafe_allow_html=True)
 
-    # Solo muestra campos con información
-    tao_fields = [
-        ("tao_sensacion", "Sensación al estar en el espacio"),
-        ("tao_deseado", "Lo que desean para este espacio"),
-        ("tao_no_deseado", "Lo que no desean para este espacio"),
-        ("tao_llama", "Lo que los llama hacia la regeneración"),
-        ("tao_ritmo", "Ritmo de vida actual"),
-        ("tao_tiempo_libre", "Tiempo disponible para el espacio"),
-        ("tao_actividades", "Actividades que los nutren en el espacio"),
-        ("tao_sencillez", "Relación con la sencillez"),
-        ("tao_consumo", "Relación con el consumo material"),
-        ("tao_descanso_creativo", "Descanso creativo"),
-        ("tao_naturaleza_ext", "Cómo ven su relación con la naturaleza"),
-        ("tao_cuerpo_tierra", "Cuerpo y tierra"),
-        ("tao_agua_virtud", "El agua como virtud"),
-        ("tao_bienestar", "Nivel de bienestar general"),
-        ("tao_naturaleza_rel", "Relación con la naturaleza"),
-        ("tao_aprender", "Lo que desean aprender"),
-        ("tao_justicia", "Reflexión sobre justicia ambiental"),
-        ("tao_palabra_esencial", "Palabra esencial del proceso"),
-    ]
-    c1, c2 = st.columns(2)
-    for i, (key, label) in enumerate(tao_fields):
-        with (c1 if i % 2 == 0 else c2):
-            _card(label, str(data.get(key, "")) if data.get(key) else "", "#F0FFF4", "#1B4332", "#40916C")
+    # Solo mostrar si el módulo fue abordado
+    mod_tao = data.get("mod_tao", "")
+    if mod_tao == "no_abordado":
+        st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">'
+                    'Este módulo no fue abordado en el diagnóstico.</div>', unsafe_allow_html=True)
+    else:
+        # Indicador de modo inferido
+        if mod_tao == "inferido":
+            st.markdown('<div style="background:#FFFDE7;border-radius:6px;padding:0.3rem 0.7rem;'
+                        'font-size:0.78rem;color:#A67C00;margin-bottom:0.5rem;">'
+                        'Respuestas inferidas por el facilitador tras la visita</div>',
+                        unsafe_allow_html=True)
 
-    # Crisis planetaria
-    tao_crisis = [
-        ("tao_cc_conciencia", "Conciencia sobre el cambio climático"),
-        ("tao_cc_impacto", "Impacto percibido del cambio climático"),
-        ("tao_cc_respuesta", "Respuesta al cambio climático"),
-        ("tao_bio_conciencia", "Conciencia sobre pérdida de biodiversidad"),
-        ("tao_bio_local", "Biodiversidad local observada"),
-        ("tao_bio_accion", "Acciones de apoyo a la biodiversidad"),
-        ("tao_cont_conciencia", "Conciencia sobre contaminación"),
-        ("tao_cont_respuesta", "Respuesta frente a la contaminación"),
-    ]
-    any_crisis = any(data.get(k) for k, _ in tao_crisis)
-    if any_crisis:
-        st.markdown("**Conciencia sobre las crisis planetarias**")
-        c1, c2 = st.columns(2)
-        for i, (key, label) in enumerate(tao_crisis):
-            with (c1 if i % 2 == 0 else c2):
-                _card(label, str(data.get(key, "")) if data.get(key) else "", "#FFFDE7", "#1B4332", "#A67C00")
+        # Solo campos de texto libre (preguntas abiertas) — no sliders/radios con defaults
+        # Estos campos SOLO existen si fueron respondidos conscientemente (texto libre)
+        tao_text_fields = [
+            ("tao_sensacion",         "Sensación al estar en el espacio"),
+            ("tao_deseado",           "Lo que desean para este espacio"),
+            ("tao_no_deseado",        "Lo que no desean para este espacio"),
+            ("tao_llama",             "Lo que los llama hacia la regeneración"),
+            ("tao_consumo",           "Relación con el consumo material"),
+            ("tao_actividades",       "Actividades que los nutren en el espacio"),
+            ("tao_descanso_creativo", "Descanso creativo"),
+            ("tao_cuerpo_tierra",     "Cuerpo y tierra"),
+            ("tao_agua_virtud",       "El agua como virtud"),
+            ("tao_naturaleza_rel",    "Relación con la naturaleza"),
+            ("tao_aprender",          "Lo que desean aprender"),
+            ("tao_justicia",          "Reflexión sobre justicia ambiental"),
+            ("tao_palabra_esencial",  "Palabra esencial del proceso"),
+            ("tao_cc_impacto",        "Impacto percibido del cambio climático"),
+            ("tao_cc_respuesta",      "Respuesta al cambio climático"),
+            ("tao_bio_local",         "Biodiversidad local observada"),
+            ("tao_bio_accion",        "Acciones de apoyo a la biodiversidad"),
+            ("tao_cont_respuesta",    "Respuesta frente a la contaminación"),
+        ]
+        # Campos de selección (radio/select): mostrar solo si difieren del default
+        # (el default es el primer valor de la lista en el módulo tao)
+        TAO_SELECT_DEFAULTS = {
+            "tao_ritmo":         "Acelerado",
+            "tao_tiempo_libre":  "Fines de semana",
+            "tao_sencillez":     "A veces",
+            "tao_naturaleza_ext":"Ambas perspectivas coexisten",
+            "tao_silencio":      "No",
+            "tao_contemplacion": "No",
+            "tao_tiempo_aire":   "15–30 min",
+            "tao_bienestar":     None,  # slider 0-5, mostrar si > 0
+        }
+        tao_select_fields = [
+            ("tao_ritmo",          "Ritmo de vida actual"),
+            ("tao_tiempo_libre",   "Tiempo disponible para el espacio"),
+            ("tao_sencillez",      "Relación con la sencillez"),
+            ("tao_naturaleza_ext", "Cómo ven su relación con la naturaleza"),
+            ("tao_silencio",       "Silencio y quietud"),
+            ("tao_contemplacion",  "Práctica contemplativa"),
+            ("tao_tiempo_aire",    "Tiempo al aire libre"),
+            ("tao_bienestar",      "Nivel de bienestar general"),
+        ]
+        tao_crisis_select = [
+            ("tao_cc_conciencia",  "Conciencia sobre el cambio climático",  "Lo conocemos pero parece lejano"),
+            ("tao_bio_conciencia", "Conciencia sobre pérdida de biodiversidad", None),
+            ("tao_cont_conciencia","Conciencia sobre contaminación",         None),
+        ]
 
-    tao_tipos = data.get("tao_cont_tipos", [])
-    if isinstance(tao_tipos, list) and tao_tipos:
-        st.markdown(f'<div style="font-size:0.82rem;color:#555;padding:0.3rem 0;">'
-                    f'Tipos de contaminación identificados: {", ".join(tao_tipos)}</div>', unsafe_allow_html=True)
+        # Collect all fields that have non-default values
+        all_tao_items = []
+        for key, label in tao_text_fields:
+            v = data.get(key, "")
+            if v and str(v).strip():
+                all_tao_items.append((label, str(v).strip(), "#F0FFF4", "#40916C"))
 
-    if data.get("tao_notas"):
-        _card("Notas del facilitador", data["tao_notas"], "#FDF6EC", "#333", "#A67C00")
+        for key, label in tao_select_fields:
+            v = data.get(key)
+            default = TAO_SELECT_DEFAULTS.get(key)
+            if v is None:
+                continue
+            if default is None:  # slider
+                try:
+                    if float(v) > 0:
+                        all_tao_items.append((label, str(v), "#F0FFF4", "#40916C"))
+                except:
+                    pass
+            elif str(v) != default:
+                all_tao_items.append((label, str(v), "#F0FFF4", "#40916C"))
+
+        for key, label, default in tao_crisis_select:
+            v = data.get(key)
+            if v and (default is None or str(v) != default):
+                all_tao_items.append((label, str(v), "#FFFDE7", "#A67C00"))
+
+        # Tipos de contaminación (multiselect)
+        tao_tipos = data.get("tao_cont_tipos", [])
+        if isinstance(tao_tipos, list) and tao_tipos:
+            all_tao_items.append(("Tipos de contaminación identificados", ", ".join(tao_tipos), "#FFFDE7", "#A67C00"))
+
+        if all_tao_items:
+            c1, c2 = st.columns(2)
+            for i, item in enumerate(all_tao_items):
+                label, val, bg, border = item
+                with (c1 if i % 2 == 0 else c2):
+                    _card(label, val, bg, "#1B4332", border)
+        else:
+            st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">'
+                        'No se registraron respuestas en este módulo.</div>', unsafe_allow_html=True)
+
+        if data.get("tao_notas"):
+            _card("Notas del facilitador", data["tao_notas"], "#FDF6EC", "#333", "#A67C00")
 
     st.markdown("---")
 
@@ -312,31 +366,57 @@ def render():
         'antes de diseñar.</div>',
         unsafe_allow_html=True)
 
-    # Superficie y cultivo — siempre mostrar
-    area_tot  = _safe_float(data.get("proyecto_area") or data.get("proyecto_superficie"))
-    area_cult = _safe_float(data.get("cultivo_m2"))
-    pct_cult  = round(area_cult / area_tot * 100) if area_tot > 0 and area_cult > 0 else 0
+    # Superficie y cultivo — actual vs futuro, 2 decimales
+    area_tot      = _safe_float(data.get("proyecto_area") or data.get("proyecto_superficie"))
+    area_cult_act = _safe_float(data.get("cultivo_m2"))         # actual (bancales actuales)
+    area_cult_fut = _safe_float(data.get("cultivo_m2_futuro"))  # potencial identificado
+    pct_act  = round(area_cult_act / area_tot * 100, 1) if area_tot > 0 and area_cult_act > 0 else 0
+    pct_fut  = round(area_cult_fut / area_tot * 100, 1) if area_tot > 0 and area_cult_fut > 0 else 0
 
-    m1, m2, m3 = st.columns(3)
-    def _metric_card(col, value, label, show_zero=False):
-        display = str(int(value)) if value and (value > 0 or show_zero) else "No registrado"
+    def _metric_card_v2(col, value_raw, label, color="#52B788", is_pct=False):
+        if value_raw and float(value_raw) > 0:
+            if is_pct:
+                display = f"{value_raw}%"
+            else:
+                display = f"{float(value_raw):.2f}".rstrip('0').rstrip('.') + " m²"
+                # Show clean number: 12.50 → 12.5, 12.00 → 12
+        else:
+            display = "No registrado"
         with col:
             st.markdown(
                 f'<div style="background:white;border-radius:8px;padding:0.7rem;'
-                f'box-shadow:0 2px 8px rgba(27,67,50,0.07);border-left:3px solid #52B788;">'
-                f'<div style="font-size:1.4rem;font-weight:800;color:#1B4332;">{display}</div>'
+                f'box-shadow:0 2px 8px rgba(27,67,50,0.07);border-left:3px solid {color};">'
+                f'<div style="font-size:1.3rem;font-weight:800;color:#1B4332;">{display}</div>'
                 f'<div style="font-size:0.7rem;color:#52B788;text-transform:uppercase;">{label}</div></div>',
                 unsafe_allow_html=True)
 
-    _metric_card(m1, area_tot, "m² totales")
-    _metric_card(m2, area_cult, "m² cultivables")
+    m1, m2, m3, m4, m5 = st.columns(5)
+    # m² totales
+    with m1:
+        disp = f"{area_tot:.2f}".rstrip('0').rstrip('.') + " m²" if area_tot > 0 else "No registrado"
+        st.markdown(
+            f'<div style="background:white;border-radius:8px;padding:0.7rem;'
+            f'box-shadow:0 2px 8px rgba(27,67,50,0.07);border-left:3px solid #52B788;">'
+            f'<div style="font-size:1.3rem;font-weight:800;color:#1B4332;">{disp}</div>'
+            f'<div style="font-size:0.7rem;color:#52B788;text-transform:uppercase;">m² totales</div></div>',
+            unsafe_allow_html=True)
+    _metric_card_v2(m2, area_cult_act, "m² cultivables actuales",  "#40916C")
     with m3:
-        pct_display = f"{pct_cult}%" if pct_cult > 0 else "No registrado"
+        d = f"{pct_act}%" if pct_act > 0 else "No registrado"
         st.markdown(
             f'<div style="background:white;border-radius:8px;padding:0.7rem;'
             f'box-shadow:0 2px 8px rgba(27,67,50,0.07);border-left:3px solid #2D6A4F;">'
-            f'<div style="font-size:1.4rem;font-weight:800;color:#1B4332;">{pct_display}</div>'
-            f'<div style="font-size:0.7rem;color:#52B788;text-transform:uppercase;">% cultivable</div></div>',
+            f'<div style="font-size:1.3rem;font-weight:800;color:#1B4332;">{d}</div>'
+            f'<div style="font-size:0.7rem;color:#52B788;text-transform:uppercase;">% cultivable actual</div></div>',
+            unsafe_allow_html=True)
+    _metric_card_v2(m4, area_cult_fut, "m² cultivables futuros",   "#1B4332")
+    with m5:
+        d = f"{pct_fut}%" if pct_fut > 0 else "No registrado"
+        st.markdown(
+            f'<div style="background:white;border-radius:8px;padding:0.7rem;'
+            f'box-shadow:0 2px 8px rgba(27,67,50,0.07);border-left:3px solid #1B4332;">'
+            f'<div style="font-size:1.3rem;font-weight:800;color:#1B4332;">{d}</div>'
+            f'<div style="font-size:0.7rem;color:#52B788;text-transform:uppercase;">% cultivable futuro</div></div>',
             unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -628,22 +708,20 @@ def render():
     with col_cross:
         # Métricas del sitio
         cap_lluvia = round(_safe_float(data.get("agua_prec_anual")) * _safe_float(data.get("agua_techo_m2")) * 0.8)
-        metrics = [
-            (int(area_tot),  "m² totales",     "#52B788"),
-            (int(area_cult), "m² cultivables", "#40916C"),
-            (pct_cult,       "% cultivable",   "#2D6A4F", True),
-            (cap_lluvia,     "L/año captables", "#1B4332"),
+        def _disp_m2(v):
+            return (f"{float(v):.2f}".rstrip("0").rstrip(".") + " m²") if v and float(v) > 0 else "No registrado"
+        metrics_v2 = [
+            (_disp_m2(area_tot),      "m² totales",             "#52B788"),
+            (_disp_m2(area_cult_act), "m² cultivables actuales","#40916C"),
+            (f"{pct_act}%" if pct_act > 0 else "No registrado", "% cultivable actual", "#2D6A4F"),
+            (_disp_m2(area_cult_fut), "m² cultivables futuros", "#1B4332"),
+            (f"{cap_lluvia:,} L/año" if cap_lluvia > 0 else "No registrado", "L/año captables", "#1B4332"),
         ]
-        for m in metrics:
-            val_m  = m[0]
-            lab_m  = m[1]
-            col_m  = m[2]
-            is_pct = len(m) > 3
-            disp   = f"{val_m}%" if is_pct else (f"{val_m:,}" if val_m > 0 else "No registrado")
+        for disp, lab_m, col_m in metrics_v2:
             st.markdown(
                 f'<div style="background:white;border-radius:8px;padding:0.7rem;'
                 f'box-shadow:0 2px 8px rgba(27,67,50,0.07);border-left:3px solid {col_m};margin-bottom:0.5rem;">'
-                f'<div style="font-size:1.4rem;font-weight:800;color:#1B4332;">{disp}</div>'
+                f'<div style="font-size:1.3rem;font-weight:800;color:#1B4332;">{disp}</div>'
                 f'<div style="font-size:0.7rem;color:#52B788;text-transform:uppercase;">{lab_m}</div></div>',
                 unsafe_allow_html=True)
 

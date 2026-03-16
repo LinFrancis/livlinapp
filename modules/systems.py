@@ -396,7 +396,8 @@ def _render_materiales(data):
 def _save_button(data, suffix=""):
     _, c, _ = st.columns([2, 1, 2])
     with c:
-        if not _readonly:
+        from utils.module_status import is_readonly as _is_ro_sb
+        if not _is_ro_sb():
             if st.button("💾 Guardar módulos 4–6", use_container_width=True,
                          type="primary", key=f"save_sys_{suffix}"):
                 vid = save_visit(data)

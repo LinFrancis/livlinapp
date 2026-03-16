@@ -311,7 +311,8 @@ def _save_button(data):
     st.markdown("---")
     _, col_b, _ = st.columns([2,1,2])
     with col_b:
-        if not _readonly:
+        from utils.module_status import is_readonly as _is_ro_sb
+        if not _is_ro_sb():
             if st.button("💾 Guardar módulo 1", use_container_width=True, type="primary"):
                 if not data.get("proyecto_nombre") or not data.get("proyecto_cliente"):
                     st.error("⚠️ Nombre del proyecto y del grupo son obligatorios.")

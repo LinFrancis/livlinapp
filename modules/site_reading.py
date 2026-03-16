@@ -297,8 +297,23 @@ def _render_cultivo(data, only_containers):
                     st.session_state.visit_data = data
                     st.rerun()
     else:
-        data["cultivo_m2"] = st.number_input("Área cultivable estimada total (m²)",
-            min_value=0.0, value=float(data.get("cultivo_m2", 0)), step=0.5)
+        data["cultivo_m2"] = st.number_input("Área cultivable actual (m²)",
+            min_value=0.0, value=float(data.get("cultivo_m2", 0)), step=0.01,
+            format="%.2f",
+            help="Superficie que ya se cultiva o está activa hoy.")
+
+    # Área cultivable futura (potencial identificado)
+    data["cultivo_m2_futuro"] = st.number_input(
+        "Área cultivable potencial — futura (m²)",
+        min_value=0.0, value=float(data.get("cultivo_m2_futuro", 0)), step=0.01,
+        format="%.2f",
+        help="Superficie adicional que podría cultivarse con las mejoras identificadas.")
+    if data.get("cultivo_m2_futuro", 0) > 0:
+        area_tot_tmp = float(data.get("proyecto_area", 0) or data.get("proyecto_superficie", 0) or 0)
+        tot_cult = float(data.get("cultivo_m2", 0)) + float(data.get("cultivo_m2_futuro", 0))
+        if area_tot_tmp > 0:
+            st.caption(f"Área cultivable total (actual + futura): **{tot_cult:.2f} m²** "
+                       f"({round(tot_cult/area_tot_tmp*100, 1)}% del espacio)")
 
     c3, c4 = st.columns(2)
     with c3:
@@ -317,7 +332,8 @@ def _render_cultivo(data, only_containers):
 def _save_button(data, suffix=""):
     _, c, _ = st.columns([2, 1, 2])
     with c:
-        if not _readonly:
+        from utils.module_status import is_readonly as _is_ro_sb
+        if not _is_ro_sb():
             if st.button("💾 Guardar módulos 2–3", use_container_width=True,
                          type="primary", key=f"save_m23_{suffix}"):
                 vid = save_visit(data)
