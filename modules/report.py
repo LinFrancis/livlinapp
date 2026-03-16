@@ -154,6 +154,17 @@ def render():
     ciudad  = data.get("proyecto_ciudad",  "—")
     fecha   = data.get("proyecto_fecha",   "—")
 
+    # ── Status badge helper ───────────────────────────────────────────────
+    STATUS_BADGE = {
+        "respondido":  '<span style="background:#D8F3DC;color:#1B4332;border-radius:4px;padding:1px 8px;font-size:0.72rem;font-weight:600;">Respondido</span>',
+        "inferido":    '<span style="background:#FFF3CD;color:#856404;border-radius:4px;padding:1px 8px;font-size:0.72rem;font-weight:600;">Inferido</span>',
+        "no_abordado": '<span style="background:#F5F5F5;color:#757575;border-radius:4px;padding:1px 8px;font-size:0.72rem;">No abordado</span>',
+        "":            '<span style="background:#F5F5F5;color:#757575;border-radius:4px;padding:1px 8px;font-size:0.72rem;">Sin estado</span>',
+    }
+    def _status_badge(mod_key: str) -> str:
+        s = data.get(mod_key, "respondido")
+        return STATUS_BADGE.get(s, STATUS_BADGE[""])
+
     # ── Header ────────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
     st.markdown('<p class="module-subtitle">Visión completa del diagnóstico · LivLin v6.0</p>',
@@ -271,11 +282,12 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — DATOS DEL PROYECTO
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 1. Datos del Proyecto")
+    st.markdown(f"### 1. Datos del Proyecto &nbsp; {_status_badge('mod_cliente')}", unsafe_allow_html=True)
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-        'Información general del espacio diagnosticado y del grupo habitante que participa en el proceso.</div>',
+        'Información general del espacio diagnosticado y del grupo habitante. '
+        'Incluye los datos del lugar, su geolocalización y la intención colectiva del grupo.</div>',
         unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
@@ -298,14 +310,66 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     if data.get("geo_display"):
         _show_field("Ubicación geolocalizada", data.get("geo_display"))
 
-    # Datos climáticos si están disponibles
-    if data.get("agua_prec_anual") or data.get("clima_t_max_abs"):
-        st.markdown("**Datos climáticos del sitio:**")
-        c1c, c2c, c3c, c4c = st.columns(4)
-        with c1c: _show_field("Precipitación anual (mm)", data.get("agua_prec_anual"))
-        with c2c: _show_field("T° máxima histórica", data.get("clima_t_max_abs"))
-        with c3c: _show_field("Mes más cálido", data.get("clima_mes_caluroso"))
-        with c4c: _show_field("Mes más frío", data.get("clima_mes_frio"))
+    # Datos climáticos y solares desde API
+    has_climate = data.get("agua_prec_anual") or data.get("clima_t_max_abs")
+    has_solar   = data.get("geo_solar")
+    lat = data.get("geo_lat")
+    lon = data.get("geo_lon")
+
+    if has_climate or has_solar:
+        st.markdown("**Datos climáticos y solares del sitio (fuente: Open-Meteo, histórico 5 años):**")
+        if has_climate:
+            c1c, c2c, c3c, c4c = st.columns(4)
+            with c1c: _show_field("Precipitación anual (mm)", data.get("agua_prec_anual"))
+            with c2c: _show_field("T° máxima histórica", data.get("clima_t_max_abs"))
+            with c3c: _show_field("Mes más cálido", data.get("clima_mes_caluroso"))
+            with c4c: _show_field("Mes más frío", data.get("clima_mes_frio"))
+
+        # Solar data
+        if has_solar:
+            try:
+                import ast as _ast
+                solar = data.get("geo_solar")
+                if isinstance(solar, str):
+                    solar = _ast.literal_eval(solar)
+                if isinstance(solar, dict) and solar.get("annual_avg_kwh_m2"):
+                    annual = solar["annual_avg_kwh_m2"]
+                    months = solar.get("months", [])
+                    monthly = solar.get("monthly_kwh_m2", [])
+                    panel   = solar.get("panel_100w_kwh_day", [])
+                    best_idx = monthly.index(max(x for x in monthly if x)) if any(monthly) else 0
+                    best_m  = months[best_idx] if months else "—"
+                    panel_avg = round(sum(x for x in panel if x) / max(1, sum(1 for x in panel if x)), 2) if panel else 0
+                    cs1, cs2, cs3 = st.columns(3)
+                    with cs1: _show_field("Radiación solar promedio anual", f"{annual} kWh/m²/día")
+                    with cs2: _show_field("Mejor mes solar", best_m)
+                    with cs3: _show_field("Panel 100W genera en promedio", f"{panel_avg} kWh/día")
+                    st.markdown(
+                        f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem 0.8rem;'
+                        f'font-size:0.82rem;color:#555;margin-top:0.3rem;">'
+                        f'Para cubrir un consumo hogareño de 5-10 kWh/día necesitarías entre '
+                        f'{round(5/max(0.01,panel_avg))} y {round(10/max(0.01,panel_avg))} paneles de 100W, '
+                        f'considerando un 80% de eficiencia del sistema.</div>',
+                        unsafe_allow_html=True)
+            except Exception:
+                pass
+
+    # Herramientas recomendadas según geolocalización
+    if lat and lon:
+        lat_r = round(float(lat), 2)
+        lon_r = round(float(lon), 2)
+        st.markdown("**Herramientas de análisis solar recomendadas para este espacio:**")
+        st.markdown(
+            f'<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem 1rem;'
+            f'border-left:3px solid #52B788;font-size:0.85rem;">'
+            f'Con la latitud registrada ({lat_r}°, longitud {lon_r}°) puedes analizar el potencial solar y de sombras:<br><br>'
+            f'<a href="https://shademap.app/@{lat_r},{lon_r},15z" target="_blank" style="color:#1B4332;font-weight:600;">ShadowMap</a> — Sombras en tiempo real para cualquier hora y mes del año<br>'
+            f'<a href="https://pvwatts.nrel.gov/index.php" target="_blank" style="color:#1B4332;font-weight:600;">PVWatts (NREL)</a> — Calcula el potencial fotovoltaico exacto para este sitio<br>'
+            f'<a href="https://re.jrc.ec.europa.eu/pvg_tools/en/" target="_blank" style="color:#1B4332;font-weight:600;">PVGIS (Europa)</a> — Herramienta solar gratuita con datos históricos satelitales<br>'
+            f'<a href="https://www.google.com/maps?q={lat_r},{lon_r}" target="_blank" style="color:#1B4332;font-weight:600;">Google Maps</a> — Ver el espacio en vista satélite<br>'
+            f'<a href="https://www.meteoblue.com/es/tiempo/historyplus/{lat_r}N{abs(lon_r)}{"E" if lon_r>=0 else "W"}" target="_blank" style="color:#1B4332;font-weight:600;">Meteoblue</a> — Histórico climático detallado del lugar'
+            f'</div>',
+            unsafe_allow_html=True)
 
     # Intención del grupo habitante
     intencion_fields = [
@@ -340,7 +404,7 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 2 — TAO DE LA REGENERACIÓN
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 2. Tao de la Regeneración")
+    st.markdown(f"### 2. Tao de la Regeneración &nbsp; {_status_badge('mod_tao')}", unsafe_allow_html=True)
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -461,7 +525,7 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 3 — OBSERVACIÓN ECOLÓGICA (M2-3)
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 3. Observación Ecológica y Potencial de Cultivo")
+    st.markdown(f"### 3. Observación Ecológica y Potencial de Cultivo &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -546,9 +610,36 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
                      ("sol_horas_verano","Horas de sol verano"),("sol_orientacion","Orientación"),
                      ("sol_zonas_max","Zonas más soleadas"),("sol_sombra_perm","Zonas de sombra permanente"),
                      ("viento_direccion","Dirección del viento"),("viento_protegidas","Zonas protegidas del viento"),
+                     ("viento_expuestas","Zonas expuestas al viento"),
                      ("agua_flujo_lluvia","Flujo del agua de lluvia"),("agua_acumulacion","Acumulación de agua"),
-                     ("flujos_notas","Notas de flujos")]:
+                     ("flujos_notas","Notas de flujos naturales")]:
             _card(l, str(data.get(k,"")) if data.get(k) else "", "#E3F2FD","#1B4332","#1565C0")
+
+        # Gráfico climático si hay datos de API
+        geo_clima = data.get("geo_clima_anual")
+        if geo_clima:
+            try:
+                import ast as _ast, plotly.graph_objects as go
+                climate = _ast.literal_eval(geo_clima) if isinstance(geo_clima, str) else geo_clima
+                if isinstance(climate, dict) and climate.get("months"):
+                    st.markdown("**Perfil climático anual (Open-Meteo, histórico):**")
+                    fig_c = go.Figure()
+                    fig_c.add_trace(go.Bar(name="Precipitación (mm)", x=climate["months"],
+                        y=climate.get("prec",[]), yaxis="y2",
+                        marker_color="rgba(30,136,229,0.4)", offsetgroup=1))
+                    fig_c.add_trace(go.Scatter(name="T° Máx", x=climate["months"],
+                        y=climate.get("t_max",[]), line=dict(color="#E53935",width=2), mode="lines+markers"))
+                    fig_c.add_trace(go.Scatter(name="T° Mín", x=climate["months"],
+                        y=climate.get("t_min",[]), line=dict(color="#1565C0",width=2), mode="lines+markers"))
+                    fig_c.update_layout(
+                        yaxis=dict(title="T° (°C)", side="left"),
+                        yaxis2=dict(title="Precipitación (mm)", side="right", overlaying="y"),
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, font=dict(size=9)),
+                        height=260, margin=dict(l=30,r=30,t=20,b=20),
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.4)")
+                    st.plotly_chart(fig_c, use_container_width=True, key="clima_report")
+            except Exception:
+                pass
 
         st.markdown("**Cultivo**")
         for k, l in [("cultivo_produce_hoy","Produce alimentos hoy"),("cultivo_interes","Interés en producir"),
@@ -604,7 +695,7 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 4 — SISTEMAS (M4-6)
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 4. Contexto, Agua, Energía y Materiales")
+    st.markdown(f"### 4. Contexto, Agua, Energía y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
@@ -741,7 +832,7 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     # ══════════════════════════════════════════════════════════════════════
     # SECCIÓN 6 — FLOR DE LA PERMACULTURA + IPR DUAL
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 6. Flor de la Permacultura — Indice de Potencial Regenerativo")
+    st.markdown(f"### 6. Flor de la Permacultura — Indice de Potencial Regenerativo &nbsp; {_status_badge('mod_potencial')}", unsafe_allow_html=True)
     st.markdown(
         '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
         'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
