@@ -105,6 +105,10 @@ Porque cuando muchas personas comienzan a escuchar ese mismo pulso de vida, los 
 Y con ellos, también cambia nuestra forma de habitar el mundo. 🌱
 """
 def render():
+    from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    _readonly = _is_ro()
+    if _readonly:
+        render_readonly_notice()
     st.markdown("## ☯️ Tao de la Regeneración")
     st.markdown(
         '<p class="module-subtitle">Exploración interior opcional — desde lo que sienten '
@@ -366,12 +370,13 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
         # Limpiar valores por defecto si el módulo no fue abordado
         save_col1, save_col2 = st.columns([1,1])
         with save_col1:
-            if st.button("💾 Guardar como No Abordado", key="save_na_mod_tao",
-                         use_container_width=True):
-                st.session_state.visit_data = data
-                save_visit(data)
-                st.success("✅ Módulo marcado como No Abordado.")
-                show_drive_save_status()
+            if not _readonly:
+                if st.button("💾 Guardar como No Abordado", key="save_na_mod_tao",
+                             use_container_width=True):
+                    st.session_state.visit_data = data
+                    save_visit(data)
+                    st.success("✅ Módulo marcado como No Abordado.")
+                    show_drive_save_status()
         return
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
@@ -391,8 +396,10 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
     st.markdown("---")
     _, col_b, _ = st.columns([2,1,2])
     with col_b:
-        if st.button("💾 Guardar Tao", use_container_width=True, type="primary"):
-            vid = save_visit(data)
-            data["id"] = vid
-            st.session_state.visit_data = data
-            st.success("✅ Guardado.")
+        if not _readonly:
+            if st.button("💾 Guardar Tao", use_container_width=True, type="primary"):
+                vid = save_visit(data)
+                data["id"] = vid
+                st.session_state.visit_data = data
+                st.success("✅ Guardado.")
+    

@@ -33,6 +33,10 @@ def _interp_auto(dim: str, val: float) -> str:
 
 
 def render():
+    from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    _readonly = _is_ro()
+    if _readonly:
+        render_readonly_notice()
     st.markdown("## 🗺️ Módulo 9 — Síntesis Regenerativa + Plan de Acción")
     data = st.session_state.visit_data
 
@@ -126,12 +130,13 @@ def _render_potencial(data):
         # Limpiar valores por defecto si el módulo no fue abordado
         save_col1, save_col2 = st.columns([1,1])
         with save_col1:
-            if st.button("💾 Guardar como No Abordado", key="save_na_mod_plan",
-                         use_container_width=True):
-                st.session_state.visit_data = data
-                save_visit(data)
-                st.success("✅ Módulo marcado como No Abordado.")
-                show_drive_save_status()
+            if not _readonly:
+                if st.button("💾 Guardar como No Abordado", key="save_na_mod_plan",
+                             use_container_width=True):
+                    st.session_state.visit_data = data
+                    save_visit(data)
+                    st.success("✅ Módulo marcado como No Abordado.")
+                    show_drive_save_status()
         return
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
@@ -276,15 +281,17 @@ def _save_button(data, suffix=""):
     st.markdown("---")
     _, c, _ = st.columns([2, 1, 2])
     with c:
-        if st.button("💾 Guardar módulo 9", use_container_width=True,
-                     type="primary", key=f"save_m9_{suffix}"):
-            vid = save_visit(data)
-            data["id"] = vid
-            st.session_state.visit_data = data
-            try:
-                from utils.gdrive import is_configured, sync_visits_to_drive
-                from utils.data_manager import DATA_FILE
-                if is_configured(): sync_visits_to_drive(DATA_FILE)
-            except Exception: pass
-            st.success("✅ Módulo 9 guardado.")
-            show_drive_save_status()
+        if not _readonly:
+            if st.button("💾 Guardar módulo 9", use_container_width=True,
+                         type="primary", key=f"save_m9_{suffix}"):
+                vid = save_visit(data)
+                data["id"] = vid
+                st.session_state.visit_data = data
+                try:
+                    from utils.gdrive import is_configured, sync_visits_to_drive
+                    from utils.data_manager import DATA_FILE
+                    if is_configured(): sync_visits_to_drive(DATA_FILE)
+                except Exception: pass
+                st.success("✅ Módulo 9 guardado.")
+                show_drive_save_status()
+    

@@ -103,3 +103,26 @@ def module_status_badge(status: str) -> str:
 
 def get_module_status(data: dict, module_key: str) -> str:
     return data.get(module_key, "respondido")
+
+
+def is_readonly() -> bool:
+    """Returns True if the current user should see modules in read-only mode."""
+    try:
+        import streamlit as st
+        user = st.session_state.get("current_user", {})
+        return user.get("role", "user") != "admin"
+    except Exception:
+        return False
+
+
+def render_readonly_notice():
+    """Show a small read-only banner at the top of a module."""
+    try:
+        import streamlit as st
+        st.markdown(
+            '<div style="background:#E8F5E9;border:1px solid #A8D5B5;border-radius:6px;'
+            'padding:0.4rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:#2D6A4F;">'
+            'Vista de resultados — esta sección muestra la información registrada en el diagnóstico.</div>',
+            unsafe_allow_html=True)
+    except Exception:
+        pass

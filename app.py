@@ -1,11 +1,11 @@
-"""Indagación Regenerativa v4.2 — LivLin · Multi-usuario · www.livlin.cl"""
+"""Indagación Regenerativa v5.0 — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin v4.2",
+    page_title="Indagación Regenerativa · LivLin v5.0",
     page_icon="🌿", layout="wide",
     initial_sidebar_state="expanded")
 
@@ -15,7 +15,7 @@ if CSS_FILE.exists():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ── Pages ──────────────────────────────────────────────────────────────────
-PAGES_USER = {
+PAGES_ALL = {
     "🌿 Inicio":                               "home",
     "📋 M1 · Información + Intención":         "client",
     "☯️ Tao de la Regeneración":               "tao",
@@ -26,7 +26,9 @@ PAGES_USER = {
     "🗺️ M9 · Síntesis + Plan":                "action_plan",
     "📊 Informe Final":                        "report",
 }
-PAGES_ADMIN = {**PAGES_USER, "⚙️ Administración": "admin"}
+PAGES_ADMIN = {**PAGES_ALL, "⚙️ Administración": "admin"}
+# Cliente ve las mismas páginas pero en modo solo lectura
+PAGES_CLIENT = PAGES_ALL
 
 
 def _login_page():
@@ -36,39 +38,46 @@ def _login_page():
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Indagación Regenerativa</h2>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnóstico · LivLin v5</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnóstico · LivLin v5.0</p>', unsafe_allow_html=True)
         st.markdown("---")
-        uname = st.text_input("👤 Usuario", placeholder="Ej: francis", key="login_user")
-        pwd   = st.text_input("🔑 Contraseña", type="password", key="login_pwd")
-        if st.button("🌿 Ingresar", use_container_width=True, type="primary", key="btn_login"):
+        uname = st.text_input("Usuario", placeholder="Ej: francis", key="login_user")
+        pwd   = st.text_input("Contraseña", type="password", key="login_pwd")
+        if st.button("Ingresar", use_container_width=True, type="primary", key="btn_login"):
             from utils.users import authenticate
             user = authenticate(uname.strip(), pwd.strip())
             if user:
                 st.session_state.authenticated = True
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
-                # Invalidate visit cache to force reload from Drive on login
                 st.session_state.pop("_visits_cache_v4.2", None)
                 st.session_state.pop("_sb_status_cache", None)
-                # Load user's visit if linked
                 if user.get("visit_id"):
                     v = get_visit(user["visit_id"])
                     st.session_state.visit_data = v if v else {}
                 else:
                     st.session_state.visit_data = {}
-                # Force reload from Supabase on login
                 st.session_state.pop("_visits_cache", None)
                 st.session_state.pop("_db_status_cache", None)
+                # Clientes van directo al informe, admins al home
+                role = user.get("role","user")
+                st.session_state.page = "home" if role == "admin" else "report"
                 st.rerun()
             else:
-                st.error("⚠️ Usuario o contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v4.2 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+                st.error("Usuario o contraseña incorrectos.")
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v5.0 · LivLin Permacultura Urbana</p>', unsafe_allow_html=True)
+
+
+def _is_readonly() -> bool:
+    """Returns True if current user is in read-only mode (role=user/client)."""
+    user = st.session_state.get("current_user", {})
+    return user.get("role", "user") != "admin"
 
 
 def _sidebar():
-    user  = st.session_state.get("current_user", {})
+    user     = st.session_state.get("current_user", {})
     is_admin = user.get("role") == "admin"
-    PAGES = PAGES_ADMIN if is_admin else PAGES_USER
+    readonly = not is_admin
+    PAGES    = PAGES_ADMIN if is_admin else PAGES_CLIENT
 
     with st.sidebar:
         logo_path = Path(__file__).parent / "assets" / "logolivlin.png"
@@ -81,6 +90,15 @@ def _sidebar():
         st.markdown('<div style="text-align:center;padding:0 0 0.4rem;">'
             '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Potencial para una vida regenerativa</span></div>',
             unsafe_allow_html=True)
+
+        # Badge de modo lectura para clientes
+        if readonly:
+            st.markdown(
+                '<div style="background:#E8F5E9;border:1px solid #A8D5B5;border-radius:6px;'
+                'padding:0.3rem 0.7rem;margin-bottom:0.5rem;text-align:center;'
+                'font-size:0.72rem;color:#2D6A4F;">Vista de resultados · Solo lectura</div>',
+                unsafe_allow_html=True)
+
         st.markdown("---")
 
         data = st.session_state.get("visit_data", {})
@@ -88,20 +106,26 @@ def _sidebar():
             st.markdown(
                 f'<div style="padding:0.4rem 0.7rem;background:rgba(82,183,136,0.15);'
                 f'border-radius:8px;margin-bottom:0.4rem;border:1px solid #A8D5B5;">'
-                f'<div style="font-size:0.62rem;color:#40916C;text-transform:uppercase;">VISITA ACTIVA</div>'
+                f'<div style="font-size:0.62rem;color:#40916C;text-transform:uppercase;">DIAGNÓSTICO</div>'
                 f'<div style="font-weight:700;font-size:0.82rem;color:#1B4332;">{data["proyecto_nombre"]}</div>'
                 f'<div style="font-size:0.7rem;color:#2D6A4F;">{data.get("proyecto_cliente","")}</div></div>',
                 unsafe_allow_html=True)
 
-        progress = _module_progress(st.session_state.get("visit_data", {}))
+        # Progress solo para admin
+        if is_admin:
+            progress = _module_progress(st.session_state.get("visit_data", {}))
+        else:
+            progress = {}
+
         for label, key in PAGES.items():
             is_active = st.session_state.get("page") == key
-            pct = progress.get(key, 0)
             btn_label = label
-            if pct == 100:
-                btn_label = f"{label} ✅"
-            elif pct > 0:
-                btn_label = f"{label} ({pct}%)"
+            if is_admin and progress:
+                pct = progress.get(key, 0)
+                if pct == 100:
+                    btn_label = f"{label} ✅"
+                elif pct > 0:
+                    btn_label = f"{label} ({pct}%)"
             if is_active:
                 st.markdown('<div class="nav-active">', unsafe_allow_html=True)
             if st.button(btn_label, key=f"nav_{key}", use_container_width=True):
@@ -112,9 +136,9 @@ def _sidebar():
 
         st.markdown("---")
 
-        # Visit management (admin sees all, user sees only theirs)
+        # Visit management: solo admin
         if is_admin:
-            st.caption("📂 Todos los diagnósticos")
+            st.caption("Todos los diagnósticos")
             visits = load_visits()
             if visits:
                 visit_names = {v.get("id",""): f"{v.get('proyecto_nombre','?')} ({str(v.get('updated_at',v.get('created_at','?')))[:10]})"
@@ -124,19 +148,19 @@ def _sidebar():
                     label_visibility="collapsed")
                 cl, dl = st.columns(2)
                 with cl:
-                    if st.button("📂 Cargar", use_container_width=True, key="btn_load"):
+                    if st.button("Cargar", use_container_width=True, key="btn_load"):
                         v = get_visit(sel)
                         if v: st.session_state.visit_data = v; st.session_state.page = "client"; st.rerun()
                 with dl:
-                    if st.button("🗑️ Borrar", use_container_width=True, key="btn_del"):
+                    if st.button("Borrar", use_container_width=True, key="btn_del"):
                         st.session_state["_confirm_del"] = sel
                         st.rerun()
 
                 if st.session_state.get("_confirm_del") == sel:
-                    st.warning(f"⚠️ ¿Confirmar eliminación de **{visit_names.get(sel,'?')}**?")
+                    st.warning(f"Confirmar eliminación de **{visit_names.get(sel,'?')}**")
                     cc1, cc2 = st.columns(2)
                     with cc1:
-                        if st.button("✅ Sí, eliminar", key="btn_del_confirm", type="primary",
+                        if st.button("Si, eliminar", key="btn_del_confirm", type="primary",
                                      use_container_width=True):
                             delete_visit(sel)
                             st.session_state.pop("_confirm_del", None)
@@ -144,21 +168,21 @@ def _sidebar():
                                 st.session_state.visit_data = {}
                             st.rerun()
                     with cc2:
-                        if st.button("❌ Cancelar", key="btn_del_cancel",
+                        if st.button("Cancelar", key="btn_del_cancel",
                                      use_container_width=True):
                             st.session_state.pop("_confirm_del", None)
                             st.rerun()
 
-            if st.button("➕ Nuevo diagnóstico", use_container_width=True, key="btn_new"):
+            if st.button("Nuevo diagnóstico", use_container_width=True, key="btn_new"):
                 st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
 
         space = user.get("space_name", "")
         st.markdown("---")
-        st.markdown(f'<div style="font-size:0.75rem;color:#40916C;">👤 {user.get("display_name","")}'
-                    + (f'<br>🏡 {space}' if space else '')
+        st.markdown(f'<div style="font-size:0.75rem;color:#40916C;">Usuario: {user.get("display_name","")}'
+                    + (f'<br>Espacio: {space}' if space else '')
                     + '</div>', unsafe_allow_html=True)
 
-        # ── Supabase status indicator ───────────────────────
+        # Supabase status
         try:
             from utils.supabase_db import is_configured, test_connection as get_status
             if is_configured():
@@ -170,34 +194,29 @@ def _sidebar():
                     st.markdown(
                         '<div style="background:#D8F3DC;border-radius:8px;padding:0.35rem 0.6rem;'
                         'font-size:0.72rem;color:#1B4332;text-align:center;margin-top:0.5rem;">'
-                        '🗄️ Supabase conectado</div>', unsafe_allow_html=True)
+                        'Supabase conectado</div>', unsafe_allow_html=True)
                 else:
                     err_short = str(sb_status.get("error",""))[:55]
                     st.markdown(
                         f'<div style="background:#FFE0E0;border-radius:8px;padding:0.35rem 0.6rem;'
                         f'font-size:0.7rem;color:#B00020;margin-top:0.5rem;">'
-                        f'⚠️ DB: {err_short}</div>', unsafe_allow_html=True)
-                errs = st.session_state.get("_db_last_errors")
-                if errs:
-                    with st.expander("⚠️ Errores DB", expanded=False):
-                        for err in errs:
-                            st.caption(f"• {err}")
+                        f'DB: {err_short}</div>', unsafe_allow_html=True)
         except Exception:
             pass
 
-        if st.button("🚪 Cerrar sesión", use_container_width=True, key="btn_logout"):
+        if st.button("Cerrar sesión", use_container_width=True, key="btn_logout"):
             st.session_state.authenticated = False
             st.session_state.current_user  = {}
             st.session_state.visit_data    = {}
             st.rerun()
-        st.caption("🌿 LivLin · Permacultura Urbana")
+        st.caption("LivLin · Permacultura Urbana")
 
 
 def _home():
     st.markdown(
         '<div class="app-header">'
         '<h1>Indagación Regenerativa</h1>'
-        '<p>Potencial para una vida regenerativa  ·  LivLin v4.2  ·  www.livlin.cl</p>'
+        '<p>Potencial para una vida regenerativa  ·  LivLin v5.0  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
 
     _, cc, _ = st.columns([1, 3, 1])
@@ -243,7 +262,7 @@ def _home():
         '· www.livlin.cl</span></div>',
         unsafe_allow_html=True)
 
-    with st.expander("💚 ¿Por qué LivLin? — Nuestra propuesta", expanded=False):
+    with st.expander("Por qué LivLin — Nuestra propuesta", expanded=False):
         from utils.petal_content import LIVLIN_NARRATIVE_INTRO
         st.markdown(
             f'<div class="tao-quote" style="white-space:pre-line;">{LIVLIN_NARRATIVE_INTRO}</div>',
@@ -251,16 +270,14 @@ def _home():
 
     _, cb, _ = st.columns([2, 1, 2])
     with cb:
-        if st.button("🌿 Comenzar diagnóstico", use_container_width=True, type="primary"):
+        if st.button("Comenzar diagnóstico", use_container_width=True, type="primary"):
             st.session_state.page = "client"; st.rerun()
 
 
-
 def _module_progress(data: dict) -> dict:
-    """Calculate completion % for each module."""
     checks = {
         "client":    [("proyecto_nombre",""), ("proyecto_cliente",""), ("geo_lat",None)],
-        "tao":       [("tao_motivacion",""), ("tao_presencia",""), ("tao_cc_conciencia","")],
+        "tao":       [("tao_deseado",""), ("tao_sensacion",""), ("tao_cc_conciencia","")],
         "media":     [("media_count", 0)],
         "site_reading": [("suelo_tipo",""), ("sol_horas",None), ("cultivo_m2",None)],
         "systems":   [("ctx_cuenca",""), ("agua_consumo",None), ("ene_kwh_dia_calc",None)],
@@ -275,11 +292,34 @@ def _module_progress(data: dict) -> dict:
         result[page] = round(filled / len(fields) * 100)
     return result
 
+
+def _render_readonly(page: str):
+    """Render a module in read-only mode for client users."""
+    data = st.session_state.get("visit_data", {})
+    if not data.get("id"):
+        st.warning("No hay diagnóstico cargado.")
+        return
+
+    # For most pages, render the actual module — the modules check _is_readonly
+    dispatch = {
+        "home":                   _home,
+        "client":                 lambda: __import__("modules.client",             fromlist=["render"]).render(),
+        "tao":                    lambda: __import__("modules.tao",                fromlist=["render"]).render(),
+        "media":                  lambda: __import__("modules.media_manager",      fromlist=["render"]).render(),
+        "site_reading":           lambda: __import__("modules.site_reading",       fromlist=["render"]).render(),
+        "systems":                lambda: __import__("modules.systems",            fromlist=["render"]).render(),
+        "regenerative_potential": lambda: __import__("modules.regenerative_potential", fromlist=["render"]).render(),
+        "action_plan":            lambda: __import__("modules.action_plan",        fromlist=["render"]).render(),
+        "report":                 lambda: __import__("modules.report",             fromlist=["render"]).render(),
+    }
+    dispatch.get(page, _home)()
+
+
 def main():
-    if "page"            not in st.session_state: st.session_state.page = "home"
-    if "visit_data"      not in st.session_state: st.session_state.visit_data = {}
-    if "authenticated"   not in st.session_state: st.session_state.authenticated = False
-    if "current_user"    not in st.session_state: st.session_state.current_user = {}
+    if "page"          not in st.session_state: st.session_state.page = "home"
+    if "visit_data"    not in st.session_state: st.session_state.visit_data = {}
+    if "authenticated" not in st.session_state: st.session_state.authenticated = False
+    if "current_user"  not in st.session_state: st.session_state.current_user = {}
 
     if not st.session_state.authenticated:
         _login_page(); return
@@ -288,16 +328,16 @@ def main():
     page = st.session_state.get("page", "home")
 
     dispatch = {
-        "home":                 _home,
-        "client":               lambda: __import__("modules.client",             fromlist=["render"]).render(),
-        "tao":                  lambda: __import__("modules.tao",                fromlist=["render"]).render(),
-        "media":                lambda: __import__("modules.media_manager",      fromlist=["render"]).render(),
-        "site_reading":         lambda: __import__("modules.site_reading",       fromlist=["render"]).render(),
-        "systems":              lambda: __import__("modules.systems",            fromlist=["render"]).render(),
-        "regenerative_potential":lambda: __import__("modules.regenerative_potential", fromlist=["render"]).render(),
-        "action_plan":          lambda: __import__("modules.action_plan",        fromlist=["render"]).render(),
-        "report":               lambda: __import__("modules.report",             fromlist=["render"]).render(),
-        "admin":                lambda: __import__("modules.admin",              fromlist=["render"]).render(),
+        "home":                   _home,
+        "client":                 lambda: __import__("modules.client",             fromlist=["render"]).render(),
+        "tao":                    lambda: __import__("modules.tao",                fromlist=["render"]).render(),
+        "media":                  lambda: __import__("modules.media_manager",      fromlist=["render"]).render(),
+        "site_reading":           lambda: __import__("modules.site_reading",       fromlist=["render"]).render(),
+        "systems":                lambda: __import__("modules.systems",            fromlist=["render"]).render(),
+        "regenerative_potential": lambda: __import__("modules.regenerative_potential", fromlist=["render"]).render(),
+        "action_plan":            lambda: __import__("modules.action_plan",        fromlist=["render"]).render(),
+        "report":                 lambda: __import__("modules.report",             fromlist=["render"]).render(),
+        "admin":                  lambda: __import__("modules.admin",              fromlist=["render"]).render(),
     }
     dispatch.get(page, _home)()
 

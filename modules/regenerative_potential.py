@@ -56,6 +56,10 @@ def _petal_done(data, i):
 
 
 def render():
+    from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    _readonly = _is_ro()
+    if _readonly:
+        render_readonly_notice()
     data = st.session_state.get("visit_data", {})
     if not data.get("id"):
         st.warning("⚠️ Primero crea o carga un diagnóstico.")
@@ -70,12 +74,13 @@ def render():
     st.markdown("**Estado de este módulo:**")
     _mod_status = render_module_status(data, "mod_potencial")
     if not is_module_active(_mod_status):
-        if st.button("💾 Guardar como No Abordado", key="save_na_mod_potencial",
-                     use_container_width=True):
-            st.session_state.visit_data = data
-            save_visit(data)
-            st.success("✅ Módulo marcado como No Abordado.")
-            show_drive_save_status()
+        if not _readonly:
+            if st.button("💾 Guardar como No Abordado", key="save_na_mod_potencial",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("✅ Módulo marcado como No Abordado.")
+                show_drive_save_status()
         return
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Respuestas del facilitador.")
@@ -171,39 +176,65 @@ exista al menos una práctica activa ya es un avance significativo.
 
         try:
             import plotly.graph_objects as go
-            labels = [f"{PETAL_ICONS[i]} {p['nombre'][:18]}"
-                      for i, p in enumerate(petalos)]
-            scores_tot = data["ipr_tot"]
-            max_v = max(max(scores_obs + scores_tot, default=1), 1)
-            norm_obs = [min(s/max_v*10, 10) for s in scores_obs]
-            norm_tot = [min(s/max_v*10, 10) for s in scores_tot]
-            lbls_c = labels + [labels[0]]
+            from utils.scoring import (
+                compute_domain_scores, compute_domain_scores_total,
+                compute_regenerative_score, compute_regenerative_score_potential,
+                score_label, PETAL_ORDER, FLOWER_DOMAINS, _count_to_score, _score_to_level
+            )
+            domain_obs_v5 = compute_domain_scores(data)
+            domain_tot_v5 = compute_domain_scores_total(data)
+            regen_obs_v5  = compute_regenerative_score(data)
+            regen_pot_v5  = compute_regenerative_score_potential(data)
+            label_obs_v5, color_obs_v5 = score_label(regen_obs_v5)
+            label_pot_v5, color_pot_v5 = score_label(regen_pot_v5)
+
+            labels_v5 = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
+            r_obs_v5 = [domain_obs_v5[p] for p in PETAL_ORDER] + [domain_obs_v5[PETAL_ORDER[0]]]
+            r_tot_v5 = [domain_tot_v5[p] for p in PETAL_ORDER] + [domain_tot_v5[PETAL_ORDER[0]]]
+            theta_v5 = labels_v5 + [labels_v5[0]]
+
             fig = go.Figure()
             fig.add_trace(go.Scatterpolar(
-                r=norm_tot + [norm_tot[0]], theta=lbls_c,
-                name="🌟 Con potencial adicional",
+                r=r_tot_v5, theta=theta_v5,
+                name="Con potencial adicional",
                 fill="toself", fillcolor="rgba(82,183,136,0.12)",
                 line=dict(color="#52B788", width=2, dash="dash")))
             fig.add_trace(go.Scatterpolar(
-                r=norm_obs + [norm_obs[0]], theta=lbls_c,
-                name="✅ Observado hoy",
+                r=r_obs_v5, theta=theta_v5,
+                name="Estado actual",
                 fill="toself", fillcolor="rgba(27,67,50,0.28)",
                 line=dict(color="#1B4332", width=2.5)))
             fig.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0,10],
-                           tickfont=dict(size=8))),
-                legend=dict(orientation="h", yanchor="bottom", y=1.05),
+                polar=dict(
+                    bgcolor="rgba(240,255,244,0.4)",
+                    radialaxis=dict(visible=True, range=[0,10],
+                        tickvals=[2,4,6,8,10],
+                        tickfont=dict(size=8, color="#2D6A4F"),
+                        gridcolor="rgba(45,106,79,0.2)")),
+                legend=dict(orientation="h", yanchor="bottom", y=1.05, font=dict(size=10)),
                 height=420, margin=dict(l=60,r=60,t=50,b=30),
                 paper_bgcolor="rgba(0,0,0,0)")
-            st.plotly_chart(fig, use_container_width=True, key="radar_chart")
 
-            # Store chart as image for reports
-            try:
-                img_bytes = fig.to_image(format="png", width=700, height=420)
-                import base64
-                data["ipr_radar_b64"] = base64.b64encode(img_bytes).decode()
-            except Exception:
-                pass
+            col_r, col_s = st.columns([2, 1])
+            with col_r:
+                st.plotly_chart(fig, use_container_width=True, key="radar_chart")
+            with col_s:
+                st.markdown(
+                    f'''<div style="background:white;border:2px solid #D8F3DC;border-radius:10px;
+padding:0.8rem;text-align:center;margin-bottom:0.5rem;">
+<div style="font-size:0.65rem;color:#888;text-transform:uppercase;">IPR Estado actual</div>
+<div style="font-size:2.8rem;font-weight:900;color:#1B4332;line-height:1;">{regen_obs_v5}</div>
+<div style="color:#52B788;font-size:0.75rem;">/10</div>
+<div style="font-size:0.75rem;color:{color_obs_v5};font-weight:600;">{label_obs_v5}</div></div>''',
+                    unsafe_allow_html=True)
+                st.markdown(
+                    f'''<div style="background:white;border:2px dashed #52B788;border-radius:10px;
+padding:0.8rem;text-align:center;">
+<div style="font-size:0.65rem;color:#888;text-transform:uppercase;">IPR Con potencial</div>
+<div style="font-size:2.8rem;font-weight:900;color:#52B788;line-height:1;">{regen_pot_v5}</div>
+<div style="color:#52B788;font-size:0.75rem;">/10</div>
+<div style="font-size:0.75rem;color:{color_pot_v5};font-weight:600;">{label_pot_v5}</div></div>''',
+                    unsafe_allow_html=True)
         except Exception as e:
             st.caption(f"Gráfico no disponible: {e}")
 
@@ -361,9 +392,11 @@ exista al menos una práctica activa ya es un avance significativo.
 
     # ── Guardar ───────────────────────────────────────────────────────────
     st.markdown("---")
-    if st.button("💾 Guardar Flor de la Permacultura", use_container_width=True,
-                 type="primary", key="save_potencial"):
-        st.session_state.visit_data = data
-        save_visit(data)
-        st.success("✅ Flor de la Permacultura guardada.")
-        show_drive_save_status()
+    if not _readonly:
+        if st.button("💾 Guardar Flor de la Permacultura", use_container_width=True,
+                     type="primary", key="save_potencial"):
+            st.session_state.visit_data = data
+            save_visit(data)
+            st.success("✅ Flor de la Permacultura guardada.")
+            show_drive_save_status()
+    

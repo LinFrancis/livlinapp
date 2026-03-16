@@ -16,6 +16,10 @@ COMPOSICION_GRUPO = [
 ]
 
 def render():
+    from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    _readonly = _is_ro()
+    if _readonly:
+        render_readonly_notice()
     st.markdown("## 🌿 Módulo 1 — Información del Proyecto")
     st.markdown('<p class="module-subtitle">Datos generales del espacio e intención colectiva del grupo habitante.</p>', unsafe_allow_html=True)
     st.markdown('<div class="group-notice">👥 <strong>Diagnóstico colectivo:</strong> Las respuestas reflejan la conversación y acuerdo del grupo habitante. No es un cuestionario individual — es una exploración compartida.</div>', unsafe_allow_html=True)
@@ -32,12 +36,13 @@ def render():
     st.markdown("**Estado de este módulo:**")
     _mod_status = render_module_status(data, "mod_cliente")
     if not is_module_active(_mod_status):
-        if st.button("💾 Guardar como No Abordado", key="save_na_mod_cliente",
-                     use_container_width=True):
-            st.session_state.visit_data = data
-            save_visit(data)
-            st.success("✅ Módulo marcado como No Abordado.")
-            show_drive_save_status()
+        if not _readonly:
+            if st.button("💾 Guardar como No Abordado", key="save_na_mod_cliente",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("✅ Módulo marcado como No Abordado.")
+                show_drive_save_status()
         return
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas son interpretaciones del facilitador.")
@@ -306,12 +311,14 @@ def _save_button(data):
     st.markdown("---")
     _, col_b, _ = st.columns([2,1,2])
     with col_b:
-        if st.button("💾 Guardar módulo 1", use_container_width=True, type="primary"):
-            if not data.get("proyecto_nombre") or not data.get("proyecto_cliente"):
-                st.error("⚠️ Nombre del proyecto y del grupo son obligatorios.")
-                return
-            vid = save_visit(data)
-            data["id"] = vid
-            st.session_state.visit_data = data
-            st.success("✅ Módulo 1 guardado.")
-            show_drive_save_status()
+        if not _readonly:
+            if st.button("💾 Guardar módulo 1", use_container_width=True, type="primary"):
+                if not data.get("proyecto_nombre") or not data.get("proyecto_cliente"):
+                    st.error("⚠️ Nombre del proyecto y del grupo son obligatorios.")
+                    return
+                vid = save_visit(data)
+                data["id"] = vid
+                st.session_state.visit_data = data
+                st.success("✅ Módulo 1 guardado.")
+                show_drive_save_status()
+    

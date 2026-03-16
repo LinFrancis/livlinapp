@@ -13,6 +13,10 @@ MOD  = "m23"
 
 
 def render():
+    from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    _readonly = _is_ro()
+    if _readonly:
+        render_readonly_notice()
     st.markdown("## 🔬 Módulos 2–3 — Observación Ecológica + Flujos + Cultivo")
     st.markdown('<p class="module-subtitle">Registro de las características del espacio, '
                 'flujos naturales y potencial productivo.</p>', unsafe_allow_html=True)
@@ -25,12 +29,13 @@ def render():
         # Limpiar valores por defecto si el módulo no fue abordado
         save_col1, save_col2 = st.columns([1,1])
         with save_col1:
-            if st.button("💾 Guardar como No Abordado", key="save_na_mod_sitio",
-                         use_container_width=True):
-                st.session_state.visit_data = data
-                save_visit(data)
-                st.success("✅ Módulo marcado como No Abordado.")
-                show_drive_save_status()
+            if not _readonly:
+                if st.button("💾 Guardar como No Abordado", key="save_na_mod_sitio",
+                             use_container_width=True):
+                    st.session_state.visit_data = data
+                    save_visit(data)
+                    st.success("✅ Módulo marcado como No Abordado.")
+                    show_drive_save_status()
         return
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
@@ -312,15 +317,17 @@ def _render_cultivo(data, only_containers):
 def _save_button(data, suffix=""):
     _, c, _ = st.columns([2, 1, 2])
     with c:
-        if st.button("💾 Guardar módulos 2–3", use_container_width=True,
-                     type="primary", key=f"save_m23_{suffix}"):
-            vid = save_visit(data)
-            data["id"] = vid
-            st.session_state.visit_data = data
-            try:
-                from utils.gdrive import is_configured, sync_visits_to_drive
-                from utils.data_manager import DATA_FILE
-                if is_configured(): sync_visits_to_drive(DATA_FILE)
-            except Exception: pass
-            st.success("✅ Módulos 2–3 guardados.")
-            show_drive_save_status()
+        if not _readonly:
+            if st.button("💾 Guardar módulos 2–3", use_container_width=True,
+                         type="primary", key=f"save_m23_{suffix}"):
+                vid = save_visit(data)
+                data["id"] = vid
+                st.session_state.visit_data = data
+                try:
+                    from utils.gdrive import is_configured, sync_visits_to_drive
+                    from utils.data_manager import DATA_FILE
+                    if is_configured(): sync_visits_to_drive(DATA_FILE)
+                except Exception: pass
+                st.success("✅ Módulos 2–3 guardados.")
+                show_drive_save_status()
+    
