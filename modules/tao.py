@@ -389,6 +389,60 @@ saltada, o explorada con la profundidad que el grupo sienta apropiada.
             value=data.get("tao_palabra_esencial",""), height=90,
             placeholder="Ej: Raíces. Abundancia simple. Conexión. Hogar vivo…")
 
+    # ── T.7 Alimentación saludable y actividad física ──────────────────────
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown("### 🥗 T.7 · Alimentación Saludable y Actividad Física")
+    st.markdown(
+        '<div class="tao-quote-sm">'
+        '«Tratar el cuerpo bien es la primera forma de respetar la tierra que lo sostiene.»<br>'
+        '<em>La salud personal y la salud del ecosistema están profundamente conectadas. '
+        'Lo que comemos, cómo nos movemos y cómo descansamos forma parte de la misma red.</em>'
+        '</div>', unsafe_allow_html=True)
+    st.caption("Estas preguntas se relacionan con el Pétalo 5 de la Flor de la Permacultura: Salud y Bienestar Espiritual.")
+
+    f1, f2 = st.columns(2)
+    with f1:
+        opts_ali = ["No registrado","Poco — comemos principalmente procesados","Regular — mezcla de procesados y frescos",
+                    "Buena — mayoritariamente alimentos frescos","Muy buena — dieta basada en plantas y local",
+                    "Excelente — producimos parte de lo que comemos"]
+        data["sal_alimentacion"] = st.selectbox(
+            "¿Cómo describirían la calidad de su alimentación?",
+            opts_ali, index=opts_ali.index(data.get("sal_alimentacion","No registrado")))
+
+        opts_local = ["No registrado","No","A veces","Frecuentemente","Sí, priorizamos lo local"]
+        data["sal_alim_local"] = st.selectbox(
+            "¿Consumen alimentos locales o de productores cercanos?",
+            opts_local, index=opts_local.index(data.get("sal_alim_local","No registrado")))
+
+        opts_plantas = ["No registrado","No","A veces","Frecuentemente","Mayoritariamente basada en plantas"]
+        data["sal_alim_plantas"] = st.selectbox(
+            "¿Su alimentación incluye muchas plantas, frutas y verduras frescas?",
+            opts_plantas, index=opts_plantas.index(data.get("sal_alim_plantas","No registrado")))
+
+    with f2:
+        opts_ej = ["No registrado","No hacemos ejercicio regularmente","Caminatas ocasionales",
+                   "Ejercicio leve 1-2 veces/semana","Ejercicio moderado 3+ veces/semana",
+                   "Actividad física diaria integrada a la vida"]
+        data["sal_ejercicio"] = st.selectbox(
+            "¿Realizan actividad física regularmente?",
+            opts_ej, index=opts_ej.index(data.get("sal_ejercicio","No registrado")))
+
+        opts_nat = ["No registrado","Raramente","A veces","Frecuentemente","Es parte de nuestra rutina"]
+        data["sal_contacto_naturaleza"] = st.selectbox(
+            "¿Pasan tiempo en naturaleza, parques o espacios verdes?",
+            opts_nat, index=opts_nat.index(data.get("sal_contacto_naturaleza","No registrado")))
+
+        opts_des = ["No registrado","Poco — dormimos mal o poco","Regular","Bien","Muy bien — priorizamos el descanso"]
+        data["sal_descanso"] = st.selectbox(
+            "¿Cómo es la calidad del descanso y el sueño en el grupo?",
+            opts_des, index=opts_des.index(data.get("sal_descanso","No registrado")))
+
+    data["sal_practicas_text"] = st.text_area(
+        "¿Hay otras prácticas de salud o bienestar que quieran mencionar?",
+        value=data.get("sal_practicas_text",""), height=70,
+        placeholder="Ej: meditación, yoga, huerto terapéutico, cocina colectiva, remedios naturales…")
+    st.markdown("</div>", unsafe_allow_html=True)
+
     data["tao_notas"]= st.text_area("📝 Notas del Tao de la Regeneración", value=data.get("tao_notas",""), height=80)
     st.markdown("</div>", unsafe_allow_html=True)
 

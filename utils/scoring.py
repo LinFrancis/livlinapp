@@ -260,8 +260,14 @@ def compute_synthesis_potentials(data: dict) -> dict:
     # 8. Economía regenerativa — P5 (Finanzas)
     result["Economía regenerativa"] = round(_p("sint_pot_economia", 5), 1)
 
-    # 9. Salud y bienestar — P4 (Salud)
-    result["Salud y bienestar"] = round(_p("sint_pot_interior", 4), 1)
+    # 9. Salud y bienestar — P4 (Salud) + prácticas de alimentación y ejercicio
+    sal_pot_base = _p("sint_pot_interior", 4)
+    sal_pot_boost = 0.0
+    if data.get("sal_alimentacion") in ["Muy buena — dieta basada en plantas y local",
+                                        "Excelente — producimos parte de lo que comemos"]: sal_pot_boost += 0.5
+    if data.get("sal_ejercicio") in ["Ejercicio moderado 3+ veces/semana",
+                                     "Actividad física diaria integrada a la vida"]: sal_pot_boost += 0.5
+    result["Salud y bienestar"] = round(min(5.0, sal_pot_base + sal_pot_boost), 1)
 
     # 10. Entorno construido — P1 (Entorno)
     result["Entorno construido"] = round(_p("sint_pot_entorno", 1), 1)
@@ -283,6 +289,18 @@ def compute_synthesis_potentials_obs(data: dict) -> dict:
     ene_cross = min(5.0, round(ene_pts / 10 * 5, 1))
     ene_obs = max(p2_obs, ene_cross) if (data.get("ene_fuente") or data.get("ene_led")) else p2_obs
 
+    # Boost salud y bienestar score with tao sal_ fields
+    sal_base = _o(4)
+    sal_boost = 0.0
+    good_food = ["Buena — mayoritariamente alimentos frescos","Muy buena — dieta basada en plantas y local",
+                 "Excelente — producimos parte de lo que comemos"]
+    good_exercise = ["Ejercicio moderado 3+ veces/semana","Actividad física diaria integrada a la vida"]
+    if data.get("sal_alimentacion") in good_food: sal_boost += 1.0
+    if data.get("sal_ejercicio") in good_exercise: sal_boost += 1.0
+    if data.get("sal_alim_local") in ["Frecuentemente","Sí, priorizamos lo local"]: sal_boost += 0.5
+    if data.get("sal_alim_plantas") in ["Frecuentemente","Mayoritariamente basada en plantas"]: sal_boost += 0.5
+    sal_obs_total = min(5.0, sal_base + sal_boost)
+
     return {
         "Producción alimentaria":       round(_o(0), 1),
         "Biodiversidad urbana":         round(_o(0), 1),
@@ -292,7 +310,7 @@ def compute_synthesis_potentials_obs(data: dict) -> dict:
         "Educación ambiental":          round(_o(3), 1),
         "Bienestar comunitario":        round(_o(6), 1),
         "Economía regenerativa":        round(_o(5), 1),
-        "Salud y bienestar":            round(_o(4), 1),
+        "Salud y bienestar":            round(sal_obs_total, 1),
         "Entorno construido":           round(_o(1), 1),
     }
 
@@ -340,8 +358,8 @@ DIM_WHAT_MEASURES = {
         "icono":    "💚",
     },
     "Salud y bienestar": {
-        "que_mide": "El cuidado de la salud integral: alimentación viva, plantas medicinales, movimiento y bienestar espiritual.",
-        "fuentes":  "Módulo 7 · Pétalo 5 (Salud y Bienestar Espiritual)",
+        "que_mide": "Alimentación saludable y local, actividad física, plantas medicinales, contacto con la naturaleza y bienestar espiritual.",
+        "fuentes":  "Módulo 7 · Pétalo 5 (Salud y Bienestar Espiritual) + Tao T.7 (Alimentación y Ejercicio)",
         "icono":    "🧘",
     },
     "Entorno construido": {

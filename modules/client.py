@@ -335,16 +335,21 @@ def render():
                               f"{prec_total} mm", "promedio histórico")
 
                 data["geo_clima_anual"] = str(climate)
-                # Guardar métricas clave para otros módulos
+                # Guardar métricas clave para otros módulos y persistir
                 try:
                     if climate.get("mes_mas_caluroso"):
-                        data["clima_mes_caluroso"]  = climate["mes_mas_caluroso"]
-                        data["clima_mes_frio"]       = climate.get("mes_mas_frio","")
-                        data["clima_t_max_abs"]      = climate.get("abs_max_ultimo_anio")
-                        data["clima_t_min_abs"]      = climate.get("abs_min_ultimo_anio")
-                    prec_sum = round(sum(p for p in climate.get("prec", []) if p))
-                    if prec_sum > 0:
-                        data["agua_prec_anual"] = float(prec_sum)
+                        data["clima_mes_caluroso"] = climate["mes_mas_caluroso"]
+                        data["clima_mes_frio"]      = climate.get("mes_mas_frio", "")
+                        data["clima_t_max_abs"]     = climate.get("abs_max_ultimo_anio")
+                        data["clima_t_min_abs"]     = climate.get("abs_min_ultimo_anio")
+                    prec_anual = climate.get("prec_anual")
+                    if not prec_anual:
+                        prec_anual = round(sum(p for p in climate.get("prec", []) if p))
+                    if prec_anual and prec_anual > 0:
+                        data["agua_prec_anual"] = float(prec_anual)
+                    # Save immediately so precipitation persists
+                    st.session_state.visit_data = data
+                    save_visit(data)
                 except Exception:
                     pass
             except Exception as e:

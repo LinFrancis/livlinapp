@@ -626,6 +626,26 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
             st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">'
                         'No se registraron respuestas en este módulo.</div>', unsafe_allow_html=True)
 
+        # Alimentación y actividad física (T.7) — ligado al Pétalo 5
+        sal_fields = [
+            ("sal_alimentacion",        "Calidad de la alimentación"),
+            ("sal_alim_local",          "Consumo de alimentos locales"),
+            ("sal_alim_plantas",        "Dieta basada en plantas"),
+            ("sal_ejercicio",           "Actividad física"),
+            ("sal_contacto_naturaleza", "Contacto con naturaleza"),
+            ("sal_descanso",            "Calidad del descanso"),
+            ("sal_practicas_text",      "Otras prácticas de salud y bienestar"),
+        ]
+        has_sal = any(data.get(k) and data.get(k) not in ["No registrado",""] for k,_ in sal_fields)
+        if has_sal:
+            st.markdown("**Alimentación saludable y actividad física** _(Pétalo 5 — Salud y Bienestar):_")
+            cs1, cs2 = st.columns(2)
+            for i, (key, label) in enumerate(sal_fields):
+                v = data.get(key, "")
+                if v and str(v).strip() and v != "No registrado":
+                    with (cs1 if i % 2 == 0 else cs2):
+                        _card(label, str(v), "#E8F5E9","#1B4332","#2E7D32")
+
         if data.get("tao_notas"):
             _card("Notas del facilitador", data["tao_notas"], "#FDF6EC", "#333", "#A67C00")
 
@@ -817,14 +837,22 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     # Bancales detallados
     bancales = data.get("bancales", [])
     if isinstance(bancales, list) and bancales:
-        st.markdown("**Zonas de cultivo registradas:**")
-        total_area_b = sum(b.get("area",0) for b in bancales)
-        st.markdown(f'<div style="font-size:0.82rem;color:#2D6A4F;margin-bottom:0.3rem;">Total: {total_area_b:.2f} m² en {len(bancales)} zona(s)</div>', unsafe_allow_html=True)
+        obs_b = [b for b in bancales if b.get("estado","observado") == "observado"]
+        pot_b = [b for b in bancales if b.get("estado","observado") == "potencial"]
+        area_obs_b = round(sum(b.get("area",0) for b in obs_b), 2)
+        area_pot_b = round(sum(b.get("area",0) for b in pot_b), 2)
+        st.markdown(f"**{len(bancales)} zonas de cultivo — Observado: {area_obs_b} m² · Potencial: {area_pot_b} m²**")
         cols_b = st.columns(min(len(bancales), 3))
         for i, b in enumerate(bancales):
+            estado = b.get("estado","observado")
+            bg     = "#F0FFF4" if estado == "observado" else "#FFFDE7"
+            border = "#40916C" if estado == "observado" else "#F57C00"
+            lbl    = "Observado" if estado == "observado" else "Potencial"
             with cols_b[i % 3]:
                 st.markdown(
-                    f'<div style="background:#F0FFF4;border-radius:8px;padding:0.5rem;margin-bottom:0.4rem;">'
+                    f'<div style="background:{bg};border-radius:8px;padding:0.5rem;'
+                    f'margin-bottom:0.4rem;border-left:3px solid {border};">'
+                    f'<div style="font-size:0.68rem;color:{border};font-weight:600;text-transform:uppercase;">{lbl}</div>'
                     f'<div style="font-weight:700;font-size:0.82rem;color:#1B4332;">{b.get("nombre","Zona")}</div>'
                     f'<div style="font-size:0.78rem;color:#40916C;">{b.get("tipo","")} · {b.get("area",0)} m²</div>'
                     f'<div style="font-size:0.75rem;color:#666;">{b.get("litros",0):,} L sustrato</div></div>',
@@ -911,24 +939,39 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
         st.markdown("**Energía**")
         _card("Percepción del uso energético", data.get("ene_ind_general",""), "#FFF8E1","#1B4332","#F57C00")
         for k, l in [
-            ("ene_fuente",        "Fuente de energía principal"),
-            ("ene_led",           "Iluminación LED"),
-            ("ene_solar_interes", "Interés en instalar energía solar"),
+            ("ene_fuente",               "Fuente de energía principal"),
+            ("ene_led",                  "Iluminación LED"),
+            ("ene_solar_interes",        "Interés en energía solar"),
+            ("ene_regleta",              "Regletas con interruptor (standby)"),
+            ("ene_circuitos",            "Circuitos eléctricos separados por zonas"),
+            ("ene_monitoreo",            "Monitoreo del consumo eléctrico"),
+            ("ene_apagar_luces",         "Apagan luces y equipos cuando no se usan"),
+            ("ene_eficiencia_electrodom","Consideran eficiencia al comprar electrodomésticos"),
         ]:
             v = data.get(k)
-            if v: _card(l, str(v), "#FFF8E1","#1B4332","#F57C00")
+            if v and v != "No registrado": _card(l, str(v), "#FFF8E1","#1B4332","#F57C00")
+        # Real consumption from bill
+        if data.get("ene_consumo_cuenta_kwh"):
+            kwh_cta = _safe_float(data.get("ene_consumo_cuenta_kwh"))
+            if kwh_cta > 0:
+                _card("Consumo real (cuenta de la luz)", f"{kwh_cta:.0f} kWh/mes · {data.get('ene_kwh_dia_cuenta','?')} kWh/día", "#FFF8E1","#1B4332","#F57C00")
         kwh = _safe_float(data.get("ene_kwh_dia_calc"))
         if kwh > 0:
-            _card("Consumo estimado", f"{kwh} kWh/día · {round(kwh*365):,} kWh/año", "#FFF8E1","#1B4332","#F57C00")
+            _card("Consumo estimado (calculadora)", f"{kwh} kWh/día · {round(kwh*365):,} kWh/año", "#FFF8E1","#1B4332","#F57C00")
         equipos = data.get("equipos_electricos", [])
         if isinstance(equipos, list) and equipos:
-            equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh',0)} kWh/día)" for e in equipos)
+            equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',e.get('kwh',0))} kWh/día)" for e in equipos)
             _card("Equipos eléctricos registrados", equip_text, "#FFF8E1","#1B4332","#F57C00")
 
         st.markdown("**Residuos y materiales**")
         _card("Percepción de residuos", data.get("res_ind_general",""), "#F3E5F5","#1B4332","#6A1B9A")
+        tipos_res = data.get("res_tipos_generados", [])
+        if isinstance(tipos_res, list) and tipos_res:
+            _card("Tipos de residuos generados", "; ".join(tipos_res), "#F3E5F5","#1B4332","#6A1B9A")
         for k, l in [
-            ("res_compostan",        "Compostaje"),
+            ("res_organico_kg",      "Residuos orgánicos compostables (estimación)"),
+            ("res_jardin_kg",        "Residuos de jardín"),
+            ("res_compostan",        "Compostaje activo"),
             ("res_compost_tipo",     "Sistema de compostaje"),
             ("res_intentos_fallidos","Intentos previos de compostar"),
             ("res_separan",          "Separación de reciclables"),
@@ -937,7 +980,8 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
             ("mat_notas",            "Notas de materiales"),
         ]:
             v = data.get(k)
-            if v and str(v) not in ["No","Ninguno"]: _card(l, str(v), "#F3E5F5","#1B4332","#6A1B9A")
+            if v and str(v) not in ["No","Ninguno","No registrado"]:
+                _card(l, str(v), "#F3E5F5","#1B4332","#6A1B9A")
 
     st.markdown("---")
 

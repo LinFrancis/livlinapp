@@ -139,18 +139,48 @@ def get_annual_climate(lat: float, lon: float) -> dict | None:
                 if i < len(prec)  and prec[i]  is not None: monthly[m]["prec"].append(prec[i])
             except Exception:
                 pass
-        result = {}
+        t_max_list, t_min_list, prec_list = [], [], []
         for m in range(1,13):
-            mx  = monthly[m]["t_max"]
-            mn  = monthly[m]["t_min"]
-            pr  = monthly[m]["prec"]
-            days_in_month = 30
-            result[MONTHS_ES[m-1]] = {
-                "t_max": round(sum(mx)/len(mx),1) if mx else None,
-                "t_min": round(sum(mn)/len(mn),1) if mn else None,
-                "prec":  round(sum(pr)/max(len(pr)/days_in_month,1),0) if pr else None,
-            }
-        return result
+            mx = monthly[m]["t_max"]
+            mn = monthly[m]["t_min"]
+            pr = monthly[m]["prec"]
+            # prec: sum of daily values divided by number of years to get monthly avg
+            years = 5
+            t_max_list.append(round(sum(mx)/len(mx), 1) if mx else None)
+            t_min_list.append(round(sum(mn)/len(mn), 1) if mn else None)
+            prec_list.append(round(sum(pr)/years, 1) if pr else None)
+
+        # Find key statistics
+        valid_tmax = [(i, v) for i, v in enumerate(t_max_list) if v is not None]
+        valid_tmin = [(i, v) for i, v in enumerate(t_min_list) if v is not None]
+        valid_prec = [(i, v) for i, v in enumerate(prec_list) if v is not None]
+
+        mes_caluroso = MONTHS_ES[max(valid_tmax, key=lambda x: x[1])[0]] if valid_tmax else None
+        mes_frio     = MONTHS_ES[min(valid_tmin, key=lambda x: x[1])[0]] if valid_tmin else None
+        t_max_media  = round(sum(v for _,v in valid_tmax)/len(valid_tmax), 1) if valid_tmax else None
+        t_min_media  = round(sum(v for _,v in valid_tmin)/len(valid_tmin), 1) if valid_tmin else None
+
+        # Annual precipitation = sum of monthly averages
+        prec_anual = round(sum(v for v in prec_list if v), 0) if prec_list else None
+
+        # Absolute max/min from last year
+        abs_max = max((v for v in t_max if v is not None), default=None)
+        abs_min = min((v for v in t_min if v is not None), default=None)
+
+        return {
+            "months":               MONTHS_ES,
+            "t_max":                t_max_list,
+            "t_min":                t_min_list,
+            "prec":                 prec_list,
+            "mes_mas_caluroso":     mes_caluroso,
+            "mes_mas_frio":         mes_frio,
+            "t_max_media":          t_max_media,
+            "t_min_media":          t_min_media,
+            "prec_anual":           prec_anual,
+            "abs_max_ultimo_anio":  round(abs_max, 1) if abs_max is not None else None,
+            "abs_min_ultimo_anio":  round(abs_min, 1) if abs_min is not None else None,
+            "anio_referencia":      end_year,
+        }
     except Exception:
         return None
 

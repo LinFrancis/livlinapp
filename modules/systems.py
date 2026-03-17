@@ -276,6 +276,63 @@ def _render_energia(data):
     with c2:
         data["ene_led"] = st.radio("¿Iluminación 100% LED?", ["No","Parcialmente","Sí"],
             index=["No","Parcialmente","Sí"].index(data.get("ene_led","Parcialmente")), horizontal=True)
+
+    st.markdown("**Eficiencia y control eléctrico:**")
+    e1, e2, e3 = st.columns(3)
+    with e1:
+        opts_reg = ["No registrado","No","Parcialmente","Sí"]
+        data["ene_regleta"] = st.selectbox(
+            "¿Usan regletas con interruptor para apagar equipos en standby?",
+            opts_reg, index=opts_reg.index(data.get("ene_regleta","No registrado")),
+            help="Evita el consumo vampiro de equipos en standby.")
+    with e2:
+        opts_circ = ["No registrado","No","Parcialmente","Sí"]
+        data["ene_circuitos"] = st.selectbox(
+            "¿Tienen circuitos eléctricos separados por zonas (cocina, dormitorios, etc.)?",
+            opts_circ, index=opts_circ.index(data.get("ene_circuitos","No registrado")),
+            help="Los circuitos separados permiten apagar zonas completas y detectar consumos.")
+    with e3:
+        opts_mon = ["No registrado","No","Sí, por la cuenta del mes","Sí, con medidor inteligente"]
+        data["ene_monitoreo"] = st.selectbox(
+            "¿Monitorean su consumo eléctrico?",
+            opts_mon, index=opts_mon.index(data.get("ene_monitoreo","No registrado")))
+
+    e4, e5 = st.columns(2)
+    with e4:
+        opts_elec = ["No registrado","No","A veces","Habitualmente"]
+        data["ene_apagar_luces"] = st.selectbox(
+            "¿Apagan luces y equipos cuando no se usan?",
+            opts_elec, index=opts_elec.index(data.get("ene_apagar_luces","No registrado")))
+    with e5:
+        opts_edom = ["No registrado","No","A veces","Sí, siempre"]
+        data["ene_eficiencia_electrodom"] = st.selectbox(
+            "¿Consideran eficiencia energética al comprar electrodomésticos?",
+            opts_edom, index=opts_edom.index(data.get("ene_eficiencia_electrodom","No registrado")))
+
+    # Consumo real desde la cuenta de la luz (optativo)
+    st.markdown("**Consumo real (cuenta de la luz) — optativo:**")
+    c_cta1, c_cta2 = st.columns(2)
+    with c_cta1:
+        try:
+            cuenta_val = float(data.get("ene_consumo_cuenta_kwh", 0) or 0)
+        except Exception:
+            cuenta_val = 0.0
+        cuenta_input = st.number_input(
+            "Consumo mensual según cuenta (kWh/mes)",
+            min_value=0.0, value=cuenta_val, step=10.0,
+            help="Dato de la última cuenta de la luz. Si no lo tienes, déjalo en 0.")
+        if cuenta_input > 0:
+            data["ene_consumo_cuenta_kwh"] = cuenta_input
+            data["ene_kwh_dia_cuenta"] = round(cuenta_input / 30, 2)
+            st.caption(f"Equivale a {data['ene_kwh_dia_cuenta']} kWh/día")
+    with c_cta2:
+        if data.get("ene_consumo_cuenta_kwh") and float(data.get("ene_consumo_cuenta_kwh",0)) > 0:
+            st.markdown(
+                f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem 0.8rem;margin-top:1.5rem;">'
+                f'<strong>Consumo real registrado:</strong> {data["ene_consumo_cuenta_kwh"]} kWh/mes · '
+                f'{data.get("ene_kwh_dia_cuenta","?")} kWh/día</div>',
+                unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
@@ -389,6 +446,40 @@ def _render_materiales(data):
         ]:
             data[key] = st.radio(label, opts, index=opts.index(data.get(key, opts[0])),
                                  horizontal=True, key=f"rm_{key}")
+    # Tipo de residuos generados
+    st.markdown("**Tipo de residuos que se generan:**")
+    res_tipos_opts = ["Residuos de cocina (orgánicos)","Papel y cartón","Plásticos",
+                      "Vidrio","Metales","Electrónicos","Textiles","Escombros",
+                      "Residuos de jardín","Aceites","Pañales/higiénicos"]
+    data["res_tipos_generados"] = st.multiselect(
+        "Tipos de residuos que se generan en el espacio:",
+        res_tipos_opts,
+        default=[v for v in data.get("res_tipos_generados",[]) if v in res_tipos_opts],
+        key="res_tipos_gen_sel")
+
+    # Organic waste estimation
+    st.markdown("**Estimación de residuos orgánicos compostables:**")
+    ro1, ro2 = st.columns(2)
+    with ro1:
+        opts_org_kg = ["No registrado","Menos de 1 kg/semana","1-3 kg/semana",
+                       "3-5 kg/semana","5-10 kg/semana","Más de 10 kg/semana"]
+        data["res_organico_kg"] = st.selectbox(
+            "¿Cuántos residuos orgánicos (cocina) generan aprox.?",
+            opts_org_kg, index=opts_org_kg.index(data.get("res_organico_kg","No registrado")))
+    with ro2:
+        opts_jard_kg = ["No registrado","Ninguno","Poco (hojas, pasto)","Moderado","Mucho (jardín grande)"]
+        data["res_jardin_kg"] = st.selectbox(
+            "¿Cuántos residuos de jardín generan?",
+            opts_jard_kg, index=opts_jard_kg.index(data.get("res_jardin_kg","No registrado")))
+
+    if data.get("res_organico_kg") and data["res_organico_kg"] != "No registrado":
+        kg_map = {"Menos de 1 kg/semana":0.5,"1-3 kg/semana":2,"3-5 kg/semana":4,
+                  "5-10 kg/semana":7.5,"Más de 10 kg/semana":12}
+        kg_sem = kg_map.get(data["res_organico_kg"], 0)
+        if kg_sem > 0:
+            st.info(f"Con {data['res_organico_kg']} de residuos orgánicos, al año serían ~{int(kg_sem*52)} kg de materia compostable. "
+                    f"Un compost de 200L procesa aprox. 3-5 kg/semana.")
+
     data["mat_notas"] = st.text_area("📝 Notas de materiales y residuos", value=data.get("mat_notas",""), height=80)
     st.markdown("</div>", unsafe_allow_html=True)
 

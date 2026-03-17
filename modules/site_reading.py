@@ -255,6 +255,9 @@ def _render_cultivo(data, only_containers):
 
     with st.expander("➕ Agregar zona / bancal / maceta", expanded=False):
         b_nombre = st.text_input("Nombre de la zona", placeholder="Ej: Bancal 1, Terraza sur…", key="b_nombre")
+        b_estado = st.radio("Estado", ["Observado (ya existe hoy)","Potencial (podría crearse)"],
+            horizontal=True, key="b_estado",
+            help="Observado = ya existe y está activo. Potencial = zona que se podría habilitar.")
         b_tipo   = st.radio("Forma", ["Rectangular","Circular","Área libre (m²)"], horizontal=True, key="b_tipo")
         if b_tipo == "Rectangular":
             bc1, bc2, bc3 = st.columns(3)
@@ -275,24 +278,39 @@ def _render_cultivo(data, only_containers):
         if st.button("✅ Agregar zona", key="btn_add_bancal"):
             if b_nombre.strip():
                 data["bancales"].append({"nombre": b_nombre, "tipo": b_tipo,
-                    "area": b_area, "vol": b_vol, "litros": round(b_vol*1000)})
+                    "area": b_area, "vol": b_vol, "litros": round(b_vol*1000),
+                    "estado": "observado" if b_estado.startswith("Observado") else "potencial"})
                 st.session_state.visit_data = data  # sync before rerun
                 st.rerun()
 
     if data.get("bancales"):
-        total_area = round(sum(b["area"]   for b in data["bancales"]), 2)
+        obs_bancales = [b for b in data["bancales"] if b.get("estado","observado") == "observado"]
+        pot_bancales = [b for b in data["bancales"] if b.get("estado","observado") == "potencial"]
+        area_obs = round(sum(b["area"] for b in obs_bancales), 2)
+        area_pot = round(sum(b["area"] for b in pot_bancales), 2)
+        total_area = round(area_obs + area_pot, 2)
         total_vol  = round(sum(b["vol"]    for b in data["bancales"]), 3)
         total_lit  = round(sum(b["litros"] for b in data["bancales"]))
         st.markdown(
             f'<div style="background:rgba(82,183,136,0.15);border:1px solid #52B788;'
             f'border-radius:10px;padding:0.8rem 1rem;margin:0.5rem 0;">'
-            f'<strong>📊 Totales:</strong> Área: <strong>{total_area} m²</strong> · '
-            f'Volumen: <strong>{total_vol} m³</strong> · Litros: <strong>{total_lit} L</strong> · '
-            f'Sacos 50L: <strong>~{round(total_lit/50,1)}</strong></div>', unsafe_allow_html=True)
-        data["cultivo_m2"] = total_area
+            f'<strong>Totales:</strong>'
+            f'<br>Área observada (ya existe): <strong>{area_obs} m²</strong>'
+            f'<br>Área potencial (se podría habilitar): <strong>{area_pot} m²</strong>'
+            f'<br>Total: <strong>{total_area} m²</strong> · Sustrato aprox.: <strong>{total_lit:,} L</strong>'
+            f'</div>', unsafe_allow_html=True)
+        data["cultivo_m2"]        = area_obs
+        data["cultivo_m2_futuro"] = area_pot
         for i, b in enumerate(data["bancales"]):
+            estado_label = "Potencial" if b.get("estado") == "potencial" else "Observado"
+            estado_color = "#52B788" if b.get("estado") == "potencial" else "#1B4332"
             cb, cd = st.columns([4, 1])
-            with cb: st.markdown(f"**{b['nombre']}** — {b['area']} m² · {b['vol']} m³ · {b['litros']} L")
+            with cb:
+                st.markdown(
+                    f'<span style="background:{estado_color};color:white;border-radius:3px;padding:1px 6px;'
+                    f'font-size:0.72rem;margin-right:6px;">{estado_label}</span>'
+                    f'<strong>{b["nombre"]}</strong> — {b["area"]} m² · {b["vol"]} m³ · {b["litros"]} L',
+                    unsafe_allow_html=True)
             with cd:
                 if st.button("🗑️", key=f"del_bancal_{i}"):
                     data["bancales"].pop(i)
@@ -304,18 +322,23 @@ def _render_cultivo(data, only_containers):
             format="%.2f",
             help="Superficie que ya se cultiva o está activa hoy.")
 
-    # Área cultivable futura (potencial identificado)
-    data["cultivo_m2_futuro"] = st.number_input(
-        "Área cultivable potencial — futura (m²)",
-        min_value=0.0, value=float(data.get("cultivo_m2_futuro", 0)), step=0.01,
-        format="%.2f",
-        help="Superficie adicional que podría cultivarse con las mejoras identificadas.")
-    if data.get("cultivo_m2_futuro", 0) > 0:
+    # Área cultivable futura - solo si no hay bancales (si hay bancales, se calcula automáticamente)
+    if not data.get("bancales"):
+        data["cultivo_m2_futuro"] = st.number_input(
+            "Área cultivable potencial — futura (m²)",
+            min_value=0.0, value=float(data.get("cultivo_m2_futuro", 0)), step=0.01,
+            format="%.2f",
+            help="Superficie adicional que podría cultivarse con mejoras identificadas.")
+    if data.get("cultivo_m2") or data.get("cultivo_m2_futuro"):
         area_tot_tmp = float(data.get("proyecto_area", 0) or data.get("proyecto_superficie", 0) or 0)
-        tot_cult = float(data.get("cultivo_m2", 0)) + float(data.get("cultivo_m2_futuro", 0))
-        if area_tot_tmp > 0:
-            st.caption(f"Área cultivable total (actual + futura): **{tot_cult:.2f} m²** "
-                       f"({round(tot_cult/area_tot_tmp*100, 1)}% del espacio)")
+        area_obs_v = float(data.get("cultivo_m2", 0) or 0)
+        area_pot_v = float(data.get("cultivo_m2_futuro", 0) or 0)
+        if area_tot_tmp > 0 and (area_obs_v > 0 or area_pot_v > 0):
+            tot = area_obs_v + area_pot_v
+            st.caption(
+                f"Observado: **{area_obs_v:.2f} m²** ({round(area_obs_v/area_tot_tmp*100,1)}%) · "
+                f"Potencial: **{area_pot_v:.2f} m²** ({round(area_pot_v/area_tot_tmp*100,1)}%) · "
+                f"Total: **{tot:.2f} m²** ({round(tot/area_tot_tmp*100,1)}% del espacio)")
 
     c3, c4 = st.columns(2)
     with c3:
