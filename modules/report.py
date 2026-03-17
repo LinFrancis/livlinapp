@@ -205,6 +205,49 @@ def render():
     st.markdown('<p class="module-subtitle">Visión completa del diagnóstico · LivLin v6.0</p>',
                 unsafe_allow_html=True)
 
+    # ── LECTURA INTRODUCTORIA — Mason (2025) ──────────────────────────────
+    st.markdown(
+        '<div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;'
+        'border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1.2rem;">',
+        unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;'
+        'letter-spacing:0.1em;margin-bottom:0.4rem;">Antes de leer este informe</div>',
+        unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">'
+        '¿Qué significa regenerar?</div>',
+        unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.7;margin-bottom:0.8rem;">'
+        'Este informe describe el potencial regenerativo de tu espacio. Para comprenderlo en '
+        'profundidad, te invitamos a leer el texto de base que sustenta toda la metodología LivLin. '
+        'Es un texto breve, escrito en español, que explica qué entendemos por regeneración, '
+        'por qué importa en el contexto actual y cómo cada práctica suma.</div>',
+        unsafe_allow_html=True)
+    col_mason1, col_mason2, col_mason3 = st.columns([1, 1, 1])
+    with col_mason1:
+        st.markdown(
+            '<a href="https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing" '
+            'target="_blank" style="display:block;background:#1B4332;color:white;border-radius:8px;'
+            'padding:0.7rem 1rem;text-align:center;font-weight:700;font-size:0.88rem;'
+            'text-decoration:none;">Leer en Google Drive</a>',
+            unsafe_allow_html=True)
+    with col_mason2:
+        st.markdown(
+            '<a href="https://doi.org/10.17605/OSF.IO/UCDEH" '
+            'target="_blank" style="display:block;background:#2D6A4F;color:white;border-radius:8px;'
+            'padding:0.7rem 1rem;text-align:center;font-weight:700;font-size:0.88rem;'
+            'text-decoration:none;">Ver en OSF (cita académica)</a>',
+            unsafe_allow_html=True)
+    with col_mason3:
+        st.markdown(
+            '<div style="font-size:0.8rem;color:#555;padding:0.5rem 0;">'
+            'Mason, F. (2025). <em>Introducción al enfoque de la regeneración.</em> LivLin.</div>',
+            unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("---")
+
     st.markdown(f"""
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);
                     border:2px solid #52B788;border-radius:14px;
@@ -379,13 +422,7 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
                     with cs1: _show_field("Radiación solar promedio anual", f"{annual} kWh/m²/día")
                     with cs2: _show_field("Mejor mes solar", best_m)
                     with cs3: _show_field("Panel 100W genera en promedio", f"{panel_avg} kWh/día")
-                    st.markdown(
-                        f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem 0.8rem;'
-                        f'font-size:0.82rem;color:#555;margin-top:0.3rem;">'
-                        f'Para cubrir un consumo hogareño de 5-10 kWh/día necesitarías entre '
-                        f'{round(5/max(0.01,panel_avg))} y {round(10/max(0.01,panel_avg))} paneles de 100W, '
-                        f'considerando un 80% de eficiencia del sistema.</div>',
-                        unsafe_allow_html=True)
+
             except Exception:
                 pass
 
@@ -710,6 +747,55 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
                         height=260, margin=dict(l=30,r=30,t=20,b=20),
                         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.4)")
                     st.plotly_chart(fig_c, use_container_width=True, key="clima_report")
+
+                    # Métricas climáticas clave
+                    kc1, kc2, kc3, kc4, kc5 = st.columns(5)
+                    with kc1: _show_field("Mes más cálido", climate.get("mes_mas_caluroso"))
+                    with kc2: _show_field("Mes más frío", climate.get("mes_mas_frio"))
+                    with kc3:
+                        v = climate.get("abs_max_ultimo_anio")
+                        _show_field("T° máxima registrada", f"{v}°C" if v is not None else None)
+                    with kc4:
+                        v = climate.get("abs_min_ultimo_anio")
+                        _show_field("T° mínima registrada", f"{v}°C" if v is not None else None)
+                    with kc5:
+                        prec_t = round(sum(p for p in climate.get("prec",[]) if p))
+                        _show_field("Precipitación anual prom.", f"{prec_t} mm" if prec_t else None)
+            except Exception:
+                pass
+
+        # Solar data in section 3
+        geo_solar = data.get("geo_solar")
+        if geo_solar:
+            try:
+                import ast as _ast_sol3
+                solar3 = _ast_sol3.literal_eval(geo_solar) if isinstance(geo_solar, str) else geo_solar
+                if isinstance(solar3, dict) and solar3.get("annual_avg_kwh_m2"):
+                    st.markdown("**Radiación solar del sitio (promedio histórico):**")
+                    months3  = solar3.get("months", [])
+                    monthly3 = solar3.get("monthly_kwh_m2", [])
+                    panel3   = solar3.get("panel_100w_kwh_day", [])
+                    annual3  = solar3.get("annual_avg_kwh_m2", 0)
+                    best_idx3 = monthly3.index(max(x for x in monthly3 if x)) if any(monthly3) else 0
+                    best_m3  = months3[best_idx3] if months3 else "—"
+                    worst_idx3 = monthly3.index(min(x for x in monthly3 if x)) if any(monthly3) else 0
+                    worst_m3 = months3[worst_idx3] if months3 else "—"
+                    panel_avg3 = round(sum(x for x in panel3 if x) / max(1, sum(1 for x in panel3 if x)), 2) if panel3 else 0
+                    ks1, ks2, ks3, ks4 = st.columns(4)
+                    with ks1: _show_field("Radiación anual promedio", f"{annual3} kWh/m²/día")
+                    with ks2: _show_field("Mejor mes solar", best_m3)
+                    with ks3: _show_field("Peor mes solar", worst_m3)
+                    with ks4: _show_field("Panel 100W genera en prom.", f"{panel_avg3} kWh/día")
+                    st.markdown(
+                        '<div style="background:#FFFDE7;border-radius:8px;padding:0.5rem 0.8rem;'
+                        'font-size:0.8rem;color:#666;margin-top:0.3rem;">'
+                        'Datos de irradiancia solar histórica obtenidos de '
+                        '<a href="https://open-meteo.com" target="_blank">Open-Meteo Historical API</a>. '
+                        'Para análisis fotovoltaico detallado usa '
+                        '<a href="https://pvwatts.nrel.gov" target="_blank">PVWatts</a> o '
+                        '<a href="https://re.jrc.ec.europa.eu/pvg_tools/en/" target="_blank">PVGIS</a>.'
+                        '</div>',
+                        unsafe_allow_html=True)
             except Exception:
                 pass
 
@@ -1221,21 +1307,152 @@ Cuando estos módulos no han sido completados, el IPR global se calcula solo con
     st.markdown("---")
 
     # ══════════════════════════════════════════════════════════════════════
-    # SECCIÓN 9 — CIERRE Y CONTACTO
+    # SECCIÓN 10 — BIBLIOGRAFÍA Y RECURSOS
     # ══════════════════════════════════════════════════════════════════════
-    st.markdown("### 10. Continuar el camino regenerativo")
+    st.markdown("### 10. Bibliografía y Recursos para Seguir Aprendiendo")
+    st.markdown(
+        '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;'
+        'margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
+        'Este diagnóstico se apoya en un marco teórico construido con fuentes reconocidas. '
+        'Aquí encontrarás los textos, videos y herramientas que fundamentan la metodología LivLin. '
+        'Te invitamos a explorarlos para profundizar en los temas que más te interesan.</div>',
+        unsafe_allow_html=True)
+
+    from utils.petal_content import GLOBAL_REFS, LIVLIN_CLOSING
+
+    # Texto base Mason (2025)
+    st.markdown("**Texto base de la metodología LivLin:**")
+    st.markdown(
+        '<div style="background:linear-gradient(135deg,#E8F5E9,#D8F3DC);border:2px solid #52B788;'
+        'border-radius:12px;padding:1.1rem 1.4rem;margin-bottom:1rem;">' +
+        '<div style="font-size:0.78rem;font-weight:700;color:#52B788;text-transform:uppercase;margin-bottom:0.3rem;">Lectura recomendada</div>' +
+        '<div style="font-size:1rem;font-weight:800;color:#1B4332;margin-bottom:0.3rem;">Introducción al enfoque de la regeneración</div>' +
+        '<div style="font-size:0.84rem;color:#2D6A4F;margin-bottom:0.4rem;">Mason, F. (2025) · LivLin · ' +
+        '<a href="https://doi.org/10.17605/OSF.IO/UCDEH" target="_blank">doi.org/10.17605/OSF.IO/UCDEH</a></div>' +
+        '<div style="font-size:0.84rem;color:#333;line-height:1.6;margin-bottom:0.7rem;">' +
+        'Este texto explica el fundamento filosófico y metodológico de LivLin: qué entendemos ' +
+        'por regeneración, cómo se relaciona con la permacultura y el diseño sistémico, ' +
+        'y por qué cada práctica que sumas en tu espacio contribuye a un proceso mayor. ' +
+        'Es el marco que da sentido a todos los resultados de este diagnóstico.</div>' +
+        '<div style="display:flex;gap:0.7rem;flex-wrap:wrap;">' +
+        '<a href="https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing" ' +
+        'target="_blank" style="background:#1B4332;color:white;border-radius:6px;padding:0.45rem 0.9rem;' +
+        'font-size:0.82rem;font-weight:600;text-decoration:none;">Leer en Google Drive</a>' +
+        '<a href="https://doi.org/10.17605/OSF.IO/UCDEH" ' +
+        'target="_blank" style="background:#40916C;color:white;border-radius:6px;padding:0.45rem 0.9rem;' +
+        'font-size:0.82rem;font-weight:600;text-decoration:none;">Ver en OSF (cita académica)</a>' +
+        '</div></div>',
+        unsafe_allow_html=True)
+
+    # References grouped
+    REFS_GROUPED = [
+        ("Permacultura y diseño regenerativo", [
+            ("Holmgren, D. (2002)",
+             "Permacultura: Principios y senderos más allá de la sustentabilidad. Kaicron.",
+             "https://permacultureprinciples.com/es/",
+             "El libro fundacional que define los 7 pétalos de la Flor de la Permacultura y los 12 principios de diseño. Es la base directa de la Flor de la Permacultura que estructura este diagnóstico."),
+            ("Mollison, B. (1988)",
+             "Permaculture: A Designers' Manual. Tagari Publications.",
+             "https://www.permaculturenews.org",
+             "Manual de diseño permacultural. Junto a Holmgren, es la fuente primaria de la permacultura como disciplina de diseño."),
+            ("Mang, P. & Reed, B. (2012)",
+             "Designing from place: A regenerative framework. Building Research & Information.",
+             "https://doi.org/10.1080/09613218.2012.62134",
+             "Define el marco del diseño regenerativo: cómo diseñar desde el lugar, regenerando los sistemas vivos en vez de solo reducir impactos negativos."),
+            ("Mason, F. (2025)",
+             "Introducción al enfoque de la regeneración. LivLin.",
+             "https://doi.org/10.17605/OSF.IO/UCDEH",
+             "Marco teórico base de LivLin. Sintetiza permacultura, diseño regenerativo y enfoque ecosocial para contextos urbanos chilenos y latinoamericanos."),
+        ]),
+        ("Economía, gobernanza y sistemas sociales", [
+            ("Ostrom, E. (1990)",
+             "Governing the Commons. Cambridge University Press.",
+             "https://wtf.tw/ref/ostrom_1990.pdf",
+             "Premio Nobel de Economía. Demuestra que las comunidades pueden gestionar recursos comunes de forma sostenible. Fundamento de la dimensión de gobernanza comunitaria del IPR."),
+            ("Raworth, K. (2017)",
+             "Doughnut Economics: Seven Ways to Think Like a 21st-Century Economist. Chelsea Green.",
+             "https://doughnuteconomics.org",
+             "Propone una economía dentro de límites planetarios y fundamentos sociales. Muy relevante para la dimensión de economía regenerativa."),
+            ("Schumacher, E.F. (1973)",
+             "Small is Beautiful: Economics as if People Mattered.",
+             "https://www.schumachercollege.org.uk",
+             "Pionero del pensamiento de escala humana y tecnología apropiada. Precursor de la idea de que los sistemas pequeños y locales pueden ser más eficientes y justos."),
+            ("IPES-Food (2017)",
+             "Too big to feed: Exploring the impacts of mega-mergers in the agri-food sector.",
+             "https://www.ipes-food.org",
+             "Análisis de la concentración en sistemas alimentarios globales y sus consecuencias para la soberanía alimentaria local y regional."),
+        ]),
+        ("Videos y recursos en línea", [
+            ("Lawton, G.",
+             "Introducción a la Permacultura (video, en inglés con subtítulos).",
+             "https://youtu.be/-5N9Q8KtB5w",
+             "Visión general accesible de permacultura por uno de sus principales diseñadores internacionales."),
+            ("Capra, F.",
+             "La visión sistémica de la vida (video).",
+             "https://youtu.be/O33uA_9kj4U",
+             "Fritjof Capra explica el pensamiento sistémico como base filosófica del diseño regenerativo y la ecología profunda."),
+            ("Reed, B.",
+             "Regenerative Development and Design (video, en inglés).",
+             "https://youtu.be/pBuN9CtUVAw",
+             "Bill Reed, coautor del marco de diseño regenerativo, explica cómo pasar de sustentable a regenerativo en proyectos reales."),
+            ("Wahl, D.C.",
+             "Designing for a Regenerative Culture (video, en inglés).",
+             "https://youtu.be/drY0L-wAop8",
+             "Daniel Christian Wahl sobre cultura regenerativa y cómo el diseño puede contribuir a la regeneración de sistemas vivos."),
+        ]),
+        ("Datos climáticos y herramientas de análisis solar", [
+            ("Open-Meteo (2024)",
+             "Open-Meteo Historical Weather API — datos climáticos gratuitos y abiertos.",
+             "https://open-meteo.com",
+             "Fuente de los datos de temperatura, precipitación y radiación solar histórica utilizados en este diagnóstico. API gratuita y de código abierto."),
+            ("Nominatim / OpenStreetMap (2024)",
+             "Geocodificación colaborativa y mapas de código abierto.",
+             "https://nominatim.openstreetmap.org",
+             "Sistema de geolocalización de código abierto utilizado para ubicar el espacio en el diagnóstico."),
+            ("PVWatts — NREL (National Renewable Energy Laboratory)",
+             "Calculadora de potencial fotovoltaico para cualquier ubicación del mundo.",
+             "https://pvwatts.nrel.gov",
+             "Herramienta gratuita del laboratorio de energía renovable de EE.UU. Permite calcular la producción esperada de paneles solares en cualquier dirección."),
+            ("PVGIS — Comisión Europea",
+             "Photovoltaic Geographical Information System — herramienta solar con datos satelitales.",
+             "https://re.jrc.ec.europa.eu/pvg_tools/en/",
+             "Sistema europeo de información geográfica para energía solar. Gratuito, con datos de alta precisión basados en mediciones satelitales."),
+            ("ShadowMap",
+             "Simulador de sombras solares en tiempo real para cualquier ubicación.",
+             "https://shademap.app",
+             "Permite visualizar las sombras del espacio en cualquier hora y época del año. Muy útil para planificar paneles solares, huertos y espacios verdes."),
+        ]),
+    ]
+
+    for group_name, refs in REFS_GROUPED:
+        with st.expander(f"{group_name} ({len(refs)} fuentes)", expanded=False):
+            for authors, title, url, description in refs:
+                st.markdown(
+                    f'<div style="padding:0.6rem 0;border-bottom:1px solid #E8F5E9;">' +
+                    f'<div style="font-size:0.83rem;font-weight:700;color:#1B4332;">{authors}</div>' +
+                    f'<div style="font-size:0.82rem;color:#333;font-style:italic;margin-bottom:0.15rem;">{title}</div>' +
+                    f'<div style="font-size:0.8rem;color:#555;line-height:1.5;margin-bottom:0.2rem;">{description}</div>' +
+                    f'<a href="{url}" target="_blank" style="font-size:0.78rem;color:#2D6A4F;word-break:break-all;">{url}</a>' +
+                    f'</div>',
+                    unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Closing narrative
     st.markdown(
         '<div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:1px solid #A8D5B5;'
         'border-radius:12px;padding:1.2rem 1.5rem;font-size:0.88rem;color:#1B4332;line-height:1.7;">'
         '<strong>Este diagnóstico es el primer paso de un proceso mayor.</strong><br><br>'
-        'Con él tienes claridad sobre dónde está el potencial regenerativo de tu espacio y qué prácticas '
-        'pueden transformarlo. Algunas puedes comenzarlas hoy mismo con tus propios recursos.<br><br>'
-        'Para las transformaciones más profundas — diseño integral, bioconstrucción, sistemas de captación '
-        'de agua, instalaciones solares, formación comunitaria — el equipo de LivLin puede acompañarte '
-        'con servicios especializados de diseño, implementación y seguimiento.<br><br>'
-        'Si tienes preguntas sobre este informe, quieres corregir alguna información o deseas avanzar en '
-        'el proceso regenerativo, contáctanos:<br>'
-        '<strong><a href="https://www.livlin.cl" target="_blank">www.livlin.cl</a></strong></div>',
+        'Con él tienes claridad sobre dónde está el potencial regenerativo de tu espacio '
+        'y qué prácticas concretas pueden transformarlo. Algunas puedes comenzarlas hoy mismo '
+        'con tus propios recursos. Otras requieren diseño, tiempo o comunidad.<br><br>'
+        'Para las transformaciones más profundas — diseño integral, bioconstrucción, sistemas de '
+        'captación de agua, instalaciones solares, formación comunitaria — el equipo de LivLin '
+        'puede acompañarte con servicios especializados de diseño, implementación y seguimiento.<br><br>'
+        'Si tienes preguntas sobre este informe, quieres corregir alguna información o deseas '
+        'avanzar en el proceso regenerativo, contáctanos: '
+        '<strong><a href="https://www.livlin.cl" target="_blank">www.livlin.cl</a></strong>'
+        '</div>',
         unsafe_allow_html=True)
 
     st.markdown(
