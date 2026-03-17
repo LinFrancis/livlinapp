@@ -1,4 +1,4 @@
-"""Módulo Informe Final v7.3 — LivLin Indagación Regenerativa.
+"""Módulo Informe Final v7.4 — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -193,7 +193,6 @@ REPORT_SECTIONS = {
     "ecologia":    "🔬 Observación Ecológica",
     "sistemas":    "🏙️ Contexto, Agua y Energía",
     "fotos":       "📷 Registro Fotográfico",
-    "potenciales": "🌿 Potenciales del Sitio",
     "sintesis":    "🗺️ Síntesis y Plan",
     "biblio":      "📚 Bibliografía",
 }
@@ -264,7 +263,7 @@ def render():
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.3</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.4</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -326,7 +325,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.3 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.4 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -389,7 +388,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.3</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.4</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -597,13 +596,10 @@ def render():
                     if interp_e: st.markdown(f"🌍 **Estado actual:** {interp_e}")
                     if interp_h: st.markdown(f"🌱 **Horizonte potencial:** {interp_h}")
 
-            # ── Methodology ──
-            with st.expander("📐 Metodología de cálculo", expanded=False):
-                st.markdown("**ERP** = 80% MFP observado + 20% Sub-indicadores M2-6")
-                st.markdown("**HRP** = 100% MFP proyectado (observado + potencial)")
-                st.markdown("**Brecha** = HRP − ERP → campo de acción")
-                st.markdown("**Escala 0-10:** 0-2 Sin inicio · 2-4 Semilla · 4-6 Brote · 6-8 Crecimiento · 8-10 Abundancia")
-                st.markdown(f"📖 Fuente: Mason, F. (2025) · [Publicación oficial]({MASON_URL})")
+            st.markdown(
+                '<div style="background:#FAFAFA;border-radius:8px;padding:0.5rem 0.8rem;font-size:0.82rem;color:#555;margin-top:0.5rem;">'
+                '📐 <strong>¿Cómo se calculan estos indicadores?</strong> Consulta la sección de Metodología más abajo '
+                'para el detalle completo de fórmulas, variables y escalas de puntuación.</div>', unsafe_allow_html=True)
 
             # ── Motivacional ──
             st.markdown(
@@ -655,6 +651,90 @@ def render():
                 if interp_h:
                     st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">{interp_h}</div>', unsafe_allow_html=True)
             _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
+
+        # ── SECCIÓN: METODOLOGÍA (dentro de Visión) ──────────────────
+        st.markdown("---")
+        st.markdown("#### 📐 Metodología — Cómo se construyen los indicadores")
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#2D6A4F;line-height:1.7;">'
+            'Transparencia es un principio central de LivLin. A continuación se detalla cómo se construyen '
+            'los indicadores ERP y HRP, qué variables los componen, y cómo se traducen a la escala de niveles. '
+            'Toda la metodología está basada en Mason (2025) y en el modelo de la Flor de la Permacultura (Holmgren, 2002).'
+            '</div>', unsafe_allow_html=True)
+
+        with st.expander("🌍 ¿Cómo se calcula el ERP (Estado Regenerativo Presente)?", expanded=True):
+            st.markdown(
+                '**ERP = 80% MFP observado + 20% Sub-indicadores M2-6**\n\n'
+                '- **MFP observado (80%):** Se cuentan las prácticas regenerativas **actualmente observadas** en cada uno de los '
+                '7 pétalos de la Flor de la Permacultura (Holmgren, 2002). El total de prácticas se traduce a una escala 0-10 '
+                'según la siguiente tabla de puntuación:\n\n'
+                '| Prácticas observadas | Puntuación |\n|---|---|\n'
+                '| 0 | 0/10 |\n| 1-2 | 2/10 |\n| 3-5 | 4/10 |\n| 6-9 | 6/10 |\n| 10-14 | 8/10 |\n| 15+ | 10/10 |\n\n'
+                '- **Sub-indicadores M2-6 (20%):** Datos ecológicos y sistémicos recogidos en los módulos de observación:\n')
+
+            if cross:
+                for name, info in cross.items():
+                    st.markdown(f"  - **{info.get('icono','')} {name}:** {info['score']}/10 — _{info['fuente']}_")
+                st.markdown("")
+                st.markdown("**Detalle de variables y escalas de cada sub-indicador:**")
+                for name, detail in CROSS_MODULE_DETAIL.items():
+                    st.markdown(f"**{detail.get('icono','')} {name}** — Fórmula: `{detail['formula']}`")
+                    for vn, vs in detail["variables"]:
+                        st.caption(f"  • {vn}: {vs}")
+
+        with st.expander("🌱 ¿Cómo se calcula el HRP (Horizonte Regenerativo Potencial)?", expanded=False):
+            st.markdown(
+                '**HRP = 100% MFP proyectado (observado + potencial)**\n\n'
+                'El HRP toma **todas las prácticas** de la Flor de la Permacultura: tanto las ya observadas como las '
+                'identificadas como potenciales durante el diagnóstico. Se aplica la misma tabla de puntuación que el MFP. '
+                'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida en las prácticas potenciales.\n\n'
+                'El HRP representa el techo alcanzable si se activan todas las prácticas potenciales identificadas.')
+
+        with st.expander("🌀 ¿Qué es la Brecha?", expanded=False):
+            st.markdown(
+                '**Brecha = HRP − ERP**\n\n'
+                'La brecha indica cuánto potencial hay por activar. No es un indicador negativo — una brecha grande '
+                'significa que hay mucho espacio para crecer. Una brecha pequeña indica que el espacio ya está cerca '
+                'de su máximo potencial identificado.\n\n'
+                f'En este diagnóstico, la brecha es de **{brecha} puntos**: {brecha_txt}')
+
+        with st.expander("📊 Escala de niveles (0-10)", expanded=False):
+            st.markdown(
+                'Todos los indicadores se expresan en una escala de 0 a 10 con 5 niveles narrativos:\n\n'
+                '| Rango | Nivel | Significado |\n|---|---|---|\n'
+                '| 0-2 | 🔴 Sin inicio | El camino regenerativo está por comenzar |\n'
+                '| 2-4 | 🟠 Semilla | Primeras prácticas activas, la semilla germina |\n'
+                '| 4-6 | 🟡 Brote | Prácticas en marcha, el espacio crece |\n'
+                '| 6-8 | 🟢 Crecimiento | Prácticas consolidadas, regenera con fuerza |\n'
+                '| 8-10 | 🌿 Abundancia | Referente vivo de regeneración |\n')
+
+        with st.expander("🌸 ¿Qué es la Flor de la Permacultura?", expanded=False):
+            st.markdown(
+                'La **Flor de la Permacultura** es el modelo central de David Holmgren (2002) que organiza la vida cotidiana '
+                'en **7 dominios de acción regenerativa** (pétalos). Cada pétalo representa un ámbito donde las prácticas '
+                'pueden transformar sistemas extractivos en regenerativos. Los 7 pétalos son:\n')
+            for i, p in enumerate(PETAL_ORDER):
+                icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else "🌱"
+                pinfo = PETAL_DESC.get(p, {})
+                sub = pinfo.get("subtitulo","")
+                st.markdown(f"- **{icon} {p}** — {sub}")
+            st.markdown('\nEl centro de la flor son los principios éticos: cuidado de la tierra, cuidado de las personas '
+                        'y distribución justa de los excedentes.')
+
+        with st.expander("🌿 ¿Qué son las 10 Dimensiones de análisis?", expanded=False):
+            st.markdown(
+                'Las 10 dimensiones ofrecen una lectura más granular del potencial regenerativo. '
+                'Se derivan combinando los pétalos de la Flor con los sub-indicadores ecológicos:\n')
+            for dim_name, dim_info in DIM_WHAT_MEASURES.items():
+                if isinstance(dim_info, str):
+                    dim_info = {"que_mide": dim_info, "icono": "📊", "fuentes": ""}
+                st.markdown(f"- **{dim_info.get('icono','📊')} {dim_name}:** {dim_info.get('que_mide','')} *(Fuentes: {dim_info.get('fuentes','')})*")
+
+        _ref_box([
+            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+            ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework", "https://doi.org/10.1080/09613218.2012.62134"),
+        ])
 
         st.markdown("---")
 
@@ -741,23 +821,57 @@ def render():
                         ("viento_direccion","Dirección viento"),("viento_protegidas","Zonas protegidas"),("viento_expuestas","Zonas expuestas"),
                         ("agua_flujo_lluvia","Flujo agua lluvia"),("agua_acumulacion","Acumulación agua"),("flujos_notas","Notas flujos")]:
                 _card(l, str(data.get(k,"")) if data.get(k) else "", bg="#E3F2FD", border="#1565C0")
-            # Climate chart
-            geo_clima = data.get("geo_clima_anual")
-            if geo_clima:
-                try:
-                    import ast as _ast
-                    climate = _ast.literal_eval(geo_clima) if isinstance(geo_clima, str) else geo_clima
-                    if isinstance(climate, dict) and climate.get("months"):
-                        st.markdown("**Perfil climático anual (Open-Meteo):**")
-                        fig_c = go.Figure()
-                        fig_c.add_trace(go.Bar(name="Precipitación (mm)", x=climate["months"], y=climate.get("prec",[]), yaxis="y2", marker_color="rgba(30,136,229,0.4)", offsetgroup=1))
-                        fig_c.add_trace(go.Scatter(name="T° Máx", x=climate["months"], y=climate.get("t_max",[]), line=dict(color="#E53935",width=2), mode="lines+markers"))
-                        fig_c.add_trace(go.Scatter(name="T° Mín", x=climate["months"], y=climate.get("t_min",[]), line=dict(color="#1565C0",width=2), mode="lines+markers"))
-                        fig_c.update_layout(yaxis=dict(title="T° (°C)", side="left"), yaxis2=dict(title="Precipitación (mm)", side="right", overlaying="y"),
-                            legend=dict(orientation="h", yanchor="bottom", y=1.02, font=dict(size=9)), height=260, margin=dict(l=30,r=30,t=20,b=20),
-                            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.4)")
-                        st.plotly_chart(fig_c, use_container_width=True, key="clima_report")
-                except Exception: pass
+
+        # ── Datos geográficos y climáticos (API) ──────────────────────
+        lat = _safe_float(data.get("geo_lat")); lon = _safe_float(data.get("geo_lon"))
+        elev = _safe_float(data.get("geo_elevation"))
+        if lat and lon:
+            st.markdown("---")
+            st.markdown("**🌍 Datos geográficos y climáticos (Open-Meteo API)**")
+            gc1, gc2, gc3 = st.columns(3)
+            with gc1: st.metric("📍 Latitud", f"{lat:.4f}")
+            with gc2: st.metric("📍 Longitud", f"{lon:.4f}")
+            with gc3:
+                if elev > 0: st.metric("⛰️ Elevación", f"{elev:.0f} m.s.n.m.")
+
+        geo_clima = data.get("geo_clima_anual")
+        if geo_clima:
+            try:
+                import ast as _ast
+                climate = _ast.literal_eval(geo_clima) if isinstance(geo_clima, str) else geo_clima
+                if isinstance(climate, dict) and climate.get("months"):
+                    st.markdown("**📅 Perfil climático anual (Open-Meteo — promedio histórico 5 años)**")
+                    fig_c = go.Figure()
+                    fig_c.add_trace(go.Bar(name="Precipitación (mm)", x=climate["months"], y=climate.get("prec",[]), yaxis="y2", marker_color="rgba(30,136,229,0.4)", offsetgroup=1))
+                    fig_c.add_trace(go.Scatter(name="T° Máx", x=climate["months"], y=climate.get("t_max",[]), line=dict(color="#E53935",width=2), mode="lines+markers"))
+                    fig_c.add_trace(go.Scatter(name="T° Mín", x=climate["months"], y=climate.get("t_min",[]), line=dict(color="#1565C0",width=2), mode="lines+markers"))
+                    fig_c.update_layout(yaxis=dict(title="T° (°C)", side="left"), yaxis2=dict(title="Precipitación (mm)", side="right", overlaying="y"),
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, font=dict(size=9)), height=280, margin=dict(l=30,r=30,t=20,b=20),
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.4)")
+                    st.plotly_chart(fig_c, use_container_width=True, key="clima_report")
+
+                    # Métricas climáticas clave
+                    st.markdown("**📊 Registros climáticos clave**")
+                    km1, km2, km3, km4, km5 = st.columns(5)
+                    with km1:
+                        mes_cal = data.get("clima_mes_caluroso") or climate.get("mes_mas_caluroso","—")
+                        st.metric("🌡️ Mes más cálido", mes_cal)
+                    with km2:
+                        mes_frio = data.get("clima_mes_frio") or climate.get("mes_mas_frio","—")
+                        st.metric("🥶 Mes más frío", mes_frio)
+                    with km3:
+                        t_max_abs = data.get("clima_t_max_abs") or climate.get("abs_max_ultimo_anio")
+                        st.metric("🔴 T° máx registrada", f"{t_max_abs}°C" if t_max_abs else "—")
+                    with km4:
+                        t_min_abs = data.get("clima_t_min_abs") or climate.get("abs_min_ultimo_anio")
+                        st.metric("🔵 T° mín registrada", f"{t_min_abs}°C" if t_min_abs else "—")
+                    with km5:
+                        prec_total = _safe_float(data.get("agua_prec_anual")) or round(sum(p for p in climate.get("prec",[]) if p))
+                        st.metric("💧 Precipitación anual", f"{prec_total:.0f} mm")
+
+                    st.caption("📡 Fuente: Open-Meteo Historical Weather API · Nominatim OpenStreetMap para geocodificación.")
+            except Exception:
+                pass
 
         st.markdown("**Cultivo**")
         for k,l in [("cultivo_produce_hoy","Produce hoy"),("cultivo_interes","Interés en producir"),
@@ -947,64 +1061,11 @@ def render():
         st.markdown("---")
 
 
-    # ══════════════════════════════════════════════════════════════════
-    # (Flor de la Permacultura está integrada en Visión y Estado Regenerativo → Perspectiva Comparada)
-    # ══════════════════════════════════════════════════════════════════
+    # (Flor + Potenciales están integrados en Visión y Estado Regenerativo → Perspectiva Comparada)
 
 
     # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 7 — POTENCIALES DEL SITIO
-    # ══════════════════════════════════════════════════════════════════
-    if _show("potenciales"):
-        st.markdown("### 🌿 Potenciales del Sitio — 10 Dimensiones de Análisis")
-        st.markdown(
-            '<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;margin-bottom:1rem;font-size:0.88rem;color:#2D6A4F;line-height:1.7;">'
-            'Las <strong>10 dimensiones de análisis</strong> permiten una lectura integral del potencial regenerativo del espacio. '
-            'Cada dimensión evalúa un aspecto específico de la vida en el lugar — desde la producción de alimentos '
-            'hasta la participación comunitaria. Se construyen a partir de la Flor de la Permacultura (Holmgren, 2002) '
-            'y los sub-indicadores ecológicos y sistémicos (Mason, 2025).'
-            '</div>', unsafe_allow_html=True)
-
-        dims = list(potenciales_erp.keys())
-        erp_v = [potenciales_erp[d] for d in dims]
-        hrp_v = [potenciales_hrp[d] for d in dims]
-        gap_v = [max(0, round(h-e,1)) for e,h in zip(erp_v, hrp_v)]
-        st.plotly_chart(_stacked_bar(dims, erp_v, gap_v, title="10 Dimensiones — ERP + Brecha → HRP", height=420), use_container_width=True, key="bar_pot")
-
-        for dim in dims:
-            e = potenciales_erp[dim]; h = potenciales_hrp.get(dim,0)
-            gap_d = round(h - e, 1)
-            interp_e = get_interp_text(dim, e, "erp")
-            interp_h = get_interp_text(dim, h, "hrp")
-            dim_info = DIM_WHAT_MEASURES.get(dim, {})
-            if isinstance(dim_info, str):
-                dim_info = {"que_mide": dim_info, "fuentes": "", "icono": "📊"}
-            icono = dim_info.get("icono", "📊")
-            que_mide = dim_info.get("que_mide", "")
-            fuentes = dim_info.get("fuentes", "")
-            lv_e, _ = _score_to_level(e)
-            lv_h, _ = _score_to_level(h)
-
-            with st.expander(f"{icono} {dim}: ERP {e}/10 ({lv_e}) → HRP {h}/10 ({lv_h}) · Brecha +{gap_d}", expanded=False):
-                if que_mide:
-                    st.markdown(f'<div style="background:#F0FFF4;border-radius:6px;padding:0.5rem;margin-bottom:0.4rem;font-size:0.85rem;color:#2D6A4F;">'
-                                f'<strong>¿Qué mide esta dimensión?</strong> {que_mide}</div>', unsafe_allow_html=True)
-                if fuentes:
-                    st.caption(f"📎 Fuentes de datos: {fuentes}")
-                if interp_e:
-                    st.markdown(f'<div style="background:#E8F5E9;border-radius:6px;padding:0.4rem 0.6rem;margin:0.3rem 0;font-size:0.84rem;color:#1B4332;border-left:3px solid #1B4332;">'
-                                f'🌍 <strong>Estado actual ({lv_e}):</strong> {interp_e}</div>', unsafe_allow_html=True)
-                if interp_h:
-                    st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.3rem 0;font-size:0.84rem;color:#5D4037;border-left:3px solid #FFA726;">'
-                                f'🌱 <strong>Horizonte potencial ({lv_h}):</strong> {interp_h}</div>', unsafe_allow_html=True)
-
-        _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
-                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/")])
-        st.markdown("---")
-
-
-    # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 9 — SÍNTESIS Y PLAN
+    # SECCIÓN 7 — SÍNTESIS Y PLAN
     # ══════════════════════════════════════════════════════════════════
     if _show("sintesis"):
         st.markdown("### 🗺️ Síntesis y Plan de Acción")
