@@ -1,11 +1,11 @@
-"""Indagación Regenerativa v6.0 — LivLin · Multi-usuario · www.livlin.cl"""
+"""Indagación Regenerativa v7.0 — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin v6.0",
+    page_title="Indagación Regenerativa · LivLin v7.0",
     page_icon="🌿", layout="wide",
     initial_sidebar_state="expanded")
 
@@ -40,7 +40,7 @@ def _login_page():
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Indagación Regenerativa</h2>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnóstico · LivLin v6.0</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnóstico · LivLin v7.0</p>', unsafe_allow_html=True)
         st.markdown("---")
         uname = st.text_input("Usuario", placeholder="Ej: francis", key="login_user")
         pwd   = st.text_input("Contraseña", type="password", key="login_pwd")
@@ -56,7 +56,7 @@ def _login_page():
                 st.session_state.authenticated = True
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
-                st.session_state.pop("_visits_cache_v6.0", None)
+                st.session_state.pop("_visits_cache_v7.0", None)
                 st.session_state.pop("_sb_status_cache", None)
                 if user.get("visit_id"):
                     v = get_visit(user["visit_id"])
@@ -224,7 +224,7 @@ def _home():
     st.markdown(
         '<div class="app-header">'
         '<h1>Indagación Regenerativa</h1>'
-        '<p>Potencial para una vida regenerativa  ·  LivLin v6.0  ·  www.livlin.cl</p>'
+        '<p>Potencial para una vida regenerativa  ·  LivLin v7.0  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
     _, cc, _ = st.columns([1, 3, 1])
     with cc:
@@ -236,7 +236,7 @@ def _home():
             '</p>', unsafe_allow_html=True)
     cols = st.columns(3)
     for col, (icon, title, desc) in zip(cols, [
-        ("🌸", "Flor de la Permacultura", "Mapea las prácticas activas y el potencial en los 7 pétalos de Holmgren. Genera el IPR."),
+        ("🌸", "Flor de la Permacultura", "Mapea las prácticas activas y el potencial en los 7 pétalos de Holmgren. Genera el ERP y HRP."),
         ("🌍", "Observación Ecológica",   "Lee el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad."),
         ("🗺️", "Plan de Acción",          "Hoja de ruta en 3 horizontes: acciones inmediatas, estacionales y estructurales."),
     ]):

@@ -1,6 +1,4 @@
-"""Generador Word v4.2 — LivLin Indagación Regenerativa.
-Narrativa regenerativa alineada con Mason (2025). Logo embebido.
-"""
+"""Generador Word v7.0 — LivLin · ERP/HRP, escala 0-10."""
 import io, base64, json, tempfile
 from datetime import datetime
 from pathlib import Path
@@ -21,16 +19,16 @@ try:
 except ImportError:
     DOCX_OK = False
 
-C1 = RGBColor(0x00,0x59,0x54) if DOCX_OK else None  # #005954
-C2 = RGBColor(0x33,0x8B,0x85) if DOCX_OK else None  # #338B85
-C3 = RGBColor(0x5D,0xC1,0xB9) if DOCX_OK else None  # #5DC1B9
-CA = RGBColor(0x2D,0x6A,0x4F) if DOCX_OK else None  # amber
-CG = RGBColor(0x44,0x44,0x44) if DOCX_OK else None  # gray
+C1 = RGBColor(0x00,0x59,0x54) if DOCX_OK else None
+C2 = RGBColor(0x33,0x8B,0x85) if DOCX_OK else None
+C3 = RGBColor(0x5D,0xC1,0xB9) if DOCX_OK else None
+CA = RGBColor(0x2D,0x6A,0x4F) if DOCX_OK else None
+CG = RGBColor(0x44,0x44,0x44) if DOCX_OK else None
 
 MODULE_STATUS = {
-    "respondido":  "✅ Respondido directamente por las personas del espacio",
-    "inferido":    "🔍 Inferido por el facilitador tras la visita",
-    "no_abordado": "⭕ Módulo no abordado en esta visita",
+    "respondido":  "✅ Respondido directamente",
+    "inferido":    "🔍 Inferido por el facilitador",
+    "no_abordado": "⭕ No abordado",
 }
 
 def _shd(cell, hex_color):
@@ -71,35 +69,18 @@ def _kv(doc,rows):
         r1=cells[1].paragraphs[0].add_run(str(val)[:300] if val else "—")
         r1.font.size=Pt(9); r1.font.color.rgb=C2
 
-def _ipr_table(doc):
-    _p(doc,"Escala de niveles IPR — cómo interpretar los resultados:",bold=True,color=C1,size=10)
-    tbl=doc.add_table(rows=len(IPR_SCALE)+1,cols=3); tbl.style="Table Grid"
-    for i,h in enumerate(["Nivel","N° prácticas","¿Qué significa?"]):
-        r=tbl.rows[0].cells[i].paragraphs[0].add_run(h)
-        r.bold=True; r.font.size=Pt(8); r.font.color.rgb=C1
-        _shd(tbl.rows[0].cells[i],"D5FFFF")
-    for i,(lvl,n,_,meaning) in enumerate(IPR_SCALE,1):
-        for j,val in enumerate([lvl,n,meaning]):
-            r=tbl.rows[i].cells[j].paragraphs[0].add_run(val)
-            r.font.size=Pt(8)
-            _shd(tbl.rows[i].cells[j],"F0FFFE" if i%2==0 else "FFFFFF")
-
 def _logo(doc, width_inches=1.5):
-    """Add logo to document. Uses /tmp/livlin_logo.png for cloud compatibility."""
     try:
         from utils.logo_b64 import LOGO_B64
         import os
         tmp_path = "/tmp/livlin_logo.png"
         if not os.path.exists(tmp_path):
             logo_bytes = base64.b64decode(LOGO_B64)
-            with open(tmp_path, "wb") as f_tmp:
-                f_tmp.write(logo_bytes)
+            with open(tmp_path, "wb") as f_tmp: f_tmp.write(logo_bytes)
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         r = p.add_run(); r.add_picture(tmp_path, width=Inches(width_inches))
         return True
-    except Exception as e:
-        print(f"[logo docx] {e}")
-        # Fallback: text logo
+    except Exception:
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         r = p.add_run("🌿 LivLin"); r.bold = True; r.font.size = Pt(18)
         if C1: r.font.color.rgb = C1
@@ -116,18 +97,9 @@ def _load_petalos():
         with open(jf,encoding="utf-8") as f: return json.load(f)["petalos"]
     except: return []
 
-def _score_lv(n):
-    for lvl,nr,_,_ in IPR_SCALE:
-        try:
-            lo,hi=(int(nr),int(nr)) if nr.isdigit() else (int(nr[0]),99)
-            if lo<=n<=hi: return lvl
-        except: pass
-    return IPR_SCALE[-1][0]
-
-
 def generate_docx(data:dict)->bytes:
     if not DOCX_OK:
-        raise ImportError("python-docx no instalado. Agrega 'python-docx>=1.1.0' a requirements.txt")
+        raise ImportError("python-docx no instalado.")
 
     doc=Document()
     for sec in doc.sections:
@@ -139,218 +111,177 @@ def generate_docx(data:dict)->bytes:
     ipr_obs=data.get("ipr_obs",[])
     ipr_new=data.get("ipr_new",[])
 
-    # ── PORTADA ───────────────────────────────────────────────────────────
+    # Compute ERP/HRP
+    from utils.scoring import (compute_erp, compute_hrp, compute_domain_scores,
+        compute_domain_scores_total, compute_cross_module_score, CROSS_MODULE_DETAIL,
+        score_label, brecha_valor, brecha_texto, _score_to_level, get_petal_interp,
+        compute_synthesis_potentials, compute_synthesis_potentials_obs, get_interp_text)
+    erp = compute_erp(data)
+    hrp = compute_hrp(data)
+    brecha = brecha_valor(erp, hrp)
+    brecha_txt = brecha_texto(erp, hrp)
+    label_erp, _ = score_label(erp)
+    label_hrp, _ = score_label(hrp)
+    domain_obs = compute_domain_scores(data)
+    domain_tot = compute_domain_scores_total(data)
+    cross = compute_cross_module_score(data)
+
+    # ── PORTADA ──
     doc.add_paragraph()
     _logo(doc)
     doc.add_paragraph()
-
     p=doc.add_paragraph(); p.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt=p.add_run("INDAGACIÓN REGENERATIVA")
-    rt.bold=True; rt.font.size=Pt(24); rt.font.color.rgb=C1
-
+    rt=p.add_run("INDAGACIÓN REGENERATIVA"); rt.bold=True; rt.font.size=Pt(24); rt.font.color.rgb=C1
     p2=doc.add_paragraph(); p2.alignment=WD_ALIGN_PARAGRAPH.CENTER
     rs=p2.add_run("Diagnóstico de Permacultura Urbana"); rs.font.size=Pt(12); rs.font.color.rgb=C2
-
     p3=doc.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rt2=p3.add_run(f"LivLin v6.0  ·  {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rt2=p3.add_run(f"LivLin v7.0 · {LIVLIN_TAGLINE} · www.livlin.cl")
     rt2.font.size=Pt(10); rt2.font.color.rgb=C3; rt2.italic=True
-
     doc.add_paragraph()
-    rows=[
-        ("🏡 Espacio",data.get("proyecto_nombre","")),
-        ("👤 Contacto",data.get("proyecto_cliente","")),
-        ("📍 Ciudad",data.get("proyecto_ciudad","")),
-        ("📅 Fecha visita",data.get("proyecto_fecha","") or str(datetime.now())[:10]),
-    ]
+
+    rows=[("🏡 Espacio",data.get("proyecto_nombre","")),
+          ("👤 Contacto",data.get("proyecto_cliente","")),
+          ("📍 Ciudad",data.get("proyecto_ciudad","")),
+          ("📅 Fecha",data.get("proyecto_fecha","") or str(datetime.now())[:10])]
+    if data.get("proyecto_mascotas"):
+        rows.append(("🐾 Mascotas", data["proyecto_mascotas"]))
     if facilitador: rows.append(("🌿 Facilitador/a",facilitador))
-    if data.get("informe_fecha_emision"):
-        rows.append(("📋 Fecha emisión",data["informe_fecha_emision"]))
     _kv(doc,rows)
     doc.add_paragraph()
+
+    # ERP / HRP Summary
+    _H(doc,"Estado Regenerativo Presente (ERP) y Horizonte Regenerativo Potencial (HRP)",2,C1,12)
+    _kv(doc,[
+        ("🌍 ERP", f"{erp}/10 — {label_erp}"),
+        ("🌱 HRP", f"{hrp}/10 — {label_hrp}"),
+        ("🌀 Brecha", f"{brecha} pts — {brecha_txt}"),
+    ])
+    doc.add_paragraph()
+    _box(doc,IPR_WHAT_IS,color=C2)
+    _box(doc,IPR_OBS_VS_POT,color=CG)
     doc.add_page_break()
 
-    # ── MARCO CONCEPTUAL ─────────────────────────────────────────────────
+    # ── MARCO CONCEPTUAL ──
     _H(doc,"Marco conceptual: el enfoque de la regeneración",1,C1,14)
-    _box(doc,REGENERATION_FRAMEWORK,size=10,color=C2)
-    doc.add_paragraph()
-    _H(doc,"¿Qué es LivLin?",2,C2,11)
-    _box(doc,LIVLIN_DESC,size=10,color=CG)
-    _p(doc,"🔗 www.livlin.cl · Potencial para una vida regenerativa",color=C3,size=9)
-    doc.add_paragraph()
-    _H(doc,"Módulos del Diagnóstico",2,C2,11)
-    for mod,desc in LIVLIN_MODULES:
-        _p(doc,mod,bold=True,color=C1,size=10,after=2)
-        _p(doc,desc,italic=True,color=CG,size=9,after=6)
+    _box(doc,REGENERATION_FRAMEWORK,color=C2)
+    _box(doc,LIVLIN_DESC,color=CG)
     doc.add_page_break()
 
-    # ── IPR ───────────────────────────────────────────────────────────────
-    _H(doc,"Índice de Potencial Regenerativo (IPR)",1,C1,14)
-    _box(doc,IPR_WHAT_IS,size=10,color=C2)
-    _box(doc,IPR_OBS_VS_POT,size=9,color=CG)
-    doc.add_paragraph()
-    _ipr_table(doc)
-    doc.add_paragraph()
-
-    # Add radar chart if available
-    radar_b64 = data.get("ipr_radar_b64","")
-    if radar_b64:
-        try:
-            import base64 as _b64
-            img_bytes = _b64.b64decode(radar_b64)
-            tmp_radar = "/tmp/livlin_radar.png"
-            with open(tmp_radar,"wb") as _fh: _fh.write(img_bytes)
-            p_r = doc.add_paragraph(); p_r.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            p_r.add_run().add_picture(tmp_radar, width=Inches(5.5))
-            _p(doc,"Verde sólido = Observado hoy · Verde punteado = Con potencial adicional. "
-               "Escala normalizada al máximo de prácticas registradas.",
-               italic=True, color=CG, size=8)
-        except Exception as e:
-            _p(doc,f"[Gráfico no disponible: {e}]",italic=True,color=CG,size=8)
-
-    if ipr_obs or ipr_new:
-        _p(doc,"Resumen IPR por pétalo:",bold=True,color=C1,size=10)
-        rows=[]
-        for i,p in enumerate(petalos):
-            n_o=ipr_obs[i] if i<len(ipr_obs) else 0
-            n_n=ipr_new[i] if i<len(ipr_new) else 0
-            icon=PETAL_ICONS[i] if i<len(PETAL_ICONS) else "🌱"
-            rows.append((f"{icon} {p['nombre'][:35]}",
-                         f"✅ {n_o} — {_score_lv(n_o)}  |  🌟 +{n_n} → {_score_lv(n_o+n_n)}"))
-        _kv(doc,rows)
-    doc.add_page_break()
-
-    # ── M1 ────────────────────────────────────────────────────────────────
-    _H(doc,"1. Intención y Contexto",1,C1,14)
+    # ── M1 ──
+    _H(doc,"1. Información del Proyecto e Intención",1,C1,14)
     _mod_status(doc,data,"mod_cliente")
-    _box(doc,"'Cada día tenemos una oportunidad de vivir el tránsito hacia una mejor forma de vivir.' "
-         "— Mason (2025). Este módulo registra el horizonte de sentido que guiará el proceso.",color=C2)
     rows=[]
-    for lbl,key in [("Tipo de espacio","proyecto_tipo_espacio"),("Superficie (m²)","proyecto_superficie"),
-                    ("Habitantes","proyecto_habitantes"),("Barrio","proyecto_barrio_desc")]:
+    for lbl,key in [("Tipo","proyecto_tipo_espacio"),("Superficie (m²)","proyecto_superficie"),
+                    ("Habitantes","proyecto_habitantes"),("Mascotas","proyecto_mascotas")]:
         v=data.get(key)
         if v: rows.append((lbl,str(v)))
     if rows: _kv(doc,rows)
     doc.add_paragraph()
-    for k,lbl in [("proyecto_intencion","Intención"),("tao_motivacion","Motivación"),
-                  ("tao_sueno","Sueño regenerativo")]:
+    for k,lbl in [("intencion_motivo","Motivo"),("intencion_vision5","Visión 5 años"),
+                  ("intencion_suenos","Sueños regenerativos")]:
         v=data.get(k,"")
         if v:
             _p(doc,f"{lbl}:",bold=True,color=C1,size=10)
             _p(doc,v,italic=True,color=CG,size=10)
     doc.add_page_break()
 
-    # ── M2-3 ─────────────────────────────────────────────────────────────
+    # ── M2-3 ──
     _H(doc,"2. Observación Ecológica del Sitio",1,C1,14)
     _mod_status(doc,data,"mod_sitio")
-    _box(doc,"'Observar e interactuar' — primer principio de Holmgren (2002). Antes de diseñar, se lee el lugar: "
-         "su suelo, agua, sol, viento y biodiversidad son el texto del que emerge el diseño regenerativo.",color=C2)
     for section,fields in [
         ("Suelo",[("suelo_tipo","Tipo"),("suelo_compactacion","Compactación"),
-                  ("suelo_materia_organica","Materia org."),("suelo_drenaje","Drenaje"),
-                  ("suelo_color","Color"),("suelo_notas","Notas")]),
-        ("Flujos Naturales",[("sol_horas","Horas sol (estimado/medido)"),("sol_orientacion","Orientación"),
-                              ("clima_mes_caluroso","Mes cálido [Open-Meteo API]"),
-                              ("clima_mes_frio","Mes frío [Open-Meteo API]"),
-                              ("clima_t_max_abs","T° máx [Open-Meteo API]"),
-                              ("clima_t_min_abs","T° mín [Open-Meteo API]"),
-                              ("agua_prec_anual","Precipitación anual mm [Open-Meteo API]")]),
-        ("Vegetación",[("veg_especies","Especies"),("veg_invasoras","Invasoras")]),
+                  ("suelo_materia_organica","Materia org."),("suelo_drenaje","Drenaje")]),
+        ("Flujos",[("sol_horas","Horas sol"),("sol_orientacion","Orientación"),
+                   ("agua_prec_anual","Precipitación mm")]),
     ]:
         _H(doc,section,2,C2,11)
         rows=[(lbl,str(data.get(k,""))) for k,lbl in fields if data.get(k)]
         if rows: _kv(doc,rows)
-        else: _p(doc,"— No registrado —",italic=True,color=CG,size=9)
     doc.add_page_break()
 
-    # ── M4-6 ─────────────────────────────────────────────────────────────
-    _H(doc,"3. Sistemas — Agua, Energía y Materiales",1,C1,14)
+    # ── M4-6 ──
+    _H(doc,"3. Sistemas — Agua, Energía y Contexto",1,C1,14)
     _mod_status(doc,data,"mod_sistemas")
-    _box(doc,"Cerrar ciclos es regenerar: agua que se capta, energía que se genera, residuos que se "
-         "convierten en recursos. Cada flujo mapeado es una oportunidad de autonomía.",color=C2)
     for section,fields in [
-        ("💧 Agua",[("agua_consumo","Consumo (L/día)"),("agua_prec_anual","Precip. anual (mm)"),
-                    ("agua_techo_m2","Techo captación (m²)"),("agua_riego_tipo","Riego"),("agua_grises","Aguas grises")]),
-        ("⚡ Energía",[("ene_kwh_mes","Consumo (kWh/mes)"),("ene_fuente_principal","Fuente"),
-                       ("ene_solar_interes","Interés solar")]),
-        ("♻️ Materiales",[("mat_compost","Compostaje"),("mat_reciclaje","Reciclaje"),
-                          ("mat_plastico_uso","Reducción plástico")]),
+        ("💧 Agua",[("agua_consumo","Consumo L/día"),("agua_captacion_lluvia","Captación"),("agua_grises","Grises")]),
+        ("⚡ Energía",[("ene_fuente","Fuente"),("ene_led","LED"),("ene_kwh_dia_calc","kWh/día")]),
     ]:
         _H(doc,section,2,C2,11)
         rows=[(lbl,str(data.get(k,""))) for k,lbl in fields if data.get(k)]
         if rows: _kv(doc,rows)
     doc.add_page_break()
 
-    # ── M7 FLOR ───────────────────────────────────────────────────────────
-    _H(doc,"4. Flor de la Permacultura — Índice de Potencial Regenerativo (IPR)",1,C1,14)
+    # ── M7 FLOR ──
+    _H(doc,"4. Flor de la Permacultura — ERP / HRP",1,C1,14)
     _mod_status(doc,data,"mod_potencial")
     _box(doc,IPR_WHAT_IS,color=C2)
-    _box(doc,IPR_OBS_VS_POT,color=CG)
     doc.add_paragraph()
 
+    from utils.scoring import PETAL_ORDER
     for i,petalo in enumerate(petalos):
         n_o=ipr_obs[i] if i<len(ipr_obs) else 0
         n_n=ipr_new[i] if i<len(ipr_new) else 0
         icon=PETAL_ICONS[i] if i<len(PETAL_ICONS) else "🌱"
-        _H(doc,f"{icon} {petalo['nombre']}",2,C2,11)
+        p_name = petalo["nombre"]
+        e_score = domain_obs.get(p_name,0)
+        h_score = domain_tot.get(p_name,0)
+        lv_e,_=_score_to_level(e_score)
+        lv_h,_=_score_to_level(h_score)
 
+        _H(doc,f"{icon} {p_name}",2,C2,11)
         p_sc=doc.add_paragraph(); p_sc.paragraph_format.space_after=Pt(4)
-        r1=p_sc.add_run(f"✅ Observado: {n_o} → {_score_lv(n_o)}   |   ")
+        r1=p_sc.add_run(f"🌍 ERP: {e_score:.0f}/10 ({lv_e})   |   ")
         r1.font.size=Pt(9); r1.bold=True; r1.font.color.rgb=C1
-        r2=p_sc.add_run(f"🌟 +{n_n} potencial → Total: {_score_lv(n_o+n_n)}")
+        r2=p_sc.add_run(f"🌱 HRP: {h_score:.0f}/10 ({lv_h})")
         r2.font.size=Pt(9); r2.bold=True; r2.font.color.rgb=CA
 
-        desc=PETAL_DESC.get(petalo["nombre"],{})
-        if isinstance(desc,dict):
-            if desc.get("resumen"): _box(doc,desc["resumen"],size=9,color=C2)
-            if desc.get("detalle"): _p(doc,desc["detalle"],italic=True,color=CG,size=8,after=4)
-            for auth,tit,url in desc.get("referencias",[]):
-                _p(doc,f"📚 {auth} — {tit} · {url}",italic=True,color=CG,size=7,after=1)
+        # Interpretations
+        interp_e = get_petal_interp(p_name, e_score, "erp")
+        interp_h = get_petal_interp(p_name, h_score, "hrp")
+        if interp_e: _box(doc,f"ERP: {interp_e}",size=9,color=C1)
+        if interp_h: _box(doc,f"HRP: {interp_h}",size=9,color=CA)
 
         obs_data=data.get(f"petalo_{i}_obs",{})
         new_data=data.get(f"petalo_{i}_pot_new",{})
         otros_obs=data.get(f"petalo_{i}_otros_obs",[])
         otros_new=data.get(f"petalo_{i}_otros_new",[])
-        notas=data.get(f"petalo_{i}_notas","")
-
-        obs_rows=[(k.replace("_"," ").title()," · ".join(v))
-                   for k,v in obs_data.items() if v]
-        if otros_obs: obs_rows.append(("Otras prácticas observadas"," · ".join(otros_obs)))
+        obs_rows=[(k.replace("_"," ").title()," · ".join(v)) for k,v in obs_data.items() if v]
+        if otros_obs: obs_rows.append(("Otras"," · ".join(otros_obs)))
         if obs_rows:
-            _p(doc,"✅ Prácticas observadas hoy:",bold=True,color=C1,size=9,after=2)
+            _p(doc,"Prácticas observadas (ERP):",bold=True,color=C1,size=9,after=2)
             _kv(doc,obs_rows)
-
-        new_rows=[(k.replace("_"," ").title()," · ".join(v))
-                   for k,v in new_data.items() if v]
-        if otros_new: new_rows.append(("Otras prácticas (potencial)"," · ".join(otros_new)))
+        new_rows=[(k.replace("_"," ").title()," · ".join(v)) for k,v in new_data.items() if v]
+        if otros_new: new_rows.append(("Otras"," · ".join(otros_new)))
         if new_rows:
             doc.add_paragraph()
-            _p(doc,"🌟 Potencial adicional identificado por el facilitador:",bold=True,color=CA,size=9,after=2)
+            _p(doc,"Prácticas potenciales (→ HRP):",bold=True,color=CA,size=9,after=2)
             _kv(doc,new_rows)
-
-        if notas: _p(doc,f"📝 Notas: {notas}",italic=True,color=CG,size=9)
         doc.add_paragraph()
 
-    dest=data.get("pot_practicas_destacadas","")
-    if dest:
-        _H(doc,"✨ Prácticas más destacadas del espacio",2,C2,11)
-        _p(doc,dest,italic=True,color=CG,size=10)
+    # Sub-indicadores transparency
+    if cross:
+        _H(doc,"Sub-indicadores M2-6 (aportan 20% al ERP)",2,C2,11)
+        rows = [(name, f"{info['score']}/10 — {info['fuente']}") for name,info in cross.items()]
+        _kv(doc,rows)
+        doc.add_paragraph()
+        _p(doc,"Transparencia: variables y escalas de puntuación",bold=True,color=C1,size=10)
+        for name, detail in CROSS_MODULE_DETAIL.items():
+            actual = cross.get(name,{}).get("score","—")
+            _p(doc,f"{detail.get('icono','')} {name}: {actual}/10 · {detail['formula']}",bold=True,color=C2,size=9)
+            for vn,vs in detail["variables"]:
+                _p(doc,f"  • {vn}: {vs}",color=CG,size=8,after=1)
     doc.add_page_break()
 
-    # ── M9 ────────────────────────────────────────────────────────────────
+    # ── M9 ──
     _H(doc,"5. Síntesis y Plan de Acción",1,C1,14)
-    _mod_status(doc,data,"mod_plan")
-    _box(doc,"La hoja de ruta del descenso creativo organiza los próximos pasos en 3 horizontes: "
-         "acciones cotidianas inmediatas, cambios estacionales y transformaciones estructurales "
-         "que construyen resiliencia para las generaciones futuras. — Mason (2025)",color=C2)
-    for k,lbl in [("sint_fortalezas","💚 Fortalezas — lo que ya florece"),
-                   ("sint_desafios","⚡ Desafíos — obstáculos reales"),
-                   ("sint_oportunidades","🌱 Oportunidades — potencial por activar")]:
+    for k,lbl in [("sint_fortalezas","💚 Fortalezas"),("sint_oportunidades","🌱 Oportunidades"),
+                   ("sint_limitaciones","⚡ Desafíos"),("sint_quick_wins","🎯 Primeros pasos")]:
         v=data.get(k,"")
         if v: _p(doc,f"{lbl}: {v}",color=CG,size=10)
     doc.add_paragraph()
-    for pk,fase in [("plan_inmediatas","⚡ Acciones Inmediatas (0–3 meses)"),
-                    ("plan_estacionales","🌿 Acciones Estacionales (3–12 meses)"),
-                    ("plan_estructurales","🌳 Transformaciones Estructurales (1–5 años)")]:
+    for pk,fase in [("plan_inmediatas","⚡ Inmediatas (0–3 meses)"),
+                    ("plan_estacionales","🌿 Estacionales (3–12 meses)"),
+                    ("plan_estructurales","🌳 Estructurales (1–5 años)")]:
         v=data.get(pk)
         if v:
             _p(doc,fase,bold=True,color=C2,size=10)
@@ -365,30 +296,28 @@ def generate_docx(data:dict)->bytes:
                 _p(doc,str(v),italic=True,color=CG,size=9)
     doc.add_page_break()
 
-    # ── LIVLIN SERVICES ───────────────────────────────────────────────────
-    _H(doc,"LivLin — Acompañamiento para hacer realidad este potencial",1,C1,14)
+    # ── CIERRE ──
+    _H(doc,"LivLin — Tu aliado en la regeneración",1,C1,14)
     _logo(doc)
-    doc.add_paragraph()
     _box(doc,LIVLIN_SERVICES_PITCH,size=11,color=C1)
     doc.add_paragraph()
-    _box(doc,LIVLIN_CLOSING,size=10,color=C2)
+    _box(doc,"Hoy, el espacio muestra un Estado Regenerativo Presente (ERP) que refleja su vitalidad actual. "
+         "Al mismo tiempo, identificamos un Horizonte Regenerativo Potencial (HRP) que abre posibilidades. "
+         "La diferencia entre ambos nos señala el camino.",size=10,color=C2)
     doc.add_paragraph()
     p_w=doc.add_paragraph(); p_w.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rw=p_w.add_run(f"🌿 {LIVLIN_TAGLINE}  ·  www.livlin.cl")
+    rw=p_w.add_run(f"🌿 {LIVLIN_TAGLINE} · www.livlin.cl")
     rw.font.size=Pt(11); rw.font.color.rgb=C1; rw.bold=True
     doc.add_page_break()
 
-    # ── REFERENCIAS ───────────────────────────────────────────────────────
-    _H(doc,"Referencias y Recursos de Profundización",1,C1,14)
-    _p(doc,"Los siguientes materiales amplían el marco conceptual de este diagnóstico:",size=10)
-    doc.add_paragraph()
+    # ── REFERENCIAS ──
+    _H(doc,"Referencias y Recursos",1,C1,14)
     for auth,tit,url in GLOBAL_REFS:
         _p(doc,f"• {auth} — {tit}",bold=False,color=C1,size=9,after=2)
         _p(doc,f"  🔗 {url}",italic=True,color=C3,size=8,after=4)
 
-    # ── PIE ───────────────────────────────────────────────────────────────
     p_pie=doc.add_paragraph(); p_pie.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v4.2  ·  {str(datetime.now())[:10]}")
+    r_pie=p_pie.add_run(f"LivLin Indagación Regenerativa v7.0 · {str(datetime.now())[:10]}")
     r_pie.font.size=Pt(8); r_pie.font.color.rgb=CG; r_pie.italic=True
 
     buf=io.BytesIO(); doc.save(buf); buf.seek(0)

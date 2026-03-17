@@ -1,32 +1,40 @@
-# Indagación Regenerativa — LivLin
+# 🌿 LivLin · Indagación Regenerativa v7.0
 
-Instrumento de diagnóstico colectivo para espacios en transición regenerativa.
+**Potencial para una vida regenerativa** · www.livlin.cl
 
-## Instalación y uso
+## Cambios v7.0
 
+### Nuevos indicadores: ERP y HRP
+- **🌍 ERP (Estado Regenerativo Presente)**: 80% MFP observado + 20% sub-indicadores M2-6. Fotografía del momento actual.
+- **🌱 HRP (Horizonte Regenerativo Potencial)**: 100% MFP proyectado (obs+pot). Visión futura.
+- **🌀 Brecha (HRP − ERP)**: Campo de acción con valor numérico + descripción dinámica.
+
+### Escala 0-10 con 5 niveles narrativos
+| Rango | Nivel | Descripción |
+|-------|-------|-------------|
+| 0-2 | Sin inicio | El camino regenerativo está por comenzar |
+| 2-4 | Semilla | Primeras prácticas activas |
+| 4-6 | Brote | Prácticas en marcha, el espacio crece |
+| 6-8 | Crecimiento | Prácticas consolidadas, regenera con fuerza |
+| 8-10 | Abundancia | Referente vivo de regeneración |
+
+### Informe Final mejorado
+- **Navegación por secciones** en sidebar (botones show/hide para mobile)
+- **3 niveles de presentación**: Perspectiva Comparada, ERP independiente, HRP independiente
+- **Dos radares independientes**: uno para ERP, otro para HRP
+- **Barras apiladas**: ERP + brecha → HRP para dimensiones y pétalos
+- **Sub-indicadores transparentes**: expander con variables, escalas y fórmulas
+
+### Otros cambios
+- Campo **🐾 Mascotas y animales** en Módulo 1.1
+- Narrativa integrada: visión → diagnóstico → brechas → oportunidades
+- Excel y Word actualizados con ERP/HRP y transparencia de sub-indicadores
+
+## Stack
+- Streamlit · Plotly · Supabase · Folium · python-docx · openpyxl
+
+## Instalación
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
-
-## Logo
-Reemplaza `assets/logolivlin.png` con el logo oficial de LivLin.
-
-## Google Drive (opcional)
-1. Crea un proyecto en [console.cloud.google.com](https://console.cloud.google.com)
-2. Activa la API de Google Drive
-3. Crea una cuenta de servicio y descarga el JSON de credenciales
-4. Renómbralo `gdrive_sa.json` y colócalo en `credentials/`
-5. Comparte tu carpeta de Drive con el email de la cuenta de servicio
-
-## Geocodificación y clima
-Usa Nominatim (OpenStreetMap) y Open-Meteo — sin API key.
-Requiere conexión a internet al momento del diagnóstico.
-
-## Estructura de módulos
-- M1: Información del espacio + geolocalización + intención del grupo
-- M2-3: Ecología del suelo, vegetación, fauna, flujos, cultivo
-- M4-6: Contexto urbano, agua/energía, materiales/residuos
-- M7-8: Flor de la Permacultura (7 pétalos) + Tao de la Regeneración
-- M9: Síntesis, potenciales del sitio, plan de acción
-- Informe Final: Dashboard + descarga Excel

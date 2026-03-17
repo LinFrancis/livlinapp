@@ -196,19 +196,19 @@ exista al menos una práctica activa ya es un avance significativo.
             fig = go.Figure()
             fig.add_trace(go.Scatterpolar(
                 r=r_tot_v5, theta=theta_v5,
-                name="Con potencial adicional",
+                name="HRP · Horizonte potencial",
                 fill="toself", fillcolor="rgba(82,183,136,0.12)",
                 line=dict(color="#52B788", width=2, dash="dash")))
             fig.add_trace(go.Scatterpolar(
                 r=r_obs_v5, theta=theta_v5,
-                name="Estado actual",
+                name="ERP · Estado presente",
                 fill="toself", fillcolor="rgba(27,67,50,0.28)",
                 line=dict(color="#1B4332", width=2.5)))
             fig.update_layout(
                 polar=dict(
                     bgcolor="rgba(240,255,244,0.4)",
-                    radialaxis=dict(visible=True, range=[0,5],
-                        tickvals=[1,2,3,4,5],
+                    radialaxis=dict(visible=True, range=[0,10],
+                        tickvals=[2,4,6,8,10],
                         tickfont=dict(size=8, color="#2D6A4F"),
                         gridcolor="rgba(45,106,79,0.2)")),
                 legend=dict(orientation="h", yanchor="bottom", y=1.05, font=dict(size=10)),
@@ -222,17 +222,17 @@ exista al menos una práctica activa ya es un avance significativo.
                 st.markdown(
                     f'''<div style="background:white;border:2px solid #D8F3DC;border-radius:10px;
 padding:0.8rem;text-align:center;margin-bottom:0.5rem;">
-<div style="font-size:0.65rem;color:#888;text-transform:uppercase;">IPR Estado actual</div>
+<div style="font-size:0.65rem;color:#888;text-transform:uppercase;">🌍 ERP · Estado presente</div>
 <div style="font-size:2.8rem;font-weight:900;color:#1B4332;line-height:1;">{regen_obs_v5}</div>
-<div style="color:#52B788;font-size:0.75rem;">/5</div>
+<div style="color:#52B788;font-size:0.75rem;">/10</div>
 <div style="font-size:0.75rem;color:{color_obs_v5};font-weight:600;">{label_obs_v5}</div></div>''',
                     unsafe_allow_html=True)
                 st.markdown(
                     f'''<div style="background:white;border:2px dashed #52B788;border-radius:10px;
 padding:0.8rem;text-align:center;">
-<div style="font-size:0.65rem;color:#888;text-transform:uppercase;">IPR Con potencial</div>
+<div style="font-size:0.65rem;color:#888;text-transform:uppercase;">🌱 HRP · Horizonte potencial</div>
 <div style="font-size:2.8rem;font-weight:900;color:#52B788;line-height:1;">{regen_pot_v5}</div>
-<div style="color:#52B788;font-size:0.75rem;">/5</div>
+<div style="color:#52B788;font-size:0.75rem;">/10</div>
 <div style="font-size:0.75rem;color:{color_pot_v5};font-weight:600;">{label_pot_v5}</div></div>''',
                     unsafe_allow_html=True)
         except Exception as e:

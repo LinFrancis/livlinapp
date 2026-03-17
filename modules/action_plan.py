@@ -88,7 +88,7 @@ def _render_potencial(data):
             marker=dict(size=8, color="#1B4332")))
         fig.update_layout(
             polar=dict(bgcolor="rgba(240,255,244,0.5)",
-                radialaxis=dict(visible=True, range=[0,5], tickvals=[1,2,3,4,5],
+                radialaxis=dict(visible=True, range=[0,10], tickvals=[2,4,6,8,10],
                     tickfont=dict(size=9,color="#2D6A4F"), gridcolor="rgba(45,106,79,0.2)"),
                 angularaxis=dict(tickfont=dict(size=10,color="#1B4332"))),
             paper_bgcolor="rgba(0,0,0,0)", showlegend=False,
@@ -103,7 +103,7 @@ def _render_potencial(data):
             f'border:2px solid #52B788;border-radius:14px;padding:1.2rem;text-align:center;margin-bottom:0.8rem;">'
             f'<div style="font-size:0.75rem;color:#40916C;text-transform:uppercase;letter-spacing:0.1em;">Potencial Regenerativo</div>'
             f'<div style="font-size:3.5rem;font-weight:800;color:#1B4332;line-height:1;">{prom}</div>'
-            f'<div style="color:#52B788;">/5.0</div>'
+            f'<div style="color:#52B788;">/10</div>'
             f'<div style="font-size:0.88rem;font-weight:600;color:{color_g};margin:0.3rem 0;">{label_g}</div>'
             f'</div>', unsafe_allow_html=True)
 
@@ -154,7 +154,7 @@ def _render_potencial(data):
         climate   = CLIMATE_REF.get(dim, "")
         edit_key  = f"interp_edit_{dim.replace(' ','_')}"
         saved_key = f"interp_saved_{dim.replace(' ','_')}"
-        pct = int((val/5)*100) if val else 0
+        pct = int((val/10)*100) if val else 0
 
         if val >= 4: bar_col, bg_col = "#1B4332", "rgba(27,67,50,0.08)"
         elif val >= 3: bar_col, bg_col = "#2D6A4F", "rgba(45,106,79,0.08)"
@@ -168,7 +168,7 @@ def _render_potencial(data):
             f'border-left:4px solid {bar_col};border-radius:10px;padding:0.7rem 1rem;margin:6px 0;">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">'
             f'<strong style="color:#1B4332;font-size:0.95rem;">{dim}</strong>'
-            f'<span style="background:{bar_col};color:white;padding:2px 12px;border-radius:10px;font-size:0.82rem;font-weight:700;">{val}/5</span>'
+            f'<span style="background:{bar_col};color:white;padding:2px 12px;border-radius:10px;font-size:0.82rem;font-weight:700;">{val}/10</span>'
             f'</div>'
             f'<div style="font-size:0.78rem;color:#666;font-style:italic;margin-bottom:4px;">{desc}</div>'
             f'<div style="background:rgba(255,255,255,0.6);border-radius:4px;height:7px;margin-bottom:6px;overflow:hidden;">'

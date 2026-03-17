@@ -77,7 +77,7 @@ def generate_fortalezas(data: dict) -> str:
     domain_scores = compute_domain_scores(data)
     for domain, score in domain_scores.items():
         if score >= 4:
-            items.append(f"🌸 Pétalo '{domain}': puntaje {score}/5 — muy desarrollado")
+            items.append(f"🌸 Pétalo '{domain}': puntaje {score}/10 — muy desarrollado")
 
     # Tao
     if _has(data, "tao_conexion") and _score_val(data, "tao_conexion") >= 4:

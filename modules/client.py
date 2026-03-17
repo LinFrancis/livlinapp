@@ -138,7 +138,8 @@ def render():
     c5, c6 = st.columns(2)
     with c5: data["proyecto_n_adultos"]= st.number_input("Adultos/as", min_value=0, value=int(data.get("proyecto_n_adultos",1)), step=1)
     with c6: data["proyecto_n_ninos"]  = st.number_input("Niños/as o jóvenes", min_value=0, value=int(data.get("proyecto_n_ninos",0)), step=1)
-    data["proyecto_habitantes"]= st.text_area("Descripción libre del grupo", value=data.get("proyecto_habitantes",""), height=80, placeholder="Ej: Somos pareja con dos hijos, un perro y tres gallinas…")
+    data["proyecto_habitantes"]= st.text_area("Descripción libre del grupo", value=data.get("proyecto_habitantes",""), height=80, placeholder="Ej: Somos pareja con dos hijos…")
+    data["proyecto_mascotas"] = st.text_area("🐾 Mascotas y animales del espacio", value=data.get("proyecto_mascotas",""), height=60, placeholder="Ej: Dos gatitas (Luna y Sol), un perro (Jack), tres gallinas ponedoras…")
     st.markdown("</div>", unsafe_allow_html=True)
 
     # ── 1.2 Geolocalización ─────────────────────────────────────────────

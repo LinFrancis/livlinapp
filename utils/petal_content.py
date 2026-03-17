@@ -258,25 +258,24 @@ IPR_SCALE = [
      "Varias prácticas muestran intención sostenida. El sistema empieza a tomar forma y generar resultados."),
     ("Crecimiento",   "6-9 prácticas",  "#40916C",
      "Sistema estable con rendimientos constantes. La práctica regenerativa es parte del modo habitual del espacio."),
-    ("Florecimiento", "10-14 prácticas","#2D6A4F",
-     "Alta integración entre prácticas. El espacio genera abundancia y puede compartir con la comunidad."),
-    ("Abundancia",    "15+ prácticas",  "#1B4332",
+    ("Abundancia",    "10+ prácticas",  "#1B4332",
      "Sistema autónomo y resiliente, capaz de compartir excedentes. Modelo de transformación regenerativa urbana."),
 ]
 
 IPR_WHAT_IS = (
-    "El Índice de Potencial Regenerativo (IPR) v6.0 mide el nivel de actividad regenerativa "
-    "del espacio en escala de 0 a 5. Se presenta en dos perspectivas: Estado Actual (prácticas "
-    "observadas hoy) y Potencial Proyectado (incorporando prácticas adicionales identificadas). "
-    "El IPR no es un puntaje punitivo: celebra cada práctica como un logro real. "
-    "La pregunta no es '¿cuánto falta?' sino '¿qué ya está floreciendo aquí y qué más podría despertar?'"
+    "La Indagación Regenerativa v7.0 mide el nivel de actividad regenerativa del espacio en escala "
+    "de 0 a 10 con dos indicadores complementarios: el Estado Regenerativo Presente (ERP), que "
+    "refleja lo que ya ocurre hoy; y el Horizonte Regenerativo Potencial (HRP), que describe "
+    "lo que el espacio puede llegar a ser. No es un puntaje punitivo: celebra cada práctica como "
+    "un logro real. La pregunta no es '¿cuánto falta?' sino '¿qué ya está floreciendo y qué más "
+    "podría despertar?'"
 )
 
 IPR_OBS_VS_POT = (
-    "OBSERVADO: prácticas que ya existen y funcionan en el espacio hoy. "
-    "POTENCIAL ADICIONAL: nuevas prácticas concretas y viables identificadas "
-    "por el facilitador tras la visita diagnóstica. El potencial no requiere "
-    "re-ingresar lo ya observado — solo suma lo nuevo, lo que puede activarse."
+    "ERP (Estado Regenerativo Presente): 80% MFP observado + 20% sub-indicadores M2-6. "
+    "Fotografía del momento actual basada en datos observables. "
+    "HRP (Horizonte Regenerativo Potencial): 100% MFP proyectado (obs + potencial). "
+    "Visión de lo que el espacio puede alcanzar. La brecha entre ambos es el campo de acción."
 )
 
 TAO_REFLEXION_SHORT = (
