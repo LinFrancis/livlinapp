@@ -74,10 +74,16 @@ def _login_page():
 
 
 def _sidebar():
+    """Sidebar ONLY for admin users. Client sidebar is in report.py."""
     user     = st.session_state.get("current_user", {})
     is_admin = user.get("role") == "admin"
-    PAGES    = PAGES_ADMIN if is_admin else PAGES_CLIENT
-    data     = st.session_state.get("visit_data", {})
+
+    # ── GUARD: clients never use this sidebar ──
+    if not is_admin:
+        return
+
+    PAGES = PAGES_ADMIN
+    data  = st.session_state.get("visit_data", {})
 
     with st.sidebar:
         logo_path = Path(__file__).parent / "assets" / "logolivlin.png"
@@ -283,7 +289,9 @@ def main():
     user     = st.session_state.get("current_user", {})
     is_admin = user.get("role") == "admin"
 
+    # Sidebar: _sidebar() has internal guard — only renders for admin
     _sidebar()
+
     page = st.session_state.get("page", "home")
 
     # Clients can ONLY access the report page

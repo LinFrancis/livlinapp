@@ -96,7 +96,7 @@ def _render_sintesis_list(items_text, label, bg, fg):
 
 
 # ── Radar charts ─────────────────────────────────────────────────────
-def _radar_erp(domain_obs, height=380):
+def _radar_erp(domain_obs, height=380, title=""):
     labels = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
     r_obs = [domain_obs[p] for p in PETAL_ORDER] + [domain_obs[PETAL_ORDER[0]]]
     theta = labels + [labels[0]]
@@ -107,10 +107,11 @@ def _radar_erp(domain_obs, height=380):
         radialaxis=dict(visible=True, range=[0,10], tickvals=[2,4,6,8,10], tickfont=dict(size=9,color="#2D6A4F"), gridcolor="rgba(45,106,79,0.2)"),
         angularaxis=dict(tickfont=dict(size=10,color="#1B4332"))),
         legend=dict(orientation="h",yanchor="bottom",y=1.05,font=dict(size=10)),
-        paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=60,r=60,t=50,b=30), height=height)
+        paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=60,r=60,t=50,b=30), height=height,
+        title=dict(text=title, font=dict(size=14, color="#1B4332"), x=0.5) if title else None)
     return fig
 
-def _radar_hrp(domain_tot, height=380):
+def _radar_hrp(domain_tot, height=380, title=""):
     labels = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
     r_tot = [domain_tot[p] for p in PETAL_ORDER] + [domain_tot[PETAL_ORDER[0]]]
     theta = labels + [labels[0]]
@@ -121,10 +122,11 @@ def _radar_hrp(domain_tot, height=380):
         radialaxis=dict(visible=True, range=[0,10], tickvals=[2,4,6,8,10], tickfont=dict(size=9,color="#2D6A4F"), gridcolor="rgba(45,106,79,0.2)"),
         angularaxis=dict(tickfont=dict(size=10,color="#1B4332"))),
         legend=dict(orientation="h",yanchor="bottom",y=1.05,font=dict(size=10)),
-        paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=60,r=60,t=50,b=30), height=height)
+        paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=60,r=60,t=50,b=30), height=height,
+        title=dict(text=title, font=dict(size=14, color="#2D6A4F"), x=0.5) if title else None)
     return fig
 
-def _dual_radar(domain_obs, domain_tot, height=400):
+def _dual_radar(domain_obs, domain_tot, height=400, title=""):
     labels = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
     r_obs = [domain_obs[p] for p in PETAL_ORDER] + [domain_obs[PETAL_ORDER[0]]]
     r_tot = [domain_tot[p] for p in PETAL_ORDER] + [domain_tot[PETAL_ORDER[0]]]
@@ -138,7 +140,8 @@ def _dual_radar(domain_obs, domain_tot, height=400):
         radialaxis=dict(visible=True, range=[0,10], tickvals=[2,4,6,8,10], tickfont=dict(size=9,color="#2D6A4F"), gridcolor="rgba(45,106,79,0.2)"),
         angularaxis=dict(tickfont=dict(size=10,color="#1B4332"))),
         legend=dict(orientation="h",yanchor="bottom",y=1.05,font=dict(size=10)),
-        paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=60,r=60,t=50,b=30), height=height)
+        paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=60,r=60,t=50,b=30), height=height,
+        title=dict(text=title, font=dict(size=14, color="#1B4332"), x=0.5) if title else None)
     return fig
 
 
@@ -250,51 +253,69 @@ def render():
 
     if readonly:
         with st.sidebar:
-            # A) Logo
+            # ═══ A) LOGO ═══
             try:
                 from utils.logo_b64 import LOGO_B64
                 import base64
-                st.markdown(f'<div style="text-align:center;padding:0.5rem 0 0.3rem;">'
-                    f'<img src="data:image/png;base64,{LOGO_B64}" style="width:80px;border-radius:12px;"/>'
-                    f'<div style="font-size:0.7rem;color:#40916C;margin-top:0.2rem;">LivLin · Indagación Regenerativa</div></div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="text-align:center;padding:0.8rem 0 0.2rem;">'
+                    f'<img src="data:image/png;base64,{LOGO_B64}" style="width:90px;border-radius:14px;"/>'
+                    f'</div>', unsafe_allow_html=True)
             except Exception:
-                st.markdown('<div style="text-align:center;font-size:1.2rem;font-weight:800;color:#1B4332;">🌿 LivLin</div>', unsafe_allow_html=True)
+                pass
+            st.markdown(
+                '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
+                '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.1</div>'
+                '</div>', unsafe_allow_html=True)
+
+            # Nombre del diagnóstico
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,rgba(82,183,136,0.12),rgba(45,106,79,0.08));'
+                f'border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;border:1px solid #A8D5B5;">'
+                f'<div style="font-size:0.58rem;color:#40916C;text-transform:uppercase;letter-spacing:0.08em;">Espacio diagnosticado</div>'
+                f'<div style="font-weight:700;font-size:0.85rem;color:#1B4332;">{nombre}</div>'
+                f'<div style="font-size:0.68rem;color:#2D6A4F;">{cliente} · {ciudad}</div></div>',
+                unsafe_allow_html=True)
             st.markdown("---")
 
-            # B) Secciones del informe
-            st.markdown('<div style="font-size:0.75rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">📖 Secciones del informe</div>', unsafe_allow_html=True)
-            if st.button("📖 Ver informe completo", use_container_width=True, key="nav_all",
+            # ═══ B) SECCIONES DEL INFORME ═══
+            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">📖 SECCIONES DEL INFORME</div>', unsafe_allow_html=True)
+            if st.button("📖 Ver informe completo", use_container_width=True, key="rpt_nav_all",
                          type="primary" if st.session_state.report_section == "all" else "secondary"):
                 st.session_state.report_section = "all"; st.rerun()
             for sec_key, sec_label in REPORT_SECTIONS.items():
                 active = st.session_state.report_section == sec_key
-                if st.button(sec_label, use_container_width=True, key=f"nav_{sec_key}",
+                if st.button(sec_label, use_container_width=True, key=f"rpt_nav_{sec_key}",
                              type="primary" if active else "secondary"):
                     st.session_state.report_section = sec_key; st.rerun()
             st.markdown("---")
 
-            # C) Descargar informe
-            st.markdown('<div style="font-size:0.75rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">💾 Descargar informe</div>', unsafe_allow_html=True)
+            # ═══ C) DESCARGAR INFORME ═══
+            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">💾 DESCARGAR INFORME</div>', unsafe_allow_html=True)
+            safe_n = nombre.replace(" ", "_")
             try:
                 xlsx_bytes = generate_excel(data)
                 st.download_button("📊 Descargar Excel", data=xlsx_bytes,
-                    file_name=f"livlin_{nombre.replace(' ','_')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True, key="dl_xlsx_sidebar")
+                    file_name=f"LivLin_IR_{safe_n}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True, key="rpt_dl_xlsx")
             except Exception as e:
                 st.caption(f"Excel no disponible: {e}")
             try:
                 from utils.docx_generator import generate_docx
                 docx_bytes = generate_docx(data)
                 st.download_button("📝 Descargar Word", data=docx_bytes,
-                    file_name=f"livlin_{nombre.replace(' ','_')}.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True, key="dl_docx_sidebar")
+                    file_name=f"LivLin_IR_{safe_n}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True, key="rpt_dl_docx")
             except Exception as e:
                 st.caption(f"Word no disponible: {e}")
             st.markdown("---")
 
-            # D) Cerrar sesión
-            st.markdown('<div style="font-size:0.75rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">🔒 Sesión</div>', unsafe_allow_html=True)
-            if st.button("🚪 Cerrar sesión", use_container_width=True, key="logout_sidebar"):
+            # ═══ D) CERRAR SESIÓN ═══
+            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">🔒 SESIÓN</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="font-size:0.7rem;color:#555;margin-bottom:0.3rem;">👤 {data.get("proyecto_cliente","Usuario")}</div>', unsafe_allow_html=True)
+            if st.button("🚪 Cerrar sesión", use_container_width=True, key="rpt_logout"):
                 for k in list(st.session_state.keys()):
                     del st.session_state[k]
                 st.rerun()
@@ -365,36 +386,61 @@ def render():
 
         # ── TAB: Perspectiva Comparada (contains ALL info) ────────────
         with tab_comp:
-            st.markdown("#### Perspectiva Comparada — ERP vs HRP")
-            st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem 1rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-                'Vista integrada de ambos indicadores. Las barras apiladas muestran el ERP y la brecha hasta el HRP. '
-                'Los radares muestran la forma de la regeneración en los 7 pétalos de la Flor de la Permacultura (Holmgren, 2002).</div>', unsafe_allow_html=True)
+            st.markdown("#### 📊 Perspectiva Comparada — ERP vs HRP")
+            st.markdown(
+                '<div style="background:#F0FFF4;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#2D6A4F;line-height:1.7;">'
+                '<strong>¿Qué es esta vista?</strong> Aquí se presenta la visión integrada de los dos indicadores principales del diagnóstico: '
+                'el <strong>ERP (Estado Regenerativo Presente)</strong> — una fotografía del estado actual del espacio — y '
+                'el <strong>HRP (Horizonte Regenerativo Potencial)</strong> — una proyección de lo que puede llegar a ser. '
+                'La <strong>Brecha</strong> entre ambos indica el campo de acción concreto. '
+                'Los gráficos de radar representan los 7 pétalos de la <em>Flor de la Permacultura</em> (Holmgren, 2002), '
+                'mientras que las barras apiladas muestran la puntuación ERP (verde oscuro) y la brecha hasta el HRP (ámbar).'
+                '<br><br>📖 <em>Explora las secciones siguientes para el detalle de cada área: '
+                '🔬 Ecología, 🏙️ Sistemas, 🌸 Flor de la Permacultura y 🌿 Potenciales del Sitio.</em>'
+                '</div>', unsafe_allow_html=True)
 
-            # Dual radar
-            st.plotly_chart(_dual_radar(domain_obs, domain_tot), use_container_width=True, key="r_comp_dual")
+            # Dual radar with title
+            st.markdown("##### 🕸️ Radar comparado — Flor de la Permacultura")
+            st.markdown('<div style="font-size:0.82rem;color:#555;margin-bottom:0.3rem;">'
+                'Cada eje del radar representa uno de los 7 pétalos de Holmgren (2002). '
+                'El área verde sólida es el ERP; el área verde clara con línea discontinua es el HRP.</div>', unsafe_allow_html=True)
+            st.plotly_chart(_dual_radar(domain_obs, domain_tot, title="Flor de la Permacultura — ERP vs HRP"), use_container_width=True, key="r_comp_dual")
 
             # Stacked bars — 7 pétalos
+            st.markdown("##### 📊 Barras apiladas — 7 Pétalos de la Permacultura")
+            st.markdown('<div style="font-size:0.82rem;color:#555;margin-bottom:0.3rem;">'
+                'Cada barra muestra el ERP (verde oscuro) + la brecha hasta el HRP (ámbar). '
+                'Los pétalos con mayor brecha indican el mayor potencial de transformación. '
+                'Ver sección <em>🌸 Flor de la Permacultura</em> para el detalle de cada pétalo.</div>', unsafe_allow_html=True)
             petal_names = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
             p_erp = [domain_obs[p] for p in PETAL_ORDER]
             p_gap = [max(0, round(domain_tot[p] - domain_obs[p], 1)) for p in PETAL_ORDER]
-            st.plotly_chart(_stacked_bar(petal_names, p_erp, p_gap, height=350), use_container_width=True, key="bar_comp_pet")
+            st.plotly_chart(_stacked_bar(petal_names, p_erp, p_gap, title="7 Pétalos — ERP + Brecha → HRP", height=350), use_container_width=True, key="bar_comp_pet")
 
             # Stacked bars — 10 dimensions
+            st.markdown("##### 📊 Barras apiladas — 10 Dimensiones de análisis")
+            st.markdown('<div style="font-size:0.82rem;color:#555;margin-bottom:0.3rem;">'
+                'Las 10 dimensiones permiten una lectura integral del potencial regenerativo. '
+                'Cada dimensión evalúa un aspecto de la vida en el lugar (Mason, 2025; Holmgren, 2002). '
+                'Ver sección <em>🌿 Potenciales del Sitio</em> para interpretaciones detalladas.</div>', unsafe_allow_html=True)
             dims = list(potenciales_erp.keys())
             erp_vals = [potenciales_erp[d] for d in dims]
             hrp_vals = [potenciales_hrp[d] for d in dims]
             gap_vals = [max(0, round(h-e,1)) for e,h in zip(erp_vals, hrp_vals)]
-            st.plotly_chart(_stacked_bar(dims, erp_vals, gap_vals, height=420), use_container_width=True, key="bar_comp_dim")
+            st.plotly_chart(_stacked_bar(dims, erp_vals, gap_vals, title="10 Dimensiones — ERP + Brecha → HRP", height=420), use_container_width=True, key="bar_comp_dim")
 
 
             # ── ERP detail inside Comparada ────────────────────────────
             st.markdown("---")
             st.markdown("#### 🌍 ERP — Estado Regenerativo Presente")
-            st.markdown(f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#2D6A4F;">'
-                f'El ERP es la fotografía del momento actual. Refleja lo que ya existe: las prácticas activas, los ciclos en marcha, '
-                f'las relaciones entre elementos del espacio. Se compone de 80% del Modelo Flor de la Permacultura (MFP observado) '
-                f'y 20% de sub-indicadores ecológicos y sistémicos de los módulos M2-M6.</div>', unsafe_allow_html=True)
-            st.plotly_chart(_radar_erp(domain_obs), use_container_width=True, key="r_erp_comp")
+            st.markdown(
+                '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#2D6A4F;line-height:1.6;">'
+                '<strong>Definición:</strong> El ERP es la fotografía del momento actual del espacio. '
+                'Refleja lo que ya existe: las prácticas activas, los ciclos en marcha y las relaciones entre elementos. '
+                'Se compone de <strong>80% del Modelo Flor de la Permacultura (MFP) observado</strong> + '
+                '<strong>20% de sub-indicadores ecológicos y sistémicos</strong> de los módulos M2-M6 '
+                '(ver secciones 🔬 Ecología y 🏙️ Sistemas).</div>', unsafe_allow_html=True)
+            st.plotly_chart(_radar_erp(domain_obs, title="Radar ERP — Estado Presente por Pétalo"), use_container_width=True, key="r_erp_comp")
             for i, p in enumerate(PETAL_ORDER):
                 e = domain_obs[p]; lv, _ = _score_to_level(e)
                 interp_e = get_petal_interp(p, e, "erp")
@@ -404,11 +450,11 @@ def render():
 
             # Sub-indicators
             if cross:
-                with st.expander("📈 Sub-indicadores M2-6 (aportan 20% al ERP)", expanded=False):
+                with st.expander("📈 Sub-indicadores M2-6 — aportan 20% al ERP (ver secciones 🔬 Ecología y 🏙️ Sistemas)", expanded=False):
                     for name, info in cross.items():
                         st.markdown(f"**{info.get('icono','')} {name}:** {info['score']}/10 — _{info['fuente']}_")
                     st.markdown("---")
-                    st.markdown("**Transparencia: variables y escalas**")
+                    st.markdown("**Transparencia: variables y escalas de puntuación**")
                     for name, detail in CROSS_MODULE_DETAIL.items():
                         st.markdown(f"**{detail.get('icono','')} {name}:** `{detail['formula']}`")
                         for vn, vs in detail["variables"]:
@@ -417,11 +463,15 @@ def render():
             # ── HRP detail inside Comparada ────────────────────────────
             st.markdown("---")
             st.markdown("#### 🌱 HRP — Horizonte Regenerativo Potencial")
-            st.markdown(f'<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#5D4037;">'
-                f'El HRP proyecta lo que el espacio puede llegar a ser si se activan las prácticas potenciales identificadas. '
-                f'Se compone de 100% del MFP proyectado (observado + potencial). No incluye sub-indicadores M2-6 porque '
-                f'la visión futura ya está contenida en las prácticas potenciales de cada pétalo.</div>', unsafe_allow_html=True)
-            st.plotly_chart(_radar_hrp(domain_tot), use_container_width=True, key="r_hrp_comp")
+            st.markdown(
+                '<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#5D4037;line-height:1.6;">'
+                '<strong>Definición:</strong> El HRP proyecta lo que el espacio puede llegar a ser si se activan '
+                'las prácticas potenciales identificadas durante el diagnóstico. '
+                'Se compone de <strong>100% del MFP proyectado</strong> (observado + potencial). '
+                'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida en las prácticas potenciales de cada pétalo. '
+                'Ver sección <em>🌸 Flor de la Permacultura</em> para el detalle de prácticas por pétalo y '
+                '<em>🗺️ Síntesis y Plan</em> para la hoja de ruta.</div>', unsafe_allow_html=True)
+            st.plotly_chart(_radar_hrp(domain_tot, title="Radar HRP — Horizonte Potencial por Pétalo"), use_container_width=True, key="r_hrp_comp")
             for i, p in enumerate(PETAL_ORDER):
                 h = domain_tot[p]; lv, _ = _score_to_level(h)
                 interp_h = get_petal_interp(p, h, "hrp")
@@ -430,12 +480,13 @@ def render():
                     st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">{interp_h}</div>', unsafe_allow_html=True)
 
             # Methodology
-            with st.expander("Cómo se calculan el ERP y HRP", expanded=False):
+            with st.expander("📐 Metodología — Cómo se calculan el ERP y HRP", expanded=False):
                 st.markdown(f"**ERP** = 80% MFP observado + 20% Sub-indicadores M2-6")
                 st.markdown(f"**HRP** = 100% MFP proyectado (observado + potencial)")
                 st.markdown(f"**Brecha** = HRP − ERP → campo de acción")
-                st.markdown("**Escala 0-10:** 0-2 Sin inicio | 2-4 Semilla | 4-6 Brote | 6-8 Crecimiento | 8-10 Abundancia")
-                st.markdown("**Puntuación MFP:** 0=0 | 1-2=2 | 3-5=4 | 6-9=6 | 10-14=8 | 15+=10")
+                st.markdown("**Escala 0-10:** 0-2 Sin inicio · 2-4 Semilla · 4-6 Brote · 6-8 Crecimiento · 8-10 Abundancia")
+                st.markdown("**Puntuación MFP:** 0 prácticas=0 · 1-2=2 · 3-5=4 · 6-9=6 · 10-14=8 · 15+=10")
+                st.markdown(f"📖 Fuente: Mason, F. (2025) · [Publicación oficial]({MASON_URL})")
 
             _ref_box([
                 ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
@@ -445,28 +496,36 @@ def render():
         # ── TAB: ERP ──────────────────────────────────────────────────
         with tab_erp:
             st.markdown("#### 🌍 ERP — Estado Regenerativo Presente")
-            st.markdown(f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#2D6A4F;">'
-                f'El ERP es la fotografía del momento actual. Refleja lo que ya existe: las prácticas activas, los ciclos en marcha, '
-                f'las relaciones entre elementos del espacio. Se compone de 80% del Modelo Flor de la Permacultura (MFP observado) '
-                f'y 20% de sub-indicadores ecológicos y sistémicos de los módulos M2-M6.</div>', unsafe_allow_html=True)
-            st.plotly_chart(_radar_erp(domain_obs), use_container_width=True, key="r_erp_solo")
+            st.markdown(f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#2D6A4F;line-height:1.6;">'
+                f'<strong>Definición:</strong> El ERP es la fotografía del momento actual. Refleja lo que ya existe: las prácticas activas, los ciclos en marcha, '
+                f'las relaciones entre elementos del espacio. Se compone de <strong>80% del MFP observado</strong> '
+                f'+ <strong>20% de sub-indicadores M2-M6</strong>.'
+                f'<br><br>📖 <em>Para el detalle completo con barras apiladas, sub-indicadores y metodología, consulta la pestaña "📊 Perspectiva Comparada".</em></div>', unsafe_allow_html=True)
+            st.plotly_chart(_radar_erp(domain_obs, title="Radar ERP — Estado Presente"), use_container_width=True, key="r_erp_solo")
             # Petal detail for ERP
             for i, p in enumerate(PETAL_ORDER):
                 e = domain_obs[p]; lv, _ = _score_to_level(e)
+                interp_e = get_petal_interp(p, e, "erp")
                 st.markdown(f"**{FLOWER_DOMAINS[p]['icon']} {p}:** {e:.0f}/10 — {lv}")
+                if interp_e:
+                    st.markdown(f'<div style="background:#E8F5E9;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#1B4332;border-left:3px solid #1B4332;">{interp_e}</div>', unsafe_allow_html=True)
             _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
 
         # ── TAB: HRP ──────────────────────────────────────────────────
         with tab_hrp:
             st.markdown("#### 🌱 HRP — Horizonte Regenerativo Potencial")
-            st.markdown(f'<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#5D4037;">'
-                f'El HRP proyecta lo que el espacio puede llegar a ser si se activan las prácticas potenciales identificadas. '
-                f'Se compone de 100% del MFP proyectado (observado + potencial). No incluye sub-indicadores M2-6 porque '
-                f'la visión futura ya está contenida en las prácticas potenciales de cada pétalo.</div>', unsafe_allow_html=True)
-            st.plotly_chart(_radar_hrp(domain_tot), use_container_width=True, key="r_hrp_solo")
+            st.markdown(f'<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#5D4037;line-height:1.6;">'
+                f'<strong>Definición:</strong> El HRP proyecta lo que el espacio puede llegar a ser si se activan las prácticas potenciales identificadas. '
+                f'Se compone de <strong>100% del MFP proyectado</strong> (observado + potencial). '
+                f'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida en las prácticas potenciales de cada pétalo.'
+                f'<br><br>📖 <em>Ver sección "🌸 Flor de la Permacultura" para prácticas por pétalo y "🗺️ Síntesis y Plan" para la hoja de ruta.</em></div>', unsafe_allow_html=True)
+            st.plotly_chart(_radar_hrp(domain_tot, title="Radar HRP — Horizonte Potencial"), use_container_width=True, key="r_hrp_solo")
             for i, p in enumerate(PETAL_ORDER):
                 h = domain_tot[p]; lv, _ = _score_to_level(h)
+                interp_h = get_petal_interp(p, h, "hrp")
                 st.markdown(f"**{FLOWER_DOMAINS[p]['icon']} {p}:** {h:.0f}/10 — {lv}")
+                if interp_h:
+                    st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">{interp_h}</div>', unsafe_allow_html=True)
             _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
 
         st.markdown("---")
@@ -714,7 +773,7 @@ def render():
             'y distribución justa de los excedentes.</div>', unsafe_allow_html=True)
 
         # Dual radar at top
-        st.plotly_chart(_dual_radar(domain_obs, domain_tot, height=380), use_container_width=True, key="r_flor_dual")
+        st.plotly_chart(_dual_radar(domain_obs, domain_tot, height=380, title="Flor de la Permacultura — ERP vs HRP"), use_container_width=True, key="r_flor_dual")
 
         import json
         from pathlib import Path
@@ -810,7 +869,7 @@ def render():
         erp_v = [potenciales_erp[d] for d in dims]
         hrp_v = [potenciales_hrp[d] for d in dims]
         gap_v = [max(0, round(h-e,1)) for e,h in zip(erp_v, hrp_v)]
-        st.plotly_chart(_stacked_bar(dims, erp_v, gap_v, height=420), use_container_width=True, key="bar_pot")
+        st.plotly_chart(_stacked_bar(dims, erp_v, gap_v, title="10 Dimensiones — ERP + Brecha → HRP", height=420), use_container_width=True, key="bar_pot")
 
         for dim in dims:
             e = potenciales_erp[dim]; h = potenciales_hrp.get(dim,0)
