@@ -1,4 +1,4 @@
-"""Excel export v7.0 — LivLin · ERP/HRP, escala 0-10."""
+"""Excel export v8.0 — LivLin · ERP/HRP, escala 0-10."""
 import io, json, base64, tempfile, os
 from pathlib import Path
 from openpyxl import Workbook
@@ -104,7 +104,8 @@ def generate_excel(data: dict) -> bytes:
     from utils.scoring import (compute_erp, compute_hrp, compute_domain_scores,
         compute_domain_scores_total, compute_cross_module_score, CROSS_MODULE_DETAIL,
         compute_synthesis_potentials, compute_synthesis_potentials_obs,
-        score_label, brecha_valor, brecha_texto, _score_to_level, get_interp_text)
+        score_label, brecha_valor, brecha_texto, _score_to_level, get_interp_text,
+        DIM_WHAT_MEASURES)
     erp = compute_erp(data)
     hrp = compute_hrp(data)
     brecha = brecha_valor(erp, hrp)
@@ -122,7 +123,7 @@ def generate_excel(data: dict) -> bytes:
     _wcol(ws0,[26,16,20,18,20,16])
     _add_logo(ws0, row=1, col=1, size_cm=2.2)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v7.0"
+    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v8.0"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55
@@ -220,18 +221,24 @@ def generate_excel(data: dict) -> bytes:
                 _cs(ws1,r,1,f"  • {vn}: {vs}",bg=WHITE,size=8,mc=6)
                 ws1.row_dimensions[r].height=16; r+=1
 
-    # 10 dimensions
+    # 10 dimensions with definitions
     r=_sp(ws1,r)
     r=_h(ws1,r,"🌿 10 Dimensiones — ERP vs HRP")
     for dim in pot_erp:
         e=pot_erp[dim]; h_=pot_hrp.get(dim,0)
         interp_e = get_interp_text(dim, e, "erp")
         interp_h = get_interp_text(dim, h_, "hrp")
-        _cs(ws1,r,1,dim,bg=C4,bold=True,size=9,mc=2,border=THIN)
-        _cs(ws1,r,3,f"ERP: {e}/10",bg=C5,size=9,ha="center",border=THIN)
-        _cs(ws1,r,4,f"HRP: {h_}/10",bg=AMBER,size=9,ha="center",border=THIN)
+        dim_info = DIM_WHAT_MEASURES.get(dim,{})
+        if isinstance(dim_info,str): dim_info={"que_mide":dim_info,"icono":"📊","fuentes":""}
+        icono = dim_info.get("icono","📊")
+        lv_e,_=_score_to_level(e); lv_h,_=_score_to_level(h_)
+        _cs(ws1,r,1,f"{icono} {dim}",bg=C4,bold=True,size=9,mc=2,border=THIN)
+        _cs(ws1,r,3,f"ERP: {e}/10 ({lv_e})",bg=C5,size=9,ha="center",border=THIN)
+        _cs(ws1,r,4,f"HRP: {h_}/10 ({lv_h})",bg=AMBER,size=9,ha="center",border=THIN)
         _cs(ws1,r,5,f"+{round(h_-e,1)}",bg=WHITE,size=9,ha="center",border=THIN)
         ws1.row_dimensions[r].height=20; r+=1
+        if dim_info.get("que_mide"):
+            r=_expl(ws1,r,f"¿Qué mide? {dim_info['que_mide']}",h=25)
         if interp_e:
             r=_expl(ws1,r,f"ERP: {interp_e}",h=25)
         if interp_h:
@@ -256,33 +263,112 @@ def generate_excel(data: dict) -> bytes:
     r=_h(ws2,r,"🌀 Tao de la Regeneración")
     for lbl,key in [("Sensación","tao_sensacion"),("Deseado","tao_deseado"),
                     ("No deseado","tao_no_deseado"),("Lo que llama","tao_llama"),
-                    ("Naturaleza","tao_naturaleza_rel"),("Palabra esencial","tao_palabra_esencial")]:
+                    ("Naturaleza","tao_naturaleza_rel"),("Palabra esencial","tao_palabra_esencial"),
+                    ("Conciencia","tao_cc_conciencia"),("Comunidad","tao_cc_comunidad"),
+                    ("Creatividad","tao_cc_creatividad"),("Cuidado","tao_cc_cuidado")]:
         v=data.get(key,"")
         if v: r=_row(ws2,r,lbl,str(v))
 
-    # ═══ HOJA 3 — M2-3 ═══
+    # ═══ HOJA 3 — M2-3 (full ecology + climate) ═══
     ws3=wb.create_sheet("🔬 M2-3 Ecología")
     _wcol(ws3,[24,14,24,14,12,10])
     r=_H(ws3,1,"🔬 M2-3 — Observación Ecológica")
     r=_sp(ws3,r)
-    for lbl,key in [("Suelo tipo","suelo_tipo"),("Compactación","suelo_compactacion"),
-                    ("Materia orgánica","suelo_materia_organica"),("Drenaje","suelo_drenaje"),
-                    ("Horas sol","sol_horas"),("Orientación","sol_orientacion"),
-                    ("Cultivo m²","cultivo_m2"),("Produce hoy","cultivo_produce_hoy")]:
+    r=_h(ws3,r,"🌱 Suelo")
+    for lbl,key in [("Tipo","suelo_tipo"),("Compactación","suelo_compactacion"),("Materia orgánica","suelo_materia_organica"),
+                    ("Drenaje","suelo_drenaje"),("Color","suelo_color"),("Olor","suelo_olor"),("Notas","suelo_notas")]:
+        v=data.get(key,"")
+        if v: r=_row(ws3,r,lbl,str(v))
+    r=_sp(ws3,r)
+    r=_h(ws3,r,"☀️ Flujos naturales")
+    for lbl,key in [("Horas sol/día","sol_horas"),("Sol invierno","sol_horas_invierno"),("Sol verano","sol_horas_verano"),
+                    ("Orientación","sol_orientacion"),("Zonas soleadas","sol_zonas_max"),("Sombra permanente","sol_sombra_perm"),
+                    ("Dirección viento","viento_direccion"),("Zonas protegidas","viento_protegidas"),
+                    ("Flujo agua lluvia","agua_flujo_lluvia"),("Acumulación agua","agua_acumulacion")]:
+        v=data.get(key,"")
+        if v: r=_row(ws3,r,lbl,str(v))
+    r=_sp(ws3,r)
+    r=_h(ws3,r,"🌿 Vegetación y fauna")
+    for lbl,key in [("Tipos vegetación","veg_tipos"),("Especies","veg_especies"),("Invasoras","veg_invasoras"),
+                    ("Lombrices","fauna_lombrices"),("Plagas","fauna_plagas"),("Aves","fauna_aves_especies"),
+                    ("Notas ecológicas","eco_notas")]:
+        v=data.get(key,"")
+        if v:
+            if isinstance(v,list): v=", ".join(str(x) for x in v)
+            r=_row(ws3,r,lbl,str(v))
+    r=_sp(ws3,r)
+    r=_h(ws3,r,"🥬 Cultivo")
+    for lbl,key in [("m² cultivables","cultivo_m2"),("m² futuros","cultivo_m2_futuro"),("Superficie total (m²)","proyecto_superficie"),
+                    ("Produce hoy","cultivo_produce_hoy"),("Interés","cultivo_interes"),
+                    ("Frutales","cultivo_frutales"),("Plantas actuales","cultivo_plantas_actuales")]:
+        v=data.get(key,"")
+        if v: r=_row(ws3,r,lbl,str(v))
+    r=_sp(ws3,r)
+    # Climate data
+    r=_h(ws3,r,"🌡️ Datos climáticos (Open-Meteo API)")
+    for lbl,key in [("Latitud","geo_lat"),("Longitud","geo_lon"),("Elevación (m)","geo_elevation"),
+                    ("Precipitación anual (mm)","agua_prec_anual"),("Mes más cálido","clima_mes_caluroso"),
+                    ("Mes más frío","clima_mes_frio"),("T° máx registrada","clima_t_max_abs"),("T° mín registrada","clima_t_min_abs")]:
         v=data.get(key,"")
         if v: r=_row(ws3,r,lbl,str(v))
 
-    # ═══ HOJA 4 — M4-6 ═══
+    # ═══ HOJA 4 — M4-6 (full systems) ═══
     ws4=wb.create_sheet("🏙️ M4-6 Sistemas")
     _wcol(ws4,[24,14,24,14,12,10])
-    r=_H(ws4,1,"🏙️ M4-6 — Contexto, Agua, Energía")
+    r=_H(ws4,1,"🏙️ M4-6 — Contexto, Agua, Energía, Materiales")
     r=_sp(ws4,r)
-    for lbl,key in [("Cuenca","ctx_cuenca"),("Vecinos","ctx_vecinos"),
-                    ("Consumo agua","agua_consumo"),("Captación","agua_captacion_lluvia"),
-                    ("Grises","agua_grises"),("Fuente energía","ene_fuente"),
-                    ("LED","ene_led"),("kWh/día","ene_kwh_dia_calc")]:
+    r=_h(ws4,r,"🏘️ Contexto del entorno")
+    for lbl,key in [("Percepción entorno verde","ctx_ind_verde"),("Cuenca","ctx_cuenca"),
+                    ("Vecinos","ctx_vecinos"),("Participación barrial","ctx_participacion"),
+                    ("Dist. parque más cercano (m)","ctx_distancia_parques")]:
         v=data.get(key,"")
         if v: r=_row(ws4,r,lbl,str(v))
+    parques=data.get("ctx_parques_lista",[])
+    if isinstance(parques,list) and parques:
+        r=_row(ws4,r,"Parques cercanos","; ".join(f"{p.get('nombre','')} ({p.get('dist',0)}m, {p.get('uso','')})" for p in parques),h=30)
+    actores=data.get("ctx_actores",[])
+    if isinstance(actores,list) and actores:
+        r=_row(ws4,r,"Actores territoriales","; ".join(f"{a.get('nombre','')} ({a.get('tipo','')}, {a.get('relacion','')})" for a in actores),h=30)
+    r=_sp(ws4,r)
+    r=_h(ws4,r,"💧 Gestión del agua")
+    for lbl,key in [("Percepción","agua_ind_general"),("Fuente","agua_fuente"),("Captación lluvia","agua_captacion_lluvia"),
+                    ("Aguas grises","agua_grises"),("Sistema riego","agua_riego_sistema"),("Fugas","agua_fugas"),
+                    ("Sequías","agua_sequias"),("Impacto sequía","agua_sequias_impacto")]:
+        v=data.get(key,"")
+        if v and str(v) not in ["No registrado",""]: r=_row(ws4,r,lbl,str(v))
+    cl=float(data.get("agua_consumo_estimado_ldia",0) or 0)
+    if cl>0: r=_row(ws4,r,"Consumo agua",f"{cl:.0f} L/día · {float(data.get('agua_consumo',0) or 0):.1f} m³/mes")
+    lc=float(data.get("agua_litros_captacion_anual",0) or 0)
+    techo=float(data.get("agua_techo_m2",0) or 0)
+    prec_a=float(data.get("agua_prec_anual",0) or 0)
+    if lc>0: r=_row(ws4,r,"Captación lluvia",f"{lc:,.0f} L/año (techo {techo:.0f}m², precip {prec_a:.0f}mm)")
+    r=_sp(ws4,r)
+    r=_h(ws4,r,"⚡ Energía")
+    for lbl,key in [("Percepción","ene_ind_general"),("Fuente","ene_fuente"),("LED","ene_led"),
+                    ("Interés solar","ene_solar_interes"),("Regletas","ene_regleta"),("Circuitos","ene_circuitos"),
+                    ("Monitoreo","ene_monitoreo"),("Apagar luces","ene_apagar_luces"),
+                    ("Electrodom. eficientes","ene_eficiencia_electrodom")]:
+        v=data.get(key,"")
+        if v and str(v) not in ["No registrado",""]: r=_row(ws4,r,lbl,str(v))
+    ck=float(data.get("ene_consumo_cuenta_kwh",0) or 0)
+    if ck>0: r=_row(ws4,r,"Cuenta eléctrica",f"{ck:.0f} kWh/mes · {round(ck/30,1)} kWh/día")
+    kwh=float(data.get("ene_kwh_dia_calc",0) or 0)
+    if kwh>0: r=_row(ws4,r,"Consumo equipos",f"{kwh:.1f} kWh/día · {round(kwh*30):,} kWh/mes · {round(kwh*365):,} kWh/año")
+    equipos=data.get("equipos_electricos",[])
+    if isinstance(equipos,list) and equipos:
+        r=_row(ws4,r,"Equipos","; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',0)} kWh/día)" for e in equipos),h=30)
+    sh=float(data.get("sol_horas",0) or 0)
+    if sh>0 and kwh>0:
+        pan=max(1,round(kwh/(0.1*sh)))
+        r=_row(ws4,r,"☀️ Estimación solar",f"~{pan} paneles 100W ({sh:.0f}h sol/día)")
+    r=_sp(ws4,r)
+    r=_h(ws4,r,"♻️ Materiales y residuos")
+    for lbl,key in [("Notas materiales","mat_notas"),("Percepción residuos","res_ind_general"),
+                    ("Compostaje","res_compostan"),("Tipo compost","res_compost_tipo"),
+                    ("Separación","res_separan"),("Reutilización","res_reutilizan"),
+                    ("Intentos fallidos","res_intentos_fallidos")]:
+        v=data.get(key,"")
+        if v and str(v) not in ["No","Ninguno","No registrado",""]: r=_row(ws4,r,lbl,str(v))
 
     # ═══ HOJA 5 — M7 FLOR ═══
     ws5=wb.create_sheet("🌸 M7 Flor Permacultura")
@@ -368,7 +454,8 @@ def generate_excel(data: dict) -> bytes:
     r=_H(ws7,1,"🌡️ Datos Bioclimáticos del Sitio")
     r=_expl(ws7,r,"Datos climáticos generados con APIs: Nominatim/OpenStreetMap + Open-Meteo.",h=35)
     r=_sp(ws7,r)
-    for lbl,key in [("Latitud","geo_lat"),("Longitud","geo_lon"),("Ciudad","proyecto_ciudad"),
+    for lbl,key in [("Latitud","geo_lat"),("Longitud","geo_lon"),("Elevación (m.s.n.m.)","geo_elevation"),
+                    ("Ciudad","proyecto_ciudad"),
                     ("Precipitación anual (mm)","agua_prec_anual"),("Mes cálido","clima_mes_caluroso"),
                     ("Mes frío","clima_mes_frio"),("T° máx","clima_t_max_abs"),("T° mín","clima_t_min_abs")]:
         v=data.get(key,"")
