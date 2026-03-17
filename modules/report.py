@@ -1,4 +1,4 @@
-"""Módulo Informe Final v7.1 — LivLin Indagación Regenerativa.
+"""Módulo Informe Final v7.2 — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -265,7 +265,7 @@ def render():
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.1</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.2</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -327,7 +327,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.1 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.2 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -339,10 +339,10 @@ def render():
         st.markdown(
             '<div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">'
             '<div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Antes de leer este informe</div>'
-            '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar un espacio urbano?</div>'
+            '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar un espacio?</div>'
             '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
             'Regenerar no es simplemente «mejorar» o «hacer sostenible» un lugar. Es activar los procesos vivos '
-            'que permiten a un espacio urbano evolucionar hacia mayor vitalidad, diversidad y conexión. '
+            'que permiten a un espacio evolucionar hacia mayor vitalidad, diversidad y conexión. '
             'Un espacio regenerativo produce alimentos, cicla agua, genera energía, construye comunidad '
             'y fortalece la relación entre las personas y su territorio (Holmgren, 2002; Mang & Reed, 2012).'
             '</div>'
@@ -390,7 +390,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.1</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.2</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -446,107 +446,169 @@ def render():
 
         # ── TAB: Perspectiva Comparada (contains ALL info) ────────────
         with tab_comp:
-            st.markdown("#### 📊 Perspectiva Comparada — ERP vs HRP")
-            st.markdown(
-                '<div style="background:#F0FFF4;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#2D6A4F;line-height:1.7;">'
-                '<strong>¿Qué es esta vista?</strong> Aquí se presenta la visión integrada de los dos indicadores principales del diagnóstico: '
-                'el <strong>ERP (Estado Regenerativo Presente)</strong> — una fotografía del estado actual del espacio — y '
-                'el <strong>HRP (Horizonte Regenerativo Potencial)</strong> — una proyección de lo que puede llegar a ser. '
-                'La <strong>Brecha</strong> entre ambos indica el campo de acción concreto. '
-                'Los gráficos de radar representan los 7 pétalos de la <em>Flor de la Permacultura</em> (Holmgren, 2002), '
-                'mientras que las barras apiladas muestran la puntuación ERP (verde oscuro) y la brecha hasta el HRP (ámbar).'
-                '<br><br>📖 <em>Explora las secciones siguientes para el detalle de cada área: '
-                '🔬 Ecología, 🏙️ Sistemas, 🌸 Flor de la Permacultura y 🌿 Potenciales del Sitio.</em>'
-                '</div>', unsafe_allow_html=True)
+            st.markdown("#### 📊 Perspectiva Comparada — Visión Integral")
 
-            # Dual radar with title
-            st.markdown("##### 🕸️ Radar comparado — Flor de la Permacultura")
-            st.markdown('<div style="font-size:0.82rem;color:#555;margin-bottom:0.3rem;">'
-                'Cada eje del radar representa uno de los 7 pétalos de Holmgren (2002). '
-                'El área verde sólida es el ERP; el área verde clara con línea discontinua es el HRP.</div>', unsafe_allow_html=True)
+            # ── Dual radar ──
+            st.markdown("##### 🕸️ Radar — Flor de la Permacultura")
+            st.markdown(
+                '<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.5rem;font-size:0.84rem;color:#2D6A4F;line-height:1.6;">'
+                'La <strong>Flor de la Permacultura</strong> (Holmgren, 2002) organiza la vida cotidiana en '
+                '<strong>7 pétalos o dominios de acción</strong>. Cada eje del radar representa un pétalo. '
+                'El área verde sólida es el <strong>ERP</strong> (lo que ya existe); la línea verde discontinua es el <strong>HRP</strong> '
+                '(lo que puede llegar a ser). La diferencia entre ambas áreas es tu <strong>campo de acción</strong>.</div>', unsafe_allow_html=True)
             st.plotly_chart(_dual_radar(domain_obs, domain_tot, title="Flor de la Permacultura — ERP vs HRP"), use_container_width=True, key="r_comp_dual")
 
-            # Stacked bars — 7 pétalos
-            st.markdown("##### 📊 Barras apiladas — 7 Pétalos de la Permacultura")
-            st.markdown('<div style="font-size:0.82rem;color:#555;margin-bottom:0.3rem;">'
-                'Cada barra muestra el ERP (verde oscuro) + la brecha hasta el HRP (ámbar). '
-                'Los pétalos con mayor brecha indican el mayor potencial de transformación. '
-                'Ver sección <em>🌸 Flor de la Permacultura</em> para el detalle de cada pétalo.</div>', unsafe_allow_html=True)
+            # ── Barras 7 pétalos ──
             petal_names = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
             p_erp = [domain_obs[p] for p in PETAL_ORDER]
             p_gap = [max(0, round(domain_tot[p] - domain_obs[p], 1)) for p in PETAL_ORDER]
             st.plotly_chart(_stacked_bar(petal_names, p_erp, p_gap, title="7 Pétalos — ERP + Brecha → HRP", height=350), use_container_width=True, key="bar_comp_pet")
 
-            # Stacked bars — 10 dimensions
-            st.markdown("##### 📊 Barras apiladas — 10 Dimensiones de análisis")
-            st.markdown('<div style="font-size:0.82rem;color:#555;margin-bottom:0.3rem;">'
+            # ── Detalle pétalo a pétalo con definición + prácticas ──
+            st.markdown("---")
+            st.markdown("##### 🌸 Detalle por Pétalo — Definición, Estado y Potencial")
+            st.markdown(
+                '<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.8rem;font-size:0.84rem;color:#2D6A4F;line-height:1.6;">'
+                'Cada pétalo representa un ámbito de la vida cotidiana donde las prácticas regenerativas '
+                'pueden transformar el espacio. A continuación se presenta cada pétalo con su <strong>definición</strong>, '
+                'su <strong>puntuación ERP y HRP</strong>, y las <strong>prácticas observadas y potenciales</strong>. '
+                'Los pétalos con mayor brecha representan las mayores oportunidades de transformación.</div>', unsafe_allow_html=True)
+
+            # Load petals data
+            import json
+            from pathlib import Path as _Path
+            try:
+                _jf = _Path(__file__).parent.parent / "data" / "petalos_regeneracion_urbana.json"
+                with open(_jf, encoding="utf-8") as _f:
+                    _petalos_data = json.load(_f)["petalos"]
+            except Exception:
+                _petalos_data = []
+
+            for i, p_name in enumerate(PETAL_ORDER):
+                icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else "🌱"
+                e_score = domain_obs.get(p_name, 0)
+                h_score = domain_tot.get(p_name, 0)
+                lv_e, _ = _score_to_level(e_score)
+                lv_h, _ = _score_to_level(h_score)
+                gap = round(h_score - e_score, 1)
+
+                # Header
+                st.markdown(f"""
+                <div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:12px;padding:0.8rem;margin:0.8rem 0 0.4rem;">
+                    <div style="font-size:1.1rem;font-weight:800;color:#1B4332;">{icon} {p_name}</div>
+                    <div style="display:flex;gap:0.8rem;margin-top:0.4rem;flex-wrap:wrap;">
+                        <div style="background:white;border-radius:8px;padding:0.3rem 0.6rem;border:1px solid #D8F3DC;font-size:0.82rem;">
+                            🌍 ERP: <strong>{e_score:.0f}/10</strong> — {lv_e}</div>
+                        <div style="background:white;border-radius:8px;padding:0.3rem 0.6rem;border:1px dashed #52B788;font-size:0.82rem;">
+                            🌱 HRP: <strong>{h_score:.0f}/10</strong> — {lv_h}</div>
+                        <div style="background:white;border-radius:8px;padding:0.3rem 0.6rem;border:1px solid #FFA726;font-size:0.82rem;">
+                            🌀 Brecha: <strong>+{gap:.0f}</strong> pts</div>
+                    </div>
+                </div>""", unsafe_allow_html=True)
+
+                # Petal explanation
+                petal_info = PETAL_DESC.get(p_name, {})
+                if petal_info:
+                    with st.expander(f"📖 ¿Qué es «{p_name}»? — Definición y referencias", expanded=False):
+                        if petal_info.get("subtitulo"):
+                            st.markdown(f"*{petal_info['subtitulo']}*")
+                        if petal_info.get("holmgren_name"):
+                            st.markdown(f"**Nombre original (Holmgren, 2002):** *{petal_info['holmgren_name']}*")
+                        if petal_info.get("resumen"):
+                            st.markdown(f"**Resumen:** {petal_info['resumen']}")
+                        if petal_info.get("detalle"):
+                            st.markdown(petal_info["detalle"])
+                        petal_refs = petal_info.get("referencias", [])
+                        if petal_refs:
+                            _ref_box(petal_refs)
+
+                # Interpretations
+                interp_e = get_petal_interp(p_name, e_score, "erp")
+                interp_h = get_petal_interp(p_name, h_score, "hrp")
+                if interp_e:
+                    st.markdown(f'<div style="background:#E8F5E9;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0;font-size:0.82rem;color:#1B4332;border-left:3px solid #1B4332;">🌍 <strong>Estado actual:</strong> {interp_e}</div>', unsafe_allow_html=True)
+                if interp_h:
+                    st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">🌱 <strong>Horizonte potencial:</strong> {interp_h}</div>', unsafe_allow_html=True)
+
+                # Practices (observed + potential)
+                petalo_data_item = _petalos_data[i] if i < len(_petalos_data) else {}
+                obs_data = data.get(f"petalo_{i}_obs", {})
+                new_data = data.get(f"petalo_{i}_pot_new", {})
+                otros_obs = data.get(f"petalo_{i}_otros_obs", [])
+                otros_new = data.get(f"petalo_{i}_otros_new", [])
+                has_practices = any(obs_data.values()) or otros_obs or any(new_data.values()) or otros_new
+                if has_practices:
+                    pc1, pc2 = st.columns(2)
+                    with pc1:
+                        st.markdown("**✅ Prácticas ya activas (ERP):**")
+                        for k, v in obs_data.items():
+                            if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#E8F5E9", border="#1B4332")
+                        if otros_obs: _card("Otras", " · ".join(otros_obs), bg="#E8F5E9", border="#1B4332")
+                    with pc2:
+                        st.markdown("**🌱 Prácticas por activar (→ HRP):**")
+                        for k, v in new_data.items():
+                            if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#FFFDE7", border="#FFA726")
+                        if otros_new: _card("Otras", " · ".join(otros_new), bg="#FFFDE7", border="#FFA726")
+
+            # ── Sub-indicadores M2-6 ──
+            if cross:
+                st.markdown("---")
+                with st.expander("📈 Sub-indicadores ecológicos M2-6 (aportan 20% al ERP)", expanded=False):
+                    st.markdown(
+                        '<div style="font-size:0.84rem;color:#2D6A4F;margin-bottom:0.5rem;">'
+                        'Estos indicadores provienen de los módulos de observación ecológica (🔬 M2-3) y sistemas (🏙️ M4-6). '
+                        'Complementan la Flor de la Permacultura con datos concretos del sitio.</div>', unsafe_allow_html=True)
+                    for name, info in cross.items():
+                        st.markdown(f"**{info.get('icono','')} {name}:** {info['score']}/10 — _{info['fuente']}_")
+                    st.markdown("---")
+                    st.markdown("**Transparencia: variables y escalas**")
+                    for name, detail in CROSS_MODULE_DETAIL.items():
+                        st.markdown(f"**{detail.get('icono','')} {name}:** `{detail['formula']}`")
+                        for vn, vs in detail["variables"]:
+                            st.caption(f"  • {vn}: {vs}")
+
+            # ── 10 Dimensiones ──
+            st.markdown("---")
+            st.markdown("##### 🌿 10 Dimensiones de Análisis")
+            st.markdown(
+                '<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.5rem;font-size:0.84rem;color:#2D6A4F;line-height:1.6;">'
                 'Las 10 dimensiones permiten una lectura integral del potencial regenerativo. '
-                'Cada dimensión evalúa un aspecto de la vida en el lugar (Mason, 2025; Holmgren, 2002). '
-                'Ver sección <em>🌿 Potenciales del Sitio</em> para interpretaciones detalladas.</div>', unsafe_allow_html=True)
+                'Cada dimensión evalúa un aspecto de la vida en el lugar — desde la producción de alimentos '
+                'hasta la participación comunitaria (Mason, 2025; Holmgren, 2002).</div>', unsafe_allow_html=True)
             dims = list(potenciales_erp.keys())
             erp_vals = [potenciales_erp[d] for d in dims]
             hrp_vals = [potenciales_hrp[d] for d in dims]
             gap_vals = [max(0, round(h-e,1)) for e,h in zip(erp_vals, hrp_vals)]
             st.plotly_chart(_stacked_bar(dims, erp_vals, gap_vals, title="10 Dimensiones — ERP + Brecha → HRP", height=420), use_container_width=True, key="bar_comp_dim")
 
+            for dim in dims:
+                e = potenciales_erp[dim]; h = potenciales_hrp.get(dim,0)
+                interp_e = get_interp_text(dim, e, "erp")
+                interp_h = get_interp_text(dim, h, "hrp")
+                what = DIM_WHAT_MEASURES.get(dim, "")
+                with st.expander(f"{dim}: ERP {e}/10 → HRP {h}/10", expanded=False):
+                    if what: st.markdown(f"**¿Qué mide esta dimensión?** {what}")
+                    if interp_e: st.markdown(f"🌍 **Estado actual:** {interp_e}")
+                    if interp_h: st.markdown(f"🌱 **Horizonte potencial:** {interp_h}")
 
-            # ── ERP detail inside Comparada ────────────────────────────
-            st.markdown("---")
-            st.markdown("#### 🌍 ERP — Estado Regenerativo Presente")
-            st.markdown(
-                '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#2D6A4F;line-height:1.6;">'
-                '<strong>Definición:</strong> El ERP es la fotografía del momento actual del espacio. '
-                'Refleja lo que ya existe: las prácticas activas, los ciclos en marcha y las relaciones entre elementos. '
-                'Se compone de <strong>80% del Modelo Flor de la Permacultura (MFP) observado</strong> + '
-                '<strong>20% de sub-indicadores ecológicos y sistémicos</strong> de los módulos M2-M6 '
-                '(ver secciones 🔬 Ecología y 🏙️ Sistemas).</div>', unsafe_allow_html=True)
-            st.plotly_chart(_radar_erp(domain_obs, title="Radar ERP — Estado Presente por Pétalo"), use_container_width=True, key="r_erp_comp")
-            for i, p in enumerate(PETAL_ORDER):
-                e = domain_obs[p]; lv, _ = _score_to_level(e)
-                interp_e = get_petal_interp(p, e, "erp")
-                st.markdown(f"**{FLOWER_DOMAINS[p]['icon']} {p}:** {e:.0f}/10 — {lv}")
-                if interp_e:
-                    st.markdown(f'<div style="background:#E8F5E9;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#1B4332;border-left:3px solid #1B4332;">{interp_e}</div>', unsafe_allow_html=True)
-
-            # Sub-indicators
-            if cross:
-                with st.expander("📈 Sub-indicadores M2-6 — aportan 20% al ERP (ver secciones 🔬 Ecología y 🏙️ Sistemas)", expanded=False):
-                    for name, info in cross.items():
-                        st.markdown(f"**{info.get('icono','')} {name}:** {info['score']}/10 — _{info['fuente']}_")
-                    st.markdown("---")
-                    st.markdown("**Transparencia: variables y escalas de puntuación**")
-                    for name, detail in CROSS_MODULE_DETAIL.items():
-                        st.markdown(f"**{detail.get('icono','')} {name}:** `{detail['formula']}`")
-                        for vn, vs in detail["variables"]:
-                            st.caption(f"  • {vn}: {vs}")
-
-            # ── HRP detail inside Comparada ────────────────────────────
-            st.markdown("---")
-            st.markdown("#### 🌱 HRP — Horizonte Regenerativo Potencial")
-            st.markdown(
-                '<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.88rem;color:#5D4037;line-height:1.6;">'
-                '<strong>Definición:</strong> El HRP proyecta lo que el espacio puede llegar a ser si se activan '
-                'las prácticas potenciales identificadas durante el diagnóstico. '
-                'Se compone de <strong>100% del MFP proyectado</strong> (observado + potencial). '
-                'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida en las prácticas potenciales de cada pétalo. '
-                'Ver sección <em>🌸 Flor de la Permacultura</em> para el detalle de prácticas por pétalo y '
-                '<em>🗺️ Síntesis y Plan</em> para la hoja de ruta.</div>', unsafe_allow_html=True)
-            st.plotly_chart(_radar_hrp(domain_tot, title="Radar HRP — Horizonte Potencial por Pétalo"), use_container_width=True, key="r_hrp_comp")
-            for i, p in enumerate(PETAL_ORDER):
-                h = domain_tot[p]; lv, _ = _score_to_level(h)
-                interp_h = get_petal_interp(p, h, "hrp")
-                st.markdown(f"**{FLOWER_DOMAINS[p]['icon']} {p}:** {h:.0f}/10 — {lv}")
-                if interp_h:
-                    st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">{interp_h}</div>', unsafe_allow_html=True)
-
-            # Methodology
-            with st.expander("📐 Metodología — Cómo se calculan el ERP y HRP", expanded=False):
-                st.markdown(f"**ERP** = 80% MFP observado + 20% Sub-indicadores M2-6")
-                st.markdown(f"**HRP** = 100% MFP proyectado (observado + potencial)")
-                st.markdown(f"**Brecha** = HRP − ERP → campo de acción")
+            # ── Methodology ──
+            with st.expander("📐 Metodología de cálculo", expanded=False):
+                st.markdown("**ERP** = 80% MFP observado + 20% Sub-indicadores M2-6")
+                st.markdown("**HRP** = 100% MFP proyectado (observado + potencial)")
+                st.markdown("**Brecha** = HRP − ERP → campo de acción")
                 st.markdown("**Escala 0-10:** 0-2 Sin inicio · 2-4 Semilla · 4-6 Brote · 6-8 Crecimiento · 8-10 Abundancia")
-                st.markdown("**Puntuación MFP:** 0 prácticas=0 · 1-2=2 · 3-5=4 · 6-9=6 · 10-14=8 · 15+=10")
                 st.markdown(f"📖 Fuente: Mason, F. (2025) · [Publicación oficial]({MASON_URL})")
+
+            # ── Motivacional ──
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,#E8F5E9,#D8F3DC);border-radius:12px;padding:1rem;margin-top:1rem;text-align:center;">'
+                f'<div style="font-size:1rem;font-weight:800;color:#1B4332;">🌿 Tu espacio tiene un camino claro hacia la regeneración</div>'
+                f'<div style="font-size:0.88rem;color:#2D6A4F;margin-top:0.4rem;line-height:1.6;">'
+                f'Con un ERP de <strong>{erp_score}/10</strong> y un HRP de <strong>{hrp_score}/10</strong>, '
+                f'hay <strong>{brecha} puntos de potencial por activar</strong>. '
+                f'Cada práctica nueva que incorpores acerca tu espacio a su máximo potencial regenerativo. '
+                f'LivLin te acompaña en este camino. 🌱</div>'
+                f'</div>', unsafe_allow_html=True)
 
             _ref_box([
                 ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
@@ -730,12 +792,12 @@ def render():
     if _show("sistemas"):
         st.markdown(f"### 🏙️ Contexto, Agua, Energía y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'Análisis de los flujos vitales: contexto urbano, gestión del agua, energía y materiales. '
+            'Análisis de los flujos vitales: contexto del entorno, gestión del agua, energía y materiales. '
             'Cerrar estos ciclos es la base de la autonomía regenerativa (Holmgren, 2002; Mollison, 1988).</div>', unsafe_allow_html=True)
 
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("**Contexto urbano**")
+            st.markdown("**Contexto del entorno**")
             _card("Percepción entorno verde", str(data.get("ctx_ind_verde","")) if data.get("ctx_ind_verde") else "")
             _card("Cuenca hidrográfica", str(data.get("ctx_cuenca","")) if data.get("ctx_cuenca") else "")
             _card("Relación con vecinos", str(data.get("ctx_vecinos","")) if data.get("ctx_vecinos") else "")

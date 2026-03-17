@@ -1,59 +1,36 @@
-# 🌿 LivLin · Indagación Regenerativa v7.1
+# 🌿 LivLin · Indagación Regenerativa v7.2
 
 **Potencial para una vida regenerativa** · www.livlin.cl
 
-## Cambios v7.1 (sobre v7.0)
+## Cambios v7.2
 
-### Sidebar del cliente mejorado
-El sidebar de la vista de usuarios tiene 3 secciones bien definidas:
-- **A) Logo + Secciones del informe** — botones de navegación
-- **B) Descargar informe** — Excel y Word
-- **C) Cerrar sesión**
+### Tema visual fijo: Light
+Archivo `.streamlit/config.toml` fuerza tema claro con colores LivLin.
 
-### Perspectiva Comparada completa
-La pestaña "Perspectiva Comparada" ahora contiene **toda la información** de las pestañas ERP y HRP:
-- Radar dual (ERP + HRP superpuestos)
-- Barras apiladas de 7 pétalos y 10 dimensiones
-- Radar independiente ERP con interpretaciones por pétalo
+### Contenido inclusivo
+Se eliminaron referencias exclusivas a "urbano". La herramienta aplica a espacios urbanos, periurbanos y rurales.
+
+### Perspectiva Comparada integrada
+La pestaña "📊 Perspectiva Comparada" ahora integra todo el contenido de la Flor de la Permacultura:
+- Radar dual ERP vs HRP
+- Barras apiladas de 7 pétalos
+- **Detalle pétalo a pétalo**: definición, ERP/HRP, interpretaciones, prácticas observadas y potenciales
 - Sub-indicadores M2-6 con transparencia
-- Radar independiente HRP con interpretaciones por pétalo
+- 10 Dimensiones con definiciones y barras
 - Metodología de cálculo
+- Mensaje motivacional con acompañamiento LivLin
 
-### Fotos restauradas en vista cliente
-La sección de Registro Fotográfico ahora carga las fotos desde Supabase/tmp (restaurado de v6).
+### Narrativa explicativa completa
+Cada indicador (ERP, HRP, Brecha) tiene definición clara. Escala de niveles con colores. Interpretación personalizada del resultado. Referencias cruzadas a secciones del informe.
 
-### Explicaciones profundas de pétalos
-Cada pétalo de la Flor de la Permacultura incluye:
-- Nombre original de Holmgren (2002)
-- Resumen descriptivo
-- Detalle extenso
-- Referencias bibliográficas específicas del pétalo
+### Fix: text_area height
+Corregido `height=60` → `height=68` (mínimo requerido por Streamlit).
 
-### Referencias en cada sección
-Todas las secciones del informe incluyen un box de referencias bibliográficas.
-
-### Link oficial Mason (2025)
-Único link disponible: `https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing`
-Sin mencionar "Google Drive" — se trata como publicación oficial.
-
-## Cambios v7.0
-
-### Nuevos indicadores: ERP y HRP
-- **🌍 ERP (Estado Regenerativo Presente)**: 80% MFP observado + 20% sub-indicadores M2-6
-- **🌱 HRP (Horizonte Regenerativo Potencial)**: 100% MFP proyectado (obs+pot)
-- **🌀 Brecha (HRP − ERP)**: Campo de acción con valor numérico + descripción dinámica
-
-### Escala 0-10 con 5 niveles narrativos
-| Rango | Nivel | Descripción |
-|-------|-------|-------------|
-| 0-2 | Sin inicio | El camino regenerativo está por comenzar |
-| 2-4 | Semilla | Primeras prácticas activas |
-| 4-6 | Brote | Prácticas en marcha, el espacio crece |
-| 6-8 | Crecimiento | Prácticas consolidadas, regenera con fuerza |
-| 8-10 | Abundancia | Referente vivo de regeneración |
+### Fix: sidebar keys
+Todas las keys de `app.py` con prefijo `admin_*`. Sin posibilidad de colisión con keys de `report.py` (`rpt_*`).
 
 ## Stack
-- Streamlit · Plotly · Supabase · Folium · python-docx · openpyxl
+Streamlit · Plotly · Supabase · Folium · python-docx · openpyxl
 
 ## Instalación
 ```bash

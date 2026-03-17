@@ -4,7 +4,7 @@ from utils.data_manager import save_visit
 from utils.module_status import render_module_status, is_module_active
 from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
 
-TABS = ["🏙️ Contexto Urbano", "💧 Gestión del Agua", "⚡ Energía", "♻️ Materiales"]
+TABS = ["🏙️ Contexto del Entorno", "💧 Gestión del Agua", "⚡ Energía", "♻️ Materiales"]
 MOD  = "systems"
 
 
