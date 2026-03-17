@@ -1,4 +1,4 @@
-"""Módulo Informe Final v7.2 — LivLin Indagación Regenerativa.
+"""Módulo Informe Final v7.3 — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -193,7 +193,6 @@ REPORT_SECTIONS = {
     "ecologia":    "🔬 Observación Ecológica",
     "sistemas":    "🏙️ Contexto, Agua y Energía",
     "fotos":       "📷 Registro Fotográfico",
-    "flor":        "🌸 Flor de la Permacultura",
     "potenciales": "🌿 Potenciales del Sitio",
     "sintesis":    "🗺️ Síntesis y Plan",
     "biblio":      "📚 Bibliografía",
@@ -265,7 +264,7 @@ def render():
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.2</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.3</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -327,7 +326,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.2 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.3 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -390,7 +389,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.2</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.3</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -585,9 +584,16 @@ def render():
                 e = potenciales_erp[dim]; h = potenciales_hrp.get(dim,0)
                 interp_e = get_interp_text(dim, e, "erp")
                 interp_h = get_interp_text(dim, h, "hrp")
-                what = DIM_WHAT_MEASURES.get(dim, "")
-                with st.expander(f"{dim}: ERP {e}/10 → HRP {h}/10", expanded=False):
-                    if what: st.markdown(f"**¿Qué mide esta dimensión?** {what}")
+                dim_info = DIM_WHAT_MEASURES.get(dim, {})
+                if isinstance(dim_info, str):
+                    dim_info = {"que_mide": dim_info, "fuentes": "", "icono": "📊"}
+                icono = dim_info.get("icono", "📊")
+                que_mide = dim_info.get("que_mide", "")
+                lv_e, _ = _score_to_level(e)
+                lv_h, _ = _score_to_level(h)
+                with st.expander(f"{icono} {dim}: ERP {e}/10 ({lv_e}) → HRP {h}/10 ({lv_h})", expanded=False):
+                    if que_mide:
+                        st.markdown(f"**¿Qué mide?** {que_mide}")
                     if interp_e: st.markdown(f"🌍 **Estado actual:** {interp_e}")
                     if interp_h: st.markdown(f"🌱 **Horizonte potencial:** {interp_h}")
 
@@ -797,42 +803,101 @@ def render():
 
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("**Contexto del entorno**")
-            _card("Percepción entorno verde", str(data.get("ctx_ind_verde","")) if data.get("ctx_ind_verde") else "")
-            _card("Cuenca hidrográfica", str(data.get("ctx_cuenca","")) if data.get("ctx_cuenca") else "")
-            _card("Relación con vecinos", str(data.get("ctx_vecinos","")) if data.get("ctx_vecinos") else "")
-            _card("Participación barrial", str(data.get("ctx_participacion","")) if data.get("ctx_participacion") else "")
-            st.markdown("**Materiales y residuos**")
-            _card("Notas materiales", str(data.get("mat_notas","")) if data.get("mat_notas") else "")
-            for k,l in [("res_ind_general","Percepción residuos"),("res_compostan","Compostaje activo"),
-                        ("res_separan","Separación reciclables"),("res_reutilizan","Reutilización")]:
+            st.markdown("**🏘️ Contexto del entorno**")
+            for k,l in [("ctx_ind_verde","Percepción entorno verde"),("ctx_cuenca","Cuenca hidrográfica"),
+                        ("ctx_vecinos","Relación con vecinos"),("ctx_participacion","Participación barrial"),
+                        ("ctx_distancia_parques","Distancia al parque más cercano (m)")]:
                 v = data.get(k)
-                if v and str(v) not in ["No","Ninguno","No registrado"]:
+                if v: _card(l, str(v))
+
+            # Parques cercanos
+            parques = data.get("ctx_parques_lista", [])
+            if isinstance(parques, list) and parques:
+                parks_text = "; ".join(f"{p.get('nombre','')} ({p.get('dist',0)}m — {p.get('uso','')})" for p in parques)
+                _card("Parques y áreas verdes cercanas", parks_text, bg="#E8F5E9", border="#2E7D32")
+
+            # Actores territoriales
+            actores = data.get("ctx_actores", [])
+            if isinstance(actores, list) and actores:
+                act_text = "; ".join(f"{a.get('nombre','')} ({a.get('tipo','')}, {a.get('relacion','')})" for a in actores)
+                _card("Actores territoriales identificados", act_text, bg="#E8F5E9", border="#2E7D32")
+
+            st.markdown("**♻️ Materiales y residuos**")
+            for k,l in [("mat_notas","Notas materiales"),("res_ind_general","Percepción residuos"),
+                        ("res_compostan","Compostaje activo"),("res_compost_tipo","Tipo de compostaje"),
+                        ("res_separan","Separación reciclables"),("res_reutilizan","Reutilización"),
+                        ("res_intentos_fallidos","Intentos fallidos de compostaje")]:
+                v = data.get(k)
+                if v and str(v) not in ["No","Ninguno","No registrado",""]:
                     _card(l, str(v), bg="#F3E5F5", border="#6A1B9A")
+
         with c2:
-            st.markdown("**Gestión del agua**")
+            st.markdown("**💧 Gestión del agua**")
             for k,l in [("agua_ind_general","Percepción agua"),("agua_fuente","Fuente principal"),
                         ("agua_captacion_lluvia","Captación lluvia"),("agua_grises","Aguas grises"),
                         ("agua_riego_sistema","Sistema riego"),("agua_fugas","Fugas"),
-                        ("agua_sequias","Experiencia sequías")]:
+                        ("agua_sequias","Experiencia sequías"),("agua_sequias_impacto","Impacto de la sequía")]:
                 v = data.get(k)
-                if v: _card(l, str(v), bg="#E3F2FD", border="#1565C0")
+                if v and str(v) not in ["No registrado",""]: _card(l, str(v), bg="#E3F2FD", border="#1565C0")
+
+            # Consumo de agua calculado
+            consumo_l = _safe_float(data.get("agua_consumo_estimado_ldia"))
+            consumo_m3 = _safe_float(data.get("agua_consumo"))
+            if consumo_l > 0:
+                _card("Consumo estimado de agua", f"{consumo_l:.0f} L/día · {consumo_m3:.1f} m³/mes", bg="#E3F2FD", border="#1565C0")
+
+            # Potencial captación lluvia
             prec = _safe_float(data.get("agua_prec_anual"))
             techo = _safe_float(data.get("agua_techo_m2"))
-            cap = round(prec * techo * 0.8) if prec>0 and techo>0 else 0
-            if cap > 0: _card("Potencial captación lluvia (L/año)", f"{cap:,}", bg="#E3F2FD", border="#1565C0")
+            efic = _safe_float(data.get("agua_efic_captacion", 80))
+            cap = round(prec * techo * efic / 100) if prec > 0 and techo > 0 else 0
+            litros_cap = _safe_float(data.get("agua_litros_captacion_anual", cap))
+            if litros_cap > 0:
+                _card("☔ Potencial captación lluvia",
+                      f"{litros_cap:,.0f} L/año · Techo: {techo:.0f} m² · Precip: {prec:.0f} mm · Efic: {efic:.0f}%",
+                      bg="#E3F2FD", border="#1565C0")
 
-            st.markdown("**Energía**")
+            st.markdown("**⚡ Energía**")
             for k,l in [("ene_ind_general","Percepción energía"),("ene_fuente","Fuente principal"),
-                        ("ene_led","LED"),("ene_solar_interes","Interés solar")]:
+                        ("ene_led","Iluminación LED"),("ene_solar_interes","Interés solar"),
+                        ("ene_regleta","Uso de regletas con interruptor"),("ene_circuitos","Circuitos separados"),
+                        ("ene_monitoreo","Monitoreo de consumo"),("ene_apagar_luces","Apagar luces"),
+                        ("ene_eficiencia_electrodom","Electrodomésticos eficientes")]:
                 v = data.get(k)
-                if v and v != "No registrado": _card(l, str(v), bg="#FFF8E1", border="#F57C00")
+                if v and str(v) not in ["No registrado",""]: _card(l, str(v), bg="#FFF8E1", border="#F57C00")
+
+            # Consumo de cuenta eléctrica
+            cuenta_kwh = _safe_float(data.get("ene_consumo_cuenta_kwh"))
+            if cuenta_kwh > 0:
+                _card("📊 Consumo real (cuenta eléctrica)",
+                      f"{cuenta_kwh:.0f} kWh/mes · {round(cuenta_kwh/30,1)} kWh/día",
+                      bg="#FFF8E1", border="#F57C00")
+
+            # Consumo calculado por equipos
             kwh = _safe_float(data.get("ene_kwh_dia_calc"))
-            if kwh > 0: _card("Consumo estimado", f"{kwh} kWh/día · {round(kwh*365):,} kWh/año", bg="#FFF8E1", border="#F57C00")
+            if kwh > 0:
+                _card("🔌 Consumo calculado (equipos)",
+                      f"{kwh:.1f} kWh/día · {round(kwh*30):,} kWh/mes · {round(kwh*365):,} kWh/año",
+                      bg="#FFF8E1", border="#F57C00")
+
+            # Equipos eléctricos
             equipos = data.get("equipos_electricos", [])
             if isinstance(equipos, list) and equipos:
                 equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',e.get('kwh',0))} kWh/día)" for e in equipos)
-                _card("Equipos eléctricos", equip_text, bg="#FFF8E1", border="#F57C00")
+                _card("Equipos eléctricos registrados", equip_text, bg="#FFF8E1", border="#F57C00")
+
+            # Solar calculator output
+            sol_horas = _safe_float(data.get("sol_horas", 0))
+            if sol_horas > 0 and kwh > 0:
+                paneles_100w = max(1, round(kwh / (0.1 * sol_horas)))
+                st.markdown(
+                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem;margin-top:0.5rem;border-left:3px solid #F57C00;">'
+                    f'<div style="font-weight:700;color:#E65100;font-size:0.85rem;">☀️ Estimación solar</div>'
+                    f'<div style="font-size:0.82rem;color:#5D4037;line-height:1.6;">'
+                    f'Con <strong>{sol_horas:.0f} horas sol/día</strong> y un consumo de <strong>{kwh:.1f} kWh/día</strong>, '
+                    f'se necesitarían aprox. <strong>{paneles_100w} paneles de 100W</strong> (o {max(1,round(paneles_100w/4))} de 400W) '
+                    f'para cubrir el consumo. Cada panel de 100W produce ~{round(0.1*sol_horas,2)} kWh/día en esta ubicación.</div></div>',
+                    unsafe_allow_html=True)
 
         _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
                   ("Mollison, B. (1988)", "Permaculture: A Designers' Manual", "https://tagari.com"),
@@ -883,109 +948,22 @@ def render():
 
 
     # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 7 — FLOR DE LA PERMACULTURA (deep explanations)
+    # (Flor de la Permacultura está integrada en Visión y Estado Regenerativo → Perspectiva Comparada)
     # ══════════════════════════════════════════════════════════════════
-    if _show("flor"):
-        st.markdown(f"### 🌸 Flor de la Permacultura &nbsp; {_status_badge('mod_potencial')}", unsafe_allow_html=True)
-        st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'La Flor de la Permacultura es el modelo central de David Holmgren (2002) para representar '
-            'los 7 dominios de acción regenerativa. Cada pétalo representa un ámbito de la vida cotidiana '
-            'donde las prácticas de permacultura pueden transformar sistemas extractivos en regenerativos. '
-            'El centro de la flor son los principios éticos: cuidado de la tierra, cuidado de las personas '
-            'y distribución justa de los excedentes.</div>', unsafe_allow_html=True)
-
-        # Dual radar at top
-        st.plotly_chart(_dual_radar(domain_obs, domain_tot, height=380, title="Flor de la Permacultura — ERP vs HRP"), use_container_width=True, key="r_flor_dual")
-
-        import json
-        from pathlib import Path
-        try:
-            jf = Path(__file__).parent.parent / "data" / "petalos_regeneracion_urbana.json"
-            with open(jf, encoding="utf-8") as f:
-                petalos = json.load(f)["petalos"]
-        except: petalos = []
-
-        # Render each petal with deep explanation
-        for i, p_name in enumerate(PETAL_ORDER):
-            icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else "🌱"
-            e_score = domain_obs.get(p_name, 0)
-            h_score = domain_tot.get(p_name, 0)
-            lv_e, _ = _score_to_level(e_score)
-            lv_h, _ = _score_to_level(h_score)
-            gap = round(h_score - e_score, 1)
-
-            # Header card
-            st.markdown(f"""
-            <div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:12px;padding:1rem;margin:1rem 0 0.5rem;">
-                <div style="font-size:1.2rem;font-weight:800;color:#1B4332;">{icon} {p_name}</div>
-                <div style="display:flex;gap:1rem;margin-top:0.5rem;flex-wrap:wrap;">
-                    <div style="background:white;border-radius:8px;padding:0.4rem 0.8rem;border:1px solid #D8F3DC;">
-                        🌍 ERP: <strong>{e_score:.0f}/10</strong> — {lv_e}</div>
-                    <div style="background:white;border-radius:8px;padding:0.4rem 0.8rem;border:1px dashed #52B788;">
-                        🌱 HRP: <strong>{h_score:.0f}/10</strong> — {lv_h}</div>
-                    <div style="background:white;border-radius:8px;padding:0.4rem 0.8rem;border:1px solid #FFA726;">
-                        🌀 Brecha: <strong>+{gap:.0f}</strong> pts</div>
-                </div>
-            </div>""", unsafe_allow_html=True)
-
-            # Deep explanation from PETAL_DESC
-            petal_info = PETAL_DESC.get(p_name, {})
-            if petal_info:
-                with st.expander(f"📖 ¿Qué es el pétalo '{p_name}'? — Explicación detallada", expanded=True):
-                    if petal_info.get("subtitulo"):
-                        st.markdown(f"*{petal_info['subtitulo']}*")
-                    if petal_info.get("holmgren_name"):
-                        st.markdown(f"**Nombre original (Holmgren, 2002):** *{petal_info['holmgren_name']}*")
-                    if petal_info.get("resumen"):
-                        st.markdown(f"**Resumen:** {petal_info['resumen']}")
-                    if petal_info.get("detalle"):
-                        st.markdown(f"{petal_info['detalle']}")
-                    # Petal-specific references
-                    petal_refs = petal_info.get("referencias", [])
-                    if petal_refs:
-                        _ref_box(petal_refs)
-
-            # Interpretations
-            interp_e = get_petal_interp(p_name, e_score, "erp")
-            interp_h = get_petal_interp(p_name, h_score, "hrp")
-            if interp_e:
-                st.markdown(f'<div style="background:#E8F5E9;border-radius:8px;padding:0.5rem 0.8rem;margin:0.3rem 0;font-size:0.85rem;color:#1B4332;border-left:3px solid #1B4332;">🌍 ERP: {interp_e}</div>', unsafe_allow_html=True)
-            if interp_h:
-                st.markdown(f'<div style="background:#FFFDE7;border-radius:8px;padding:0.5rem 0.8rem;margin:0.3rem 0;font-size:0.85rem;color:#5D4037;border-left:3px solid #FFA726;">🌱 HRP: {interp_h}</div>', unsafe_allow_html=True)
-
-            # Practices detail
-            petalo_data = petalos[i] if i < len(petalos) else {}
-            obs_data = data.get(f"petalo_{i}_obs", {})
-            new_data = data.get(f"petalo_{i}_pot_new", {})
-            otros_obs = data.get(f"petalo_{i}_otros_obs", [])
-            otros_new = data.get(f"petalo_{i}_otros_new", [])
-
-            has_practices = any(obs_data.values()) or otros_obs or any(new_data.values()) or otros_new
-            if has_practices:
-                pc1, pc2 = st.columns(2)
-                with pc1:
-                    st.markdown("**Prácticas observadas (ERP):**")
-                    for k, v in obs_data.items():
-                        if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#E8F5E9", border="#1B4332")
-                    if otros_obs: _card("Otras", " · ".join(otros_obs), bg="#E8F5E9", border="#1B4332")
-                with pc2:
-                    st.markdown("**Prácticas potenciales (→ HRP):**")
-                    for k, v in new_data.items():
-                        if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#FFFDE7", border="#FFA726")
-                    if otros_new: _card("Otras", " · ".join(otros_new), bg="#FFFDE7", border="#FFA726")
-
-        st.markdown("---")
 
 
     # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 8 — POTENCIALES DEL SITIO
+    # SECCIÓN 7 — POTENCIALES DEL SITIO
     # ══════════════════════════════════════════════════════════════════
     if _show("potenciales"):
-        st.markdown("### 🌿 Potenciales del Sitio — 10 Dimensiones")
-        st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'Las 10 dimensiones de análisis permiten una lectura integral del potencial regenerativo del espacio. '
-            'Cada dimensión evalúa un aspecto específico de la vida en el lugar, desde la producción de alimentos '
-            'hasta la participación comunitaria (Mason, 2025; Holmgren, 2002).</div>', unsafe_allow_html=True)
+        st.markdown("### 🌿 Potenciales del Sitio — 10 Dimensiones de Análisis")
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;margin-bottom:1rem;font-size:0.88rem;color:#2D6A4F;line-height:1.7;">'
+            'Las <strong>10 dimensiones de análisis</strong> permiten una lectura integral del potencial regenerativo del espacio. '
+            'Cada dimensión evalúa un aspecto específico de la vida en el lugar — desde la producción de alimentos '
+            'hasta la participación comunitaria. Se construyen a partir de la Flor de la Permacultura (Holmgren, 2002) '
+            'y los sub-indicadores ecológicos y sistémicos (Mason, 2025).'
+            '</div>', unsafe_allow_html=True)
 
         dims = list(potenciales_erp.keys())
         erp_v = [potenciales_erp[d] for d in dims]
@@ -995,13 +973,30 @@ def render():
 
         for dim in dims:
             e = potenciales_erp[dim]; h = potenciales_hrp.get(dim,0)
+            gap_d = round(h - e, 1)
             interp_e = get_interp_text(dim, e, "erp")
             interp_h = get_interp_text(dim, h, "hrp")
-            with st.expander(f"{dim}: ERP {e}/10 → HRP {h}/10", expanded=False):
-                what = DIM_WHAT_MEASURES.get(dim, "")
-                if what: st.markdown(f"**¿Qué mide?** {what}")
-                if interp_e: st.markdown(f"🌍 **ERP:** {interp_e}")
-                if interp_h: st.markdown(f"🌱 **HRP:** {interp_h}")
+            dim_info = DIM_WHAT_MEASURES.get(dim, {})
+            if isinstance(dim_info, str):
+                dim_info = {"que_mide": dim_info, "fuentes": "", "icono": "📊"}
+            icono = dim_info.get("icono", "📊")
+            que_mide = dim_info.get("que_mide", "")
+            fuentes = dim_info.get("fuentes", "")
+            lv_e, _ = _score_to_level(e)
+            lv_h, _ = _score_to_level(h)
+
+            with st.expander(f"{icono} {dim}: ERP {e}/10 ({lv_e}) → HRP {h}/10 ({lv_h}) · Brecha +{gap_d}", expanded=False):
+                if que_mide:
+                    st.markdown(f'<div style="background:#F0FFF4;border-radius:6px;padding:0.5rem;margin-bottom:0.4rem;font-size:0.85rem;color:#2D6A4F;">'
+                                f'<strong>¿Qué mide esta dimensión?</strong> {que_mide}</div>', unsafe_allow_html=True)
+                if fuentes:
+                    st.caption(f"📎 Fuentes de datos: {fuentes}")
+                if interp_e:
+                    st.markdown(f'<div style="background:#E8F5E9;border-radius:6px;padding:0.4rem 0.6rem;margin:0.3rem 0;font-size:0.84rem;color:#1B4332;border-left:3px solid #1B4332;">'
+                                f'🌍 <strong>Estado actual ({lv_e}):</strong> {interp_e}</div>', unsafe_allow_html=True)
+                if interp_h:
+                    st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.3rem 0;font-size:0.84rem;color:#5D4037;border-left:3px solid #FFA726;">'
+                                f'🌱 <strong>Horizonte potencial ({lv_h}):</strong> {interp_h}</div>', unsafe_allow_html=True)
 
         _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
                   ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/")])
