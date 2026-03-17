@@ -1,4 +1,4 @@
-"""Módulo Informe Final v7.4 — LivLin Indagación Regenerativa.
+"""Módulo Informe Final v7.5 — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -254,16 +254,17 @@ def render():
             # ═══ A) LOGO ═══
             try:
                 from utils.logo_b64 import LOGO_B64
-                import base64
-                st.markdown(f'<div style="text-align:center;padding:0.8rem 0 0.2rem;">'
-                    f'<img src="data:image/png;base64,{LOGO_B64}" style="width:90px;border-radius:14px;"/>'
+                st.markdown(
+                    f'<div style="text-align:center;padding:0.8rem 0 0.2rem;background:transparent;">'
+                    f'<img src="data:image/png;base64,{LOGO_B64}" '
+                    f'style="width:90px;background:transparent;border-radius:14px;mix-blend-mode:multiply;"/>'
                     f'</div>', unsafe_allow_html=True)
             except Exception:
                 pass
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.4</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.5</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -323,9 +324,27 @@ def render():
         return active_sec == "all" or active_sec == sec_key
 
 
+    # ── Welcome message (client view) ─────────────────────────────
+    if readonly:
+        st.markdown(
+            '<div style="background:linear-gradient(135deg,#D8F3DC,#E8F5E9);border-radius:14px;'
+            'padding:1.2rem 1.5rem;margin-bottom:1.2rem;border:1px solid #A8D5B5;">'
+            '<div style="font-size:1.2rem;font-weight:800;color:#1B4332;margin-bottom:0.4rem;">'
+            f'¡Bienvenid@ al informe de tu espacio, {cliente}! 🌿</div>'
+            '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
+            'Este es el resultado de la <strong>Indagación Regenerativa</strong> realizada por LivLin para tu espacio '
+            f'<strong>{nombre}</strong>. Aquí encontrarás un diagnóstico detallado del estado actual '
+            'y el potencial regenerativo de tu lugar — desde la ecología del sitio hasta las prácticas '
+            'de permacultura que ya están activas y las que puedes incorporar.'
+            '<br><br>'
+            '📖 Navega las secciones usando el menú lateral. Cada sección profundiza en un aspecto diferente. '
+            'Al final encontrarás una síntesis con un plan de acción concreto. '
+            'Este informe es una herramienta viva: LivLin te acompaña en el camino hacia la regeneración.'
+            '</div></div>', unsafe_allow_html=True)
+
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.4 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.5 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -388,7 +407,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.4</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.5</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -431,11 +450,12 @@ def render():
             f'La brecha de <strong>{brecha} puntos</strong> representa el campo de acción disponible.'
             '</div>'
             '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-top:0.5rem;">'
-            '👉 <strong>Explora las secciones siguientes</strong> para profundizar en cada dimensión: '
-            '<em>🔬 Observación Ecológica</em> (suelo, agua, sol, biodiversidad), '
+            '👉 <strong>Explora las secciones del informe</strong> usando el menú lateral: '
+            '<em>📋 Datos del Proyecto</em>, '
+            '<em>☯️ Tao de la Regeneración</em> (intención y visión), '
+            '<em>🔬 Observación Ecológica</em> (suelo, agua, sol, clima, biodiversidad), '
             '<em>🏙️ Contexto, Agua y Energía</em> (flujos y sistemas), '
-            '<em>🌸 Flor de la Permacultura</em> (prácticas por pétalo), '
-            '<em>🌿 Potenciales del Sitio</em> (10 dimensiones de análisis) y '
+            '<em>📷 Registro Fotográfico</em> y '
             '<em>🗺️ Síntesis y Plan</em> (hoja de ruta en 3 horizontes).'
             '</div></div>', unsafe_allow_html=True)
 
@@ -642,7 +662,7 @@ def render():
                 f'<strong>Definición:</strong> El HRP proyecta lo que el espacio puede llegar a ser si se activan las prácticas potenciales identificadas. '
                 f'Se compone de <strong>100% del MFP proyectado</strong> (observado + potencial). '
                 f'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida en las prácticas potenciales de cada pétalo.'
-                f'<br><br>📖 <em>Ver sección "🌸 Flor de la Permacultura" para prácticas por pétalo y "🗺️ Síntesis y Plan" para la hoja de ruta.</em></div>', unsafe_allow_html=True)
+                f'<br><br>📖 <em>Ver la pestaña "📊 Perspectiva Comparada" para el detalle de prácticas por pétalo y "🗺️ Síntesis y Plan" para la hoja de ruta.</em></div>', unsafe_allow_html=True)
             st.plotly_chart(_radar_hrp(domain_tot, title="Radar HRP — Horizonte Potencial"), use_container_width=True, key="r_hrp_solo")
             for i, p in enumerate(PETAL_ORDER):
                 h = domain_tot[p]; lv, _ = _score_to_level(h)

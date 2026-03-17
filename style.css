@@ -408,3 +408,12 @@ hr {
     color: #1B4332;
     font-weight: 700;
 }
+
+/* Ensure logo transparent background in all contexts */
+[data-testid="stSidebar"] img {
+    background: transparent !important;
+    mix-blend-mode: multiply;
+}
+[data-testid="stSidebar"] [data-testid="stImage"] {
+    background: transparent !important;
+}
