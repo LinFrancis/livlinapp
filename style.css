@@ -409,11 +409,10 @@ hr {
     font-weight: 700;
 }
 
-/* Ensure logo transparent background in all contexts */
-[data-testid="stSidebar"] img {
-    background: transparent !important;
-    mix-blend-mode: multiply;
-}
+/* Ensure sidebar images have transparent background */
 [data-testid="stSidebar"] [data-testid="stImage"] {
+    background: transparent !important;
+}
+[data-testid="stSidebar"] [data-testid="stImage"] img {
     background: transparent !important;
 }

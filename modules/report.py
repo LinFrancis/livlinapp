@@ -1,4 +1,4 @@
-"""Módulo Informe Final v7.5 — LivLin Indagación Regenerativa.
+"""Módulo Informe Final v8.0 — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -251,20 +251,15 @@ def render():
 
     if readonly:
         with st.sidebar:
-            # ═══ A) LOGO ═══
-            try:
-                from utils.logo_b64 import LOGO_B64
-                st.markdown(
-                    f'<div style="text-align:center;padding:0.8rem 0 0.2rem;background:transparent;">'
-                    f'<img src="data:image/png;base64,{LOGO_B64}" '
-                    f'style="width:90px;background:transparent;border-radius:14px;mix-blend-mode:multiply;"/>'
-                    f'</div>', unsafe_allow_html=True)
-            except Exception:
-                pass
+            # ═══ A) LOGO (use st.image like admin — handles transparency) ═══
+            from pathlib import Path as _P
+            _logo_path = _P(__file__).parent.parent / "assets" / "logolivlin.png"
+            if _logo_path.exists():
+                st.image(str(_logo_path), use_container_width=True)
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v7.5</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v8.0</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -344,7 +339,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v7.5 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Visión completa · LivLin v8.0 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -407,7 +402,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.5</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v8.0</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -682,7 +677,7 @@ def render():
             'Toda la metodología está basada en Mason (2025) y en el modelo de la Flor de la Permacultura (Holmgren, 2002).'
             '</div>', unsafe_allow_html=True)
 
-        with st.expander("🌍 ¿Cómo se calcula el ERP (Estado Regenerativo Presente)?", expanded=True):
+        with st.expander("🌍 ¿Cómo se calcula el ERP (Estado Regenerativo Presente)?", expanded=False):
             st.markdown(
                 '**ERP = 80% MFP observado + 20% Sub-indicadores M2-6**\n\n'
                 '- **MFP observado (80%):** Se cuentan las prácticas regenerativas **actualmente observadas** en cada uno de los '
