@@ -334,26 +334,63 @@ def render():
     # ══════════════════════════════════════════════════════════════════
     if _show("vision"):
         st.markdown("### 🌱 Visión y Estado Regenerativo")
-        # Intro box
+
+        # ── Intro narrativo: ¿Qué es la regeneración? ──
         st.markdown(
             '<div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">'
             '<div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Antes de leer este informe</div>'
-            '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar?</div>'
-            '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.7;margin-bottom:0.6rem;">'
-            'Este informe utiliza dos indicadores complementarios para describir el estado y el potencial regenerativo de tu espacio: '
-            'el <strong>Estado Regenerativo Presente (ERP)</strong> y el <strong>Horizonte Regenerativo Potencial (HRP)</strong>. '
-            'El ERP captura lo que ya existe: las prácticas, ciclos y relaciones activas hoy. '
-            'El HRP proyecta lo que podría existir si se activan nuevas prácticas identificadas durante el diagnóstico. '
-            'La diferencia entre ambos — la <strong>Brecha</strong> — señala el campo de acción concreto donde invertir energía.</div>'
-            f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;">📄 Leer publicación oficial · Mason (2025)</a>'
+            '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar un espacio urbano?</div>'
+            '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
+            'Regenerar no es simplemente «mejorar» o «hacer sostenible» un lugar. Es activar los procesos vivos '
+            'que permiten a un espacio urbano evolucionar hacia mayor vitalidad, diversidad y conexión. '
+            'Un espacio regenerativo produce alimentos, cicla agua, genera energía, construye comunidad '
+            'y fortalece la relación entre las personas y su territorio (Holmgren, 2002; Mang & Reed, 2012).'
+            '</div>'
+            '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
+            'Este informe utiliza dos indicadores complementarios diseñados por LivLin para describir '
+            'el estado y el potencial regenerativo de tu espacio:</div>'
+            '<div style="display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:0.8rem;">'
+            '  <div style="flex:1;min-width:200px;background:white;border-radius:10px;padding:0.8rem;border-left:4px solid #1B4332;">'
+            '    <div style="font-weight:800;color:#1B4332;font-size:0.88rem;">🌍 ERP — Estado Regenerativo Presente</div>'
+            '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
+            '      Es la <em>fotografía</em> del momento actual. Captura las prácticas, ciclos y relaciones '
+            '      que ya están activas en tu espacio. Se calcula como <strong>80% de la Flor de la Permacultura</strong> '
+            '      (prácticas observadas en los 7 pétalos de Holmgren) + <strong>20% de sub-indicadores ecológicos</strong> '
+            '      (suelo, agua, sol, biodiversidad, energía y materiales). '
+            '      Un ERP alto indica que el espacio ya tiene prácticas regenerativas consolidadas.</div>'
+            '  </div>'
+            '  <div style="flex:1;min-width:200px;background:white;border-radius:10px;padding:0.8rem;border-left:4px solid #52B788;">'
+            '    <div style="font-weight:800;color:#2D6A4F;font-size:0.88rem;">🌱 HRP — Horizonte Regenerativo Potencial</div>'
+            '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
+            '      Es la <em>proyección</em> de lo que tu espacio puede llegar a ser si se activan las prácticas '
+            '      potenciales identificadas durante el diagnóstico. Se calcula como <strong>100% de la Flor de la Permacultura proyectada</strong> '
+            '      (observadas + potenciales). Un HRP alto indica un gran margen para seguir creciendo.</div>'
+            '  </div>'
+            '</div>'
+            '<div style="background:rgba(255,167,38,0.08);border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.8rem;">'
+            '  <div style="font-weight:800;color:#E65100;font-size:0.88rem;">🌀 Brecha = HRP − ERP → Campo de acción</div>'
+            '  <div style="font-size:0.82rem;color:#5D4037;line-height:1.6;margin-top:0.3rem;">'
+            '    La diferencia entre el HRP y el ERP señala exactamente <em>cuánto potencial hay por activar</em>. '
+            '    Una brecha grande no es negativa — significa que hay mucho espacio para crecer. '
+            '    Una brecha pequeña indica que el espacio ya está cerca de su máximo potencial identificado.</div>'
+            '</div>'
+            '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:0.5rem;">'
+            '📖 <strong>Escala de niveles (0-10):</strong> '
+            '<span style="color:#B71C1C;">0-2 Sin inicio</span> · '
+            '<span style="color:#E65100;">2-4 Semilla</span> · '
+            '<span style="color:#F9A825;">4-6 Brote</span> · '
+            '<span style="color:#2E7D32;">6-8 Crecimiento</span> · '
+            '<span style="color:#1B4332;">8-10 Abundancia</span>'
+            '</div>'
+            f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;margin-top:0.3rem;">📄 Leer publicación oficial · Mason (2025)</a>'
             '</div>', unsafe_allow_html=True)
 
-        # ERP/HRP header cards
+        # ── Tarjetas de resultado ──
         st.markdown(f"""
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Diagnóstico Regenerativo · LivLin v7.1</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v7.1</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -378,8 +415,31 @@ def render():
                     </div>
                 </div>
             </div>
-            <div style="margin-top:0.8rem;padding:0.6rem;background:rgba(255,167,38,0.08);border-radius:8px;font-size:0.85rem;color:#E65100;">🌀 {brecha_txt}</div>
+            <div style="margin-top:0.8rem;padding:0.7rem;background:rgba(255,167,38,0.08);border-radius:8px;">
+                <div style="font-size:0.88rem;color:#E65100;font-weight:700;margin-bottom:0.3rem;">¿Qué significa esta brecha para tu espacio?</div>
+                <div style="font-size:0.85rem;color:#5D4037;line-height:1.6;">🌀 {brecha_txt}</div>
+            </div>
         </div>""", unsafe_allow_html=True)
+
+        # ── Interpretación narrativa del resultado ──
+        st.markdown(
+            '<div style="background:#FAFAFA;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;border-left:4px solid #52B788;">'
+            '<div style="font-weight:700;color:#1B4332;font-size:0.92rem;margin-bottom:0.4rem;">📖 ¿Cómo leer estos resultados?</div>'
+            '<div style="font-size:0.85rem;color:#333;line-height:1.7;">'
+            f'El espacio <strong>{nombre}</strong> presenta un <strong>ERP de {erp_score}/10 ({label_erp})</strong>, '
+            f'lo que indica el nivel de prácticas regenerativas que ya están activas. '
+            f'Al mismo tiempo, el <strong>HRP de {hrp_score}/10 ({label_hrp})</strong> muestra '
+            f'el horizonte al que puede llegar si se implementan las prácticas potenciales identificadas. '
+            f'La brecha de <strong>{brecha} puntos</strong> representa el campo de acción disponible.'
+            '</div>'
+            '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-top:0.5rem;">'
+            '👉 <strong>Explora las secciones siguientes</strong> para profundizar en cada dimensión: '
+            '<em>🔬 Observación Ecológica</em> (suelo, agua, sol, biodiversidad), '
+            '<em>🏙️ Contexto, Agua y Energía</em> (flujos y sistemas), '
+            '<em>🌸 Flor de la Permacultura</em> (prácticas por pétalo), '
+            '<em>🌿 Potenciales del Sitio</em> (10 dimensiones de análisis) y '
+            '<em>🗺️ Síntesis y Plan</em> (hoja de ruta en 3 horizontes).'
+            '</div></div>', unsafe_allow_html=True)
 
         # ── 3 TABS ────────────────────────────────────────────────────
         tab_comp, tab_erp, tab_hrp = st.tabs(["📊 Perspectiva Comparada", "🌍 ERP — Estado Presente", "🌱 HRP — Horizonte Potencial"])

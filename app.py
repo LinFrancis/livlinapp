@@ -74,11 +74,11 @@ def _login_page():
 
 
 def _sidebar():
-    """Sidebar ONLY for admin users. Client sidebar is in report.py."""
+    """Sidebar ONLY for admin users. Client sidebar lives in report.py."""
     user     = st.session_state.get("current_user", {})
     is_admin = user.get("role") == "admin"
 
-    # ── GUARD: clients never use this sidebar ──
+    # ── ABSOLUTE GUARD: clients NEVER render this sidebar ──
     if not is_admin:
         return
 
@@ -107,13 +107,12 @@ def _sidebar():
                 f'<div style="font-size:0.7rem;color:#2D6A4F;">{data.get("proyecto_cliente","")}</div></div>',
                 unsafe_allow_html=True)
 
-        # Progreso solo para admin
-        progress = _module_progress(data) if is_admin else {}
+        progress = _module_progress(data)
 
         for label, key in PAGES.items():
             is_active = st.session_state.get("page") == key
             btn_label = label
-            if is_admin and progress:
+            if progress:
                 pct = progress.get(key, 0)
                 if pct == 100:
                     btn_label = f"{label} ✅"
@@ -121,7 +120,7 @@ def _sidebar():
                     btn_label = f"{label} ({pct}%)"
             if is_active:
                 st.markdown('<div class="nav-active">', unsafe_allow_html=True)
-            if st.button(btn_label, key=f"nav_{key}", use_container_width=True):
+            if st.button(btn_label, key=f"admin_nav_{key}", use_container_width=True):
                 st.session_state.page = key
                 st.rerun()
             if is_active:
@@ -129,7 +128,7 @@ def _sidebar():
 
         st.markdown("---")
 
-        # ── Descargas: visibles cuando está en la página de informe ──────
+        # ── Admin downloads (only on report page) ──
         current_page = st.session_state.get("page", "")
         if current_page == "report" and data.get("proyecto_nombre"):
             st.markdown('<div style="font-size:0.75rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">Descargar informe</div>', unsafe_allow_html=True)
@@ -141,7 +140,7 @@ def _sidebar():
                     "Excel (.xlsx)", data=xlsx_bytes,
                     file_name=f"LivLin_IR_{safe_n}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True, type="primary", key="dl_xlsx_sidebar")
+                    use_container_width=True, type="primary", key="admin_dl_xlsx")
             except Exception as e:
                 st.caption(f"Excel no disponible: {e}")
             try:
@@ -151,54 +150,53 @@ def _sidebar():
                     "Word (.docx)", data=docx_bytes,
                     file_name=f"LivLin_IR_{safe_n}.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True, key="dl_docx_sidebar")
+                    use_container_width=True, key="admin_dl_docx")
             except Exception as e:
                 st.caption(f"Word no disponible: {e}")
             st.markdown("---")
 
-        # Visit management: solo admin
-        if is_admin:
-            st.caption("Todos los diagnósticos")
-            visits = load_visits()
-            if visits:
-                visit_names = {v.get("id",""): f"{v.get('proyecto_nombre','?')} ({str(v.get('updated_at',v.get('created_at','?')))[:10]})"
-                               for v in visits}
-                sel = st.selectbox("", list(visit_names.keys()),
-                    format_func=lambda x: visit_names.get(x,x), key="visit_sel",
-                    label_visibility="collapsed")
-                cl, dl = st.columns(2)
-                with cl:
-                    if st.button("Cargar", use_container_width=True, key="btn_load"):
-                        v = get_visit(sel)
-                        if v: st.session_state.visit_data = v; st.session_state.page = "client"; st.rerun()
-                with dl:
-                    if st.button("Borrar", use_container_width=True, key="btn_del"):
-                        st.session_state["_confirm_del"] = sel
+        # ── Visit management ──
+        st.caption("Todos los diagnósticos")
+        visits = load_visits()
+        if visits:
+            visit_names = {v.get("id",""): f"{v.get('proyecto_nombre','?')} ({str(v.get('updated_at',v.get('created_at','?')))[:10]})"
+                           for v in visits}
+            sel = st.selectbox("", list(visit_names.keys()),
+                format_func=lambda x: visit_names.get(x,x), key="admin_visit_sel",
+                label_visibility="collapsed")
+            cl, dl = st.columns(2)
+            with cl:
+                if st.button("Cargar", use_container_width=True, key="admin_btn_load"):
+                    v = get_visit(sel)
+                    if v: st.session_state.visit_data = v; st.session_state.page = "client"; st.rerun()
+            with dl:
+                if st.button("Borrar", use_container_width=True, key="admin_btn_del"):
+                    st.session_state["_confirm_del"] = sel
+                    st.rerun()
+
+            if st.session_state.get("_confirm_del") == sel:
+                st.warning(f"Confirmar eliminación de **{visit_names.get(sel,'?')}**")
+                cc1, cc2 = st.columns(2)
+                with cc1:
+                    if st.button("Si, eliminar", key="admin_btn_del_confirm", type="primary",
+                                 use_container_width=True):
+                        delete_visit(sel)
+                        st.session_state.pop("_confirm_del", None)
+                        if st.session_state.get("visit_data",{}).get("id") == sel:
+                            st.session_state.visit_data = {}
+                        st.rerun()
+                with cc2:
+                    if st.button("Cancelar", key="admin_btn_del_cancel",
+                                 use_container_width=True):
+                        st.session_state.pop("_confirm_del", None)
                         st.rerun()
 
-                if st.session_state.get("_confirm_del") == sel:
-                    st.warning(f"Confirmar eliminación de **{visit_names.get(sel,'?')}**")
-                    cc1, cc2 = st.columns(2)
-                    with cc1:
-                        if st.button("Si, eliminar", key="btn_del_confirm", type="primary",
-                                     use_container_width=True):
-                            delete_visit(sel)
-                            st.session_state.pop("_confirm_del", None)
-                            if st.session_state.get("visit_data",{}).get("id") == sel:
-                                st.session_state.visit_data = {}
-                            st.rerun()
-                    with cc2:
-                        if st.button("Cancelar", key="btn_del_cancel",
-                                     use_container_width=True):
-                            st.session_state.pop("_confirm_del", None)
-                            st.rerun()
-
-            if st.button("Nuevo diagnóstico", use_container_width=True, key="btn_new"):
-                st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
-            st.markdown("---")
+        if st.button("Nuevo diagnóstico", use_container_width=True, key="admin_btn_new"):
+            st.session_state.visit_data = {}; st.session_state.page = "client"; st.rerun()
+        st.markdown("---")
 
         space = user.get("space_name", "")
-        st.markdown(f'<div style="font-size:0.75rem;color:#40916C;">Usuario: {user.get("display_name","")}'
+        st.markdown(f'<div style="font-size:0.75rem;color:#40916C;">Admin: {user.get("display_name","")}'
                     + (f'<br>Espacio: {space}' if space else '')
                     + '</div>', unsafe_allow_html=True)
 
@@ -218,7 +216,7 @@ def _sidebar():
         except Exception:
             pass
 
-        if st.button("Cerrar sesión", use_container_width=True, key="btn_logout"):
+        if st.button("Cerrar sesión", use_container_width=True, key="admin_btn_logout"):
             st.session_state.authenticated = False
             st.session_state.current_user  = {}
             st.session_state.visit_data    = {}
