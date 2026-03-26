@@ -80,8 +80,15 @@ def generate_fortalezas(data: dict) -> str:
             items.append(f"🌸 Pétalo '{domain}': puntaje {score}/10 — muy desarrollado")
 
     # Tao
-    if _has(data, "tao_conexion") and _score_val(data, "tao_conexion") >= 4:
-        items.append("💚 Alta conexión emocional del grupo con el espacio")
+    try:
+        from modules.tao import get_tao_total
+        tao_total = get_tao_total(data)
+        if tao_total >= 15:
+            items.append("Alta conexion interior del grupo con la regeneracion (Tao >= 15/25)")
+        elif tao_total >= 10:
+            items.append("Conexion consciente del grupo con procesos regenerativos (Tao >= 10/25)")
+    except Exception:
+        pass
 
     if not items:
         return "Completa más módulos del diagnóstico para generar fortalezas automáticas."
@@ -160,11 +167,16 @@ def generate_limitaciones(data: dict) -> str:
     if _has(data, "ene_fuente", ["Red eléctrica"]) and not _has(data, "ene_solar_interes", ["Sí, pronto"]):
         items.append("⚡ Dependencia total de red eléctrica sin planes de transición energética")
 
-    if _has(data, "tao_ritmo", ["Muy acelerado", "Acelerado"]):
-        items.append("⏱️ Ritmo de vida acelerado del grupo — puede dificultar el cuidado continuo del espacio")
-
-    if _has(data, "tao_tiempo_libre", ["Muy poco"]):
-        items.append("⏳ Poco tiempo libre disponible — requiere diseño de bajo mantenimiento")
+    # Tao dimension 1 (wu wei / accion espontanea) bajo = posible limitacion
+    try:
+        from modules.tao import get_tao_scores
+        tao_scores = get_tao_scores(data)
+        if tao_scores.get("tao_d1_wu_wei", 0) <= 2 and tao_scores.get("tao_d1_wu_wei", 0) > 0:
+            items.append("Tendencia a forzar procesos -- puede dificultar el cuidado continuo del espacio")
+        if tao_scores.get("tao_d2_humildad", 0) <= 2 and tao_scores.get("tao_d2_humildad", 0) > 0:
+            items.append("Dificultad para reconocer lo suficiente -- riesgo de sobredimensionar intervenciones")
+    except Exception:
+        pass
 
     if not items:
         return "Completa más módulos del diagnóstico para identificar limitaciones automáticamente."

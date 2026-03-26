@@ -1,458 +1,431 @@
-"""Módulo Tao de la Regeneración — entre Módulo 1 y Módulo 2.
-Estructura: de lo yin (interior) a lo yang (exterior).
-Preguntas redactadas directamente a las personas del grupo.
+"""Modulo Tao de la Regeneracion v2.0
+Basado en 'El Tao de la Regeneracion' -- 5 dimensiones de sabiduria taoista.
+Escala 1-5 por dimension. Radar de 5 ejes. Disclaimer interpretativo.
 """
 import streamlit as st
 from utils.data_manager import save_visit
 from utils.module_status import render_module_status, is_module_active
-from utils.tab_nav import show_drive_save_status, tab_header, tab_nav_bottom, get_active_tab
+from utils.tab_nav import show_drive_save_status
+
+# ========================================================================
+# CONTENIDO: 5 dimensiones del Tao de la Regeneracion
+# ========================================================================
+
+TAO_INTRO = (
+    "El **Tao de la Regeneracion** es un marco de indagacion interior que usa "
+    "el taoismo filosofico como guia para explorar la relacion del grupo con "
+    "el espacio que habita y con los procesos regenerativos.\n\n"
+    "Las leyes de la regeneracion son las mismas que las leyes del Tao: "
+    "el retorno ciclico a lo esencial, la danza perpetua entre lo que muere "
+    "y lo que nace, la confianza en que la vida, cuando se le da espacio, "
+    "siempre retorna.\n\n"
+    "Somos naturaleza. Al cuidarnos, facilitamos que la naturaleza se "
+    "manifieste a traves nuestro. Cada dimension es una danza entre yin y "
+    "yang: no se trata de elegir un polo sobre el otro, sino de reconocer "
+    "cuando cada uno esta desequilibrado y permitir que su complemento "
+    "restaure la armonia."
+)
+
+TAO_EPIGRAFE = (
+    "Lo que buscas tambien esta aqui. Asi como lo que no buscas tambien esta "
+    "aqui. Ambos, lo deseado y lo no deseado existen y asi sera siempre. "
+    "Tranquiliza tu corazon que mientras parezca todo perdido, la llama de "
+    "aquello deseado no se apagara."
+)
+
+TAO_DISCLAIMER = (
+    "Las respuestas disponibles son siempre aproximaciones, nunca reflejo "
+    "total de lo real. La respuesta genuina es la que cada persona o grupo "
+    "logre construir para si mismo. Este modulo facilita una reflexion sobre "
+    "la dimension interior del cambio transformativo que implica transicionar "
+    "desde patrones degenerativos hacia patrones regenerativos. "
+    "Desde la perspectiva del taoismo filosofico, cada paso hacia lo esencial "
+    "es ya expresion de la virtud regenerativa en accion."
+)
+
+TAO_DIMENSIONES = [
+    {
+        "id": "tao_d1_wu_wei",
+        "titulo": "Accion espontanea y oportuna",
+        "subtitulo": "Wu wei, flexibilidad, oportunidad, no imposicion",
+        "icono": "1",
+        "cita_tao": "El sabio se ocupa de no actuar y ensena sin palabras. Las diez mil cosas surgen y el no las rechaza. Produce sin poseer. Actua sin esperar nada.",
+        "cita_cap": "Tao Te Ching, Capitulo 2",
+        "descripcion": (
+            "Quien camina por la via de la regeneracion reconoce que la naturaleza "
+            "tiene su ritmo y actua en conciencia de ese ritmo, respetandolo y sin "
+            "pretender controlarlo ni forzarlo. La no-accion no empuja los acontecimientos, "
+            "sino que los acompana como el agua que fluye desde la montana y con la "
+            "constancia a traves del tiempo logra crear valles llenos de abundancia y vida. "
+            "Regenerar es doblarse sin romperse. Quien guia un proceso regenerativo no "
+            "busca reconocimiento; su poder esta en la coherencia."
+        ),
+        "pregunta": (
+            "En que medida nuestras decisiones e intervenciones en el espacio surgen "
+            "de la observacion paciente y se realizan en el momento oportuno, sin "
+            "imponer ritmos externos ni forzar resultados?"
+        ),
+        "opciones": [
+            "Forzamos continuamente; ignoramos los ciclos naturales, actuamos con prisa o fuera de tiempo.",
+            "A veces observamos, pero predominan las imposiciones y los calendarios ajenos al lugar.",
+            "Hay momentos de accion oportuna, pero tambien tensiones entre el querer hacer y el fluir.",
+            "Generalmente respetamos los tiempos de la tierra y de las personas; intervenimos con suavidad.",
+            "Actuamos desde una accion que no busca persuadir ni controlar (wu wei): guia desde el ejemplo y solo acompana cuando es necesario.",
+        ],
+    },
+    {
+        "id": "tao_d2_humildad",
+        "titulo": "Humildad y suficiencia",
+        "subtitulo": "Estar abajo, detenerse a tiempo, sencillez",
+        "icono": "2",
+        "cita_tao": "No hay mayor desgracia que no saber que es suficiente. No hay mayor defecto que el afan de obtener. Quien sabe que lo suficiente es suficiente, siempre tendra suficiente.",
+        "cita_cap": "Tao Te Ching, Capitulo 46",
+        "descripcion": (
+            "La regeneracion surge desde abajo, desde el nivel de cada agente "
+            "regenerativo que ejerce acciones concretas. Quien regenera se situa al "
+            "servicio del territorio, aprende de los saberes ecologicos y de la "
+            "naturaleza en general. No llega como un salvador externo, sino como un "
+            "facilitador que escucha. Reducir lo superfluo, optar por lo local, "
+            "lo manual, lo duradero, es un acto de liberacion."
+        ),
+        "pregunta": (
+            "En que medida practicamos la humildad -- escuchando mas que imponiendo -- "
+            "y reconocemos lo suficiente, sin acumular mas de lo necesario, "
+            "deteniendonos a tiempo?"
+        ),
+        "opciones": [
+            "Actuamos desde la certeza de tener todas las respuestas; acumulamos sin limite ni reflexion.",
+            "Escuchamos poco; la ambicion de crecimiento o de resultados nos impulsa a no detenernos.",
+            "A veces nos detenemos, pero la cultura del tener mas suele ganar; aun cuesta ceder el protagonismo.",
+            "Frecuentemente ponemos el saber de la naturaleza y del lugar por delante, y sabemos decir basta.",
+            "Nuestra presencia es humilde y genuina; celebramos la suficiencia y nos retiramos cuando el sistema florece solo.",
+        ],
+    },
+    {
+        "id": "tao_d3_compasion",
+        "titulo": "Compasion y no-juicio",
+        "subtitulo": "Inclusividad, verdad sobria, compasion",
+        "icono": "3",
+        "cita_tao": "Tengo tres tesoros que guardo y atesoro. El primero es la compasion. El segundo, la moderacion. El tercero, no atreverme a ser el primero bajo el cielo.",
+        "cita_cap": "Tao Te Ching, Capitulo 67",
+        "descripcion": (
+            "La compasion es la primera joya del sabio taoista: actuar con cuidado "
+            "hacia todos los seres, humanos y no humanos, sin danar. En la regeneracion, "
+            "esto se traduce en no abandonar a nadie, incluso a quienes hoy actuan "
+            "de modo degenerativo. La persona que no camina por el sendero de la "
+            "regeneracion no es un enemigo a combatir, sino materia prima de la "
+            "transformacion. La comunicacion en proyectos regenerativos huye de la "
+            "retorica vacia y del marketing verde."
+        ),
+        "pregunta": (
+            "En que medida somos capaces de relacionarnos sin juicios con quienes "
+            "tienen practicas o perspectivas distintas, y de sostener una comunicacion "
+            "honesta, sin manipulacion ni protagonismo?"
+        ),
+        "opciones": [
+            "Predominan los prejuicios, las etiquetas y la comunicacion agresiva o enganosa.",
+            "Con frecuencia separamos entre nosotros y ellos; la verdad se doblega ante la conveniencia.",
+            "A veces logramos una mirada amplia, pero recaemos en la condena; la comunicacion es sincera solo en temas seguros.",
+            "Mantenemos una postura de apertura y una comunicacion que busca la transparencia, incluso en los desacuerdos.",
+            "No excluimos a nadie; nuestro dialogo es compasivo y honesto, sin necesidad de vendernos a nosotros mismos ni a nuestro proyecto.",
+        ],
+    },
+    {
+        "id": "tao_d4_esencial",
+        "titulo": "Fortalecer lo esencial",
+        "subtitulo": "Cuidar el interior, deseo reducido, raiz frente a apariencia",
+        "icono": "4",
+        "cita_tao": "Los cinco colores ciegan los ojos del hombre. Los cinco sabores estragan su paladar. Por eso el sabio se ocupa del vientre, no de los ojos. Elige lo interior y rechaza lo exterior.",
+        "cita_cap": "Tao Te Ching, Capitulo 12",
+        "descripcion": (
+            "La regeneracion no se agota en lo que se ve. Atiende a lo esencial "
+            "-- la salud de las relaciones, la cohesion grupal, el bienestar interior -- "
+            "antes que a las formas externas que deslumbran. Un proyecto es verdaderamente "
+            "regenerativo si quienes participan se sienten mas vivos, mas conectados, "
+            "mas en paz. Si la raiz esta sana, el fruto sera duradero."
+        ),
+        "pregunta": (
+            "En que medida priorizamos lo esencial -- cohesion, bienestar, calidad "
+            "de las relaciones -- sobre lo superficial -- resultados visibles, "
+            "infraestructura, reconocimiento externo?"
+        ),
+        "opciones": [
+            "Solo nos importan los resultados externos; el bienestar interno se descuida o se ignora.",
+            "Lo visible prima; lo esencial se atiende solo cuando surge una crisis.",
+            "Hay conciencia de la importancia de las relaciones, pero lo externo suele llevarse la mayor atencion y energia.",
+            "El cuidado de la raiz -- personas, relaciones, salud grupal -- es tan importante como los frutos visibles.",
+            "Todo lo que hacemos nace de lo esencial; las formas externas son un reflejo natural de la armonia interior.",
+        ],
+    },
+    {
+        "id": "tao_d5_retorno",
+        "titulo": "Retorno a la raiz",
+        "subtitulo": "Anclaje en los ciclos naturales y comunitarios",
+        "icono": "5",
+        "cita_tao": "Todas las cosas florecen, y cada una retorna a su raiz. Retornar a la raiz es la quietud. La quietud es retornar al destino. Retornar al destino es lo constante.",
+        "cita_cap": "Tao Te Ching, Capitulo 16",
+        "descripcion": (
+            "Regenerar es volver a los patrones primordiales: el ciclo del agua, "
+            "la sucesion ecologica, la red simbiotica, la comunidad de apoyo mutuo. "
+            "La raiz es el Tao mismo, fuente inagotable de vida. Este retorno no es "
+            "nostalgia, sino anclaje: en la observacion de los ciclos, en la memoria "
+            "de los saberes locales, en la recuperacion de practicas tradicionales que "
+            "han sostenido la vida durante siglos."
+        ),
+        "pregunta": (
+            "En que medida nuestras actividades cotidianas y decisiones de diseno "
+            "se basan en los ciclos de la naturaleza, los saberes del lugar y los "
+            "procesos ecologicos de regeneracion?"
+        ),
+        "opciones": [
+            "Ignoramos los ciclos naturales y la historia del lugar; nuestras practicas son ajenas al territorio.",
+            "Tenemos cierta sensibilidad ecologica, pero aun funcionamos con logicas externas al lugar.",
+            "Incorporamos algunos ciclos y saberes locales, pero de forma parcial o intermitente.",
+            "La mayoria de nuestras decisiones se guian por los ritmos naturales y la memoria del lugar.",
+            "Somos un canal de la inteligencia del lugar: cada accion honra los ciclos y profundiza el retorno a lo esencial.",
+        ],
+    },
+]
+
+TAO_INTEGRACION = (
+    "Estas cinco dimensiones no son compartimentos estancos. La accion espontanea "
+    "y oportuna solo es posible cuando se habita la humildad y la suficiencia; "
+    "la compasion y el no-juicio encuentran su fuerza en fortalecer lo esencial; "
+    "y todo ello confluye en el retorno a la raiz. Regenerar es, en el fondo, "
+    "dejar que esa virtud actue a traves nuestro -- sin forzar, sin poseer, sin "
+    "reclamar -- confiando en que la vida, cuando se le da espacio, siempre retorna."
+)
+
+TAO_INVITACION = (
+    "Este diagnostico es solo un momento dentro de un proceso mucho mas amplio. "
+    "Cada espacio tiene su propio ritmo de transformacion. "
+    "A veces la regeneracion comienza con algo pequeno: un huerto, un sistema "
+    "de compostaje, una conversacion comunitaria. Lo importante es seguir caminando.\n\n"
+    "Si deseas continuar profundizando este proceso, puedes conocer mas sobre "
+    "el trabajo de LivLin en www.livlin.cl."
+)
+
+TAO_DIM_LABELS = [d["titulo"] for d in TAO_DIMENSIONES]
+TAO_DIM_IDS = [d["id"] for d in TAO_DIMENSIONES]
 
 
+# ========================================================================
+# FUNCION RENDER PRINCIPAL
+# ========================================================================
 
-TAO_REFLEXION = """
-**Lo deseado y lo no deseado** — Tao Te Ching, Capítulos 2, 15 y 16
-
-Lo que buscas también está aquí. Y aquello que no buscas, también.
-Lo deseado y lo no deseado coexisten en el mismo espacio, como las dos caras del mismo momento.
-El segundo capítulo enseña que el ser y el no-ser se engendran mutuamente, que lo difícil
-y lo fácil se complementan. Los capítulos 15 y 16 agregan: quien regresa a la raíz regresa
-a la quietud — esa es la ley del volver.
-La regeneración comienza cuando habitamos esa tensión con serenidad, sin forzar, sin huir.
-
-
-**La triple crisis planetaria** — Tao Te Ching, Capítulo XLVI
-
-A veces parece que todo está perdido. Que los suelos están degradados, que los ecosistemas
-colapsan, que las sociedades han olvidado su relación con la tierra.
-El capítulo 46 enseña: cuando el Tao prevalece en el mundo, los caballos de guerra se retiran
-a abonar los campos. Cuando no prevalece, nacen en las fronteras.
-Sin embargo, la vida sigue latiendo. Siempre queda una semilla. Siempre hay personas
-que escuchan el llamado.
-
-
-**Ser parte de la naturaleza** — Tao Te Ching, Capítulo 5 y Capítulo 25
-
-El capítulo 5 nos recuerda que el cielo y la tierra no favorecen a nadie: ciclan, conectan,
-devuelven. El capítulo 25 describe algo anterior al cielo y la tierra — silencioso, informe,
-omnipresente — de lo que todo surge. La humanidad sigue la tierra, la tierra sigue el cielo,
-el cielo sigue el Tao, el Tao sigue su propia naturaleza.
-La regeneración no surge del control sobre la naturaleza sino de cooperar con ella.
-No somos externos a la naturaleza — somos parte del mismo ciclo.
-
-
-**Conocerse** — Tao Te Ching, Capítulo 33
-
-El capítulo 33 enseña que conocer a los demás es sabiduría, conocerse a uno mismo
-es iluminación. Vencer a los demás requiere fuerza; vencerse a uno mismo requiere
-verdadera fortaleza. Quien sabe que tiene suficiente es rico.
-Por eso el camino regenerativo también es un camino interior.
-Mente abierta. Corazón abierto. Voluntad abierta.
-
-
-**Cuatro pilares del pensamiento** — Tao Te Ching, Capítulo 2
-
-El capítulo 2 ofrece cuatro pilares para un pensar alineado con la vida:
-La interdependencia — todo surge de la relación, nada existe en aislamiento.
-La complementariedad — lo que parece opuesto se sostiene mutuamente.
-La no-acción forzada (wu wei) — actuar en armonía con los procesos naturales.
-La humildad — el sabio actúa sin proclamarse autor de sus obras.
-Estos cuatro pilares son también la base del diseño regenerativo.
-
-
-**Descenso creativo y la sabiduría del agua** — Tao Te Ching, Capítulo 8
-
-El capítulo 8 describe el bien supremo como el agua: beneficia a todos los seres sin
-competir con ninguno, se establece en los lugares que los demás rechazan.
-El descenso creativo no es una caída — es una bajada consciente hacia donde la vida florece:
-simplificar, reducir el consumo, ganar en salud, vínculos y sentido de comunidad.
-El agua transforma la roca no por violencia, sino por persistencia. Así también la regeneración.
-
-
-**Cultivarse a través del lugar** — Tao Te Ching, Capítulo LIV
-
-El capítulo 54 enseña: lo que está bien plantado no se arranca. Lo que está bien cultivado
-en uno mismo tiene virtud genuina; cultivado en la familia se desborda; cultivado en la
-comunidad crece; cultivado en el territorio abunda.
-Cada huerto que cultivas es una semilla de cultura. Cada comunidad que cuidas es un
-territorio que florece. Lo que hacemos hoy lo habitarán quienes aún no han nacido.
-
-
-**Lo que sustenta todo** — Tao Te Ching, Capítulo XXXIX
-
-El capítulo 39 describe aquello que antaño adquirió el Uno y quedó completo: el cielo
-quedó claro, la tierra quedó firme, los seres quedaron plenos.
-Un espacio regenerativo es aquel que ha recuperado su unidad — su esencia, su vitalidad,
-su capacidad de sostener vida. Ese es el trabajo que hacemos juntos: volver a encontrar
-el Uno en cada lugar que habitamos.
-
-
-*Reflexiones escritas por Hua Dao (2025), en diálogo con Lao Tsé y el Tao Te Ching
-— texto fundacional del taoísmo, siglo VI a.C.*
-"""
-
-
-
-TAO_INVITACION = """
-Este diagnóstico es solo un momento dentro de un proceso mucho más amplio.
-Cada espacio tiene su propio ritmo de transformación.
-A veces la regeneración comienza con algo pequeño: un huerto, un sistema de compostaje, una conversación comunitaria.
-Lo importante es seguir caminando.
-
-Si deseas continuar profundizando este proceso, puedes conocer más sobre el trabajo de LivLin en www.livlin.cl.
-También te invitamos a sumarte a la comunidad de práctica LivLin, donde personas y organizaciones comparten aprendizajes y experiencias relacionadas con la regeneración.
-
-Porque cuando muchas personas comienzan a escuchar ese mismo pulso de vida, los territorios cambian.
-Y con ellos, también cambia nuestra forma de habitar el mundo. 🌱
-"""
 def render():
     from utils.module_status import is_readonly as _is_ro, render_readonly_notice
     _readonly = _is_ro()
     if _readonly:
         render_readonly_notice()
-    st.markdown("## ☯️ Tao de la Regeneración")
+
+    st.markdown("## Tao de la Regeneracion")
     st.markdown(
-        '<p class="module-subtitle">Exploración interior opcional — desde lo que sienten '
-        'hacia lo que quieren crear. De lo yin a lo yang.</p>', unsafe_allow_html=True)
+        '<p class="module-subtitle">Cinco dimensiones de sabiduria taoista para '
+        'acompanar el camino de la virtud regenerativa.</p>', unsafe_allow_html=True)
 
-    # ── Introducción ──────────────────────────────────────────────────────
-    with st.expander("📖 ¿Qué es el Tao de la Regeneración? (clic para leer)", expanded=False):
-        st.markdown("""
-El **Tao de la Regeneración** es un marco de indagación interior que usa el taoísmo filosófico
-— especialmente a **Lao Tse** y **Chuang Tse** — como guía para explorar la relación
-del grupo con el espacio que habita y con los procesos regenerativos.
-
-En la permacultura, el principio de *observar antes de actuar* tiene un paralelo profundo
-en el Tao: **no forzar**, fluir con los patrones naturales, encontrar el camino del menor
-esfuerzo que produce el mayor bien. El Tao no es una filosofía de inacción — es una filosofía
-de acción alineada con los ritmos de la naturaleza.
-
-La triple crisis planetaria — cambio climático, pérdida de biodiversidad y contaminación —
-puede ser abordada también desde adentro: ¿cómo nos relacionamos interiormente con esta
-realidad? ¿Nos paraliza? ¿Nos moviliza? ¿Cómo este espacio puede ser una respuesta pequeña
-pero real?
-
-> *«Las leyes de la regeneración son las mismas que las leyes del Tao: volver a lo esencial
-de lo esencial. Regenerar es simplemente fluir de regreso a la fuente.»*
-> — Reflexiones frente a Lao Tse, Hua Dao (2025)
-
-Este módulo es **completamente opcional**. Cada pregunta puede ser respondida,
-saltada, o explorada con la profundidad que el grupo sienta apropiada.
-        """)
-
-    st.markdown(
-        '<div class="info-box">🕊️ Este módulo puede responderse en conversación grupal '
-        'o de forma individual. No hay respuestas correctas. '
-        'Tómense el tiempo que necesiten — o vuelvan a él más tarde.</div>',
-        unsafe_allow_html=True)
+    with st.expander("Que es el Tao de la Regeneracion? (clic para leer)", expanded=False):
+        st.markdown(
+            f'<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;'
+            f'margin-bottom:0.5rem;border-left:3px solid #2D6A4F;">'
+            f'<em style="color:#555;font-size:0.85rem;">'
+            f'&laquo;{TAO_EPIGRAFE}&raquo;</em><br>'
+            f'<span style="font-size:0.75rem;color:#888;">-- Reflexiones frente a Lao Tse, Hua Dao (2025)</span>'
+            f'</div>', unsafe_allow_html=True)
+        st.markdown(TAO_INTRO)
+        st.info(TAO_DISCLAIMER)
 
     data = st.session_state.visit_data
 
-    # ── Estado del módulo ─────────────────────────────────────────────────
-    st.markdown("**Estado de este módulo:**")
+    st.markdown("**Estado de este modulo:**")
     _mod_status = render_module_status(data, "mod_tao")
     if not is_module_active(_mod_status):
-        save_col1, save_col2 = st.columns([1,1])
-        with save_col1:
-            if not _readonly:
-                if st.button("💾 Guardar como No Abordado", key="save_na_mod_tao",
-                             use_container_width=True):
-                    st.session_state.visit_data = data
-                    save_visit(data)
-                    st.success("✅ Módulo marcado como No Abordado.")
-                    show_drive_save_status()
+        if not _readonly:
+            if st.button("Guardar como No Abordado", key="save_na_mod_tao",
+                         use_container_width=True):
+                st.session_state.visit_data = data
+                save_visit(data)
+                st.success("Modulo marcado como No Abordado.")
+                show_drive_save_status()
         return
+
     if _mod_status == "inferido":
-        st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
+        st.info("**Modo inferido** -- Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
     st.markdown("---")
 
-    # ── Reflexiones desde el Tao de la Regeneración ──────────────────────
-    with st.expander("🌿 Reflexiones desde el Tao de la Regeneración", expanded=False):
+    # -- Las 5 dimensiones --
+    for i, dim in enumerate(TAO_DIMENSIONES):
+        st.markdown(f'<div class="section-card">', unsafe_allow_html=True)
+        st.markdown(f"### Dimension {dim['icono']}: {dim['titulo']}")
+        st.markdown(f"*{dim['subtitulo']}*")
+
         st.markdown(
-            '<div class="tao-quote">' +
-            TAO_REFLEXION.replace("\n\n", "</div><div class='tao-quote'>") +
-            '</div>', unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown(
-            '<div class="info-box">' + TAO_INVITACION + '</div>',
-            unsafe_allow_html=True)
+            f'<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;'
+            f'margin:0.5rem 0;border-left:3px solid #40916C;">'
+            f'<em style="color:#2D6A4F;font-size:0.85rem;">&laquo;{dim["cita_tao"]}&raquo;</em><br>'
+            f'<span style="font-size:0.75rem;color:#666;">-- {dim["cita_cap"]}</span>'
+            f'</div>', unsafe_allow_html=True)
+
+        st.markdown(f'<div style="font-size:0.88rem;color:#333;margin:0.5rem 0;">{dim["descripcion"]}</div>',
+                    unsafe_allow_html=True)
+
+        st.markdown(f'<div style="background:#E8F5E9;border-radius:8px;padding:0.6rem 0.8rem;'
+                    f'margin:0.5rem 0;">'
+                    f'<strong style="color:#1B4332;">Pregunta de reflexion:</strong><br>'
+                    f'<em style="color:#2D6A4F;">{dim["pregunta"]}</em></div>',
+                    unsafe_allow_html=True)
+
+        current_val = data.get(dim["id"], 0)
+        if isinstance(current_val, str):
+            try:
+                current_val = int(current_val)
+            except (ValueError, TypeError):
+                current_val = 0
+
+        opciones_display = [f"{j+1}. {opt}" for j, opt in enumerate(dim["opciones"])]
+        opciones_con_nr = ["Sin responder"] + opciones_display
+
+        idx = 0
+        if 1 <= current_val <= 5:
+            idx = current_val
+
+        if not _readonly:
+            sel = st.radio(
+                f"Seleccione el nivel que mejor describe su situacion actual:",
+                opciones_con_nr,
+                index=idx,
+                key=f"radio_{dim['id']}",
+                horizontal=False,
+            )
+            if sel == "Sin responder":
+                data[dim["id"]] = 0
+            else:
+                data[dim["id"]] = opciones_con_nr.index(sel)
+        else:
+            if current_val > 0:
+                st.markdown(f"**Respuesta seleccionada:** {opciones_display[current_val-1]}")
+            else:
+                st.markdown("*Sin responder*")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # -- Integracion --
+    st.markdown("---")
+    with st.expander("Integracion: el camino de la virtud regenerativa", expanded=False):
+        st.markdown(TAO_INTEGRACION)
+
+    # -- Radar preview --
+    valores = [data.get(d["id"], 0) for d in TAO_DIMENSIONES]
+    valores_int = []
+    for v in valores:
+        try:
+            valores_int.append(int(v))
+        except (ValueError, TypeError):
+            valores_int.append(0)
+
+    if any(v > 0 for v in valores_int):
+        st.markdown("### Vista previa del Radar Tao")
+        _render_tao_radar(valores_int, compact=False)
+
+    # -- Notas --
+    data["tao_notas"] = st.text_area(
+        "Notas del Tao de la Regeneracion",
+        value=data.get("tao_notas", ""), height=80)
 
     st.markdown("---")
-
-    # ── T.1 Presencia y relación con el espacio ───────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### 🌿 T.1 · Presencia y Relación con el Espacio")
-    st.markdown(
-        '<div class="tao-quote-sm">«El Tao que puede ser nombrado no es el Tao eterno.» '
-        '— Lao Tse, cap. 1<br>'
-        '<em>Antes de cualquier proyecto, el espacio ya tiene su propio ritmo y su propia historia.</em>'
-        '</div>', unsafe_allow_html=True)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        data["tao_tiempo_aire"]= st.select_slider(
-            "¿Cuánto tiempo pasan al aire libre?",
-            options=["Casi nada","15–30 min","30–60 min","1–2 horas","Más de 2 horas"],
-            value=data.get("tao_tiempo_aire","15–30 min"))
-        data["tao_silencio"]= st.radio(
-            "¿Practican momentos de silencio u observación tranquila aquí?",
-            ["No","Rara vez","A veces","Regularmente"],
-            index=["No","Rara vez","A veces","Regularmente"].index(data.get("tao_silencio","No")), horizontal=True)
-        data["tao_conexion"]= st.slider(
-            "¿Qué tan conectados/as se sienten con este lugar? (0=ninguna — 5=profunda)",
-            0,5, int(data.get("tao_conexion",3)))
-    with col2:
-        data["tao_contemplacion"]= st.radio(
-            "¿Existe en el espacio algún rincón para la contemplación o el silencio?",
-            ["No","Informal / espontáneo","Sí, intencionado"],
-            index=["No","Informal / espontáneo","Sí, intencionado"].index(data.get("tao_contemplacion","No")), horizontal=True)
-        data["tao_sensacion"]= st.text_area(
-            "¿Qué sensación les genera estar en este espacio hoy?",
-            value=data.get("tao_sensacion",""), height=100,
-            placeholder="Ej: Hay caos pero también potencial. Nos pide atención…")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # ── T.2 Lo deseado y lo no deseado ───────────────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### ☯️ T.2 · Lo Deseado y lo No Deseado")
-    st.markdown(
-        '<div class="tao-quote-sm">'
-        '«Lo que buscas también está aquí. Así como lo que no buscas también está aquí. '
-        'Ambos, lo deseado y lo no deseado, existen y así será siempre.<br>'
-        'Tranquiliza tu corazón: mientras parezca todo perdido, la llama de aquello deseado '
-        'no se apagará.»<br>'
-        '<span style="font-size:0.8rem;">— Reflexiones frente a Lao Tse, Hua Dao (2025)</span>'
-        '</div>', unsafe_allow_html=True)
-
-    col3, col4 = st.columns(2)
-    with col3:
-        data["tao_deseado"]= st.text_area("¿Qué desean para este espacio?", value=data.get("tao_deseado",""), height=90,
-            placeholder="Ej: Abundancia, colores, vida, el canto de pájaros, cosechas, silencio…")
-        data["tao_acepta_nod"]= st.radio(
-            "¿Qué situaciones, dinámicas o resultados definitivamente NO quieren en este espacio?",
-            ["No todavía","Con dificultad","Sí, en parte","Sí, profundamente"],
-            index=["No todavía","Con dificultad","Sí, en parte","Sí, profundamente"].index(data.get("tao_acepta_nod","Con dificultad")))
-    with col4:
-        data["tao_no_deseado"]= st.text_area("¿Qué no desean para este espacio?", value=data.get("tao_no_deseado",""), height=90,
-            placeholder="Ej: Maleza invasora, suciedad, ruido, soledad, desorden…")
-        data["tao_llama"]= st.text_area(
-            "¿Hay algo que desean pero que parece inalcanzable? ¿Cuál es la llama que no se apaga?",
-            value=data.get("tao_llama",""), height=90,
-            placeholder="Ej: Siempre quisimos un árbol grande, pero el espacio es pequeño…")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # ── T.3 Ritmo de vida y descenso creativo ────────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### 🍃 T.3 · Ritmo de Vida y Descenso Creativo")
-    st.markdown(
-        '<div class="tao-quote-sm">«El sabio actúa sin actuar, enseña sin palabras.» — Lao Tse, cap. 2<br>'
-        '<em>El descenso creativo — hacer más con menos, encontrar plenitud en lo simple — '
-        'es una expresión viviente del Tao y del principio permacultural de "producción sin residuos".</em>'
-        '</div>', unsafe_allow_html=True)
-
-    col5, col6 = st.columns(2)
-    with col5:
-        data["tao_ritmo"]= st.select_slider("¿Cómo es su ritmo de vida actualmente?",
-            options=["Muy acelerado","Acelerado","Equilibrado","Tranquilo","Muy tranquilo"],
-            value=data.get("tao_ritmo","Acelerado"))
-        data["tao_sencillez"]= st.radio(
-            "¿Existe en el grupo una tendencia hacia la sencillez y lo esencial?",
-            ["No, somos más de acumular","A veces","Sí, aunque con altibajos","Sí, como valor central"],
-            index=["No, somos más de acumular","A veces","Sí, aunque con altibajos","Sí, como valor central"].index(data.get("tao_sencillez","A veces")))
-        data["tao_consumo"]= st.text_area("¿Qué relación tienen con el consumo material?", value=data.get("tao_consumo",""), height=80,
-            placeholder="Ej: Intentamos reducir pero es difícil en la ciudad…")
-    with col6:
-        data["tao_tiempo_libre"]= st.select_slider("¿Cuánto tiempo libre tienen para este espacio?",
-            options=["Muy poco","Fines de semana","Varios momentos/semana","Varios días","Mucho tiempo"],
-            value=data.get("tao_tiempo_libre","Fines de semana"))
-        data["tao_actividades"]= st.text_area("¿Qué actividades los nutren y recargan en este lugar?", value=data.get("tao_actividades",""), height=80,
-            placeholder="Ej: Leer, cultivar, jugar con los niños, tomar sol…")
-        data["tao_descanso_creativo"]= st.text_area(
-            "¿Han experimentado el 'descenso creativo' — bajar el ritmo y encontrar más en menos?",
-            value=data.get("tao_descanso_creativo",""), height=80,
-            placeholder="Ej: Cuando dejamos de correr tanto, el jardín empezó a florecer…")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # ── T.4 Somos naturaleza ──────────────────────────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### 🌊 T.4 · Somos Naturaleza")
-    st.markdown(
-        '<div class="tao-quote-sm">'
-        '«No intentar salvar la naturaleza como si fuera algo exterior a mí — eso reproduce el dual. '
-        'Somos naturaleza. Al cuidarme, facilito que la naturaleza se manifieste a través de mí.»<br>'
-        '<span style="font-size:0.8rem;">— Reflexiones frente a Lao Tse, Hua Dao (2025)</span>'
-        '</div>', unsafe_allow_html=True)
-
-    col7, col8 = st.columns(2)
-    with col7:
-        data["tao_naturaleza_ext"]= st.radio(
-            "¿Tienden a sentir la naturaleza como algo exterior que hay que proteger, o como algo de lo que son parte?",
-            ["Como algo exterior que hay que proteger","Ambas perspectivas coexisten","Como algo de lo que somos parte"],
-            index=["Como algo exterior que hay que proteger","Ambas perspectivas coexisten","Como algo de lo que somos parte"].index(data.get("tao_naturaleza_ext","Ambas perspectivas coexisten")))
-        data["tao_cuerpo_tierra"]= st.text_area(
-            "¿Tienen contacto físico con la tierra en este espacio? (manos, pies descalzos, sembrar, cavar…)",
-            value=data.get("tao_cuerpo_tierra",""), height=80,
-            placeholder="Ej: A veces los niños juegan en la tierra, pero los adultos casi no…")
-    with col8:
-        data["tao_agua_virtud"]= st.text_area(
-            "Lao Tse habla de la virtud del agua: fluye sin forzar, nutre todo. "
-            "¿Qué parte de su grupo o espacio se parece al agua? ¿Qué bloquea ese flujo?",
-            value=data.get("tao_agua_virtud",""), height=120,
-            placeholder="Ej: Cuando no planificamos tanto y dejamos fluir, el espacio responde mejor…")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # ── T.5 Triple crisis planetaria ─────────────────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### 🌍 T.5 · La Triple Crisis Planetaria")
-    st.markdown(
-        '<div class="tao-quote-sm">'
-        '«Regenerar es simplemente volver a lo esencial de lo esencial. '
-        'Las leyes de la regeneración son las mismas que las leyes del Tao.»<br>'
-        '<span style="font-size:0.8rem;">— Reflexiones frente a Lao Tse, Hua Dao (2025)</span>'
-        '</div>', unsafe_allow_html=True)
-
-    # ── Triple crisis: session-state tabs ─────────────────────────────
-    CRISIS_TABS = ["🌡️ Cambio Climático", "🦋 Pérdida de Biodiversidad", "🧪 Contaminación"]
-    tab_header("tao_crisis", CRISIS_TABS)
-    crisis_active = get_active_tab("tao_crisis")
-
-    if crisis_active == 0:
-        data["tao_cc_conciencia"]= st.radio(
-            "¿Qué tan presente está el cambio climático en su vida cotidiana?",
-            ["No lo pensamos mucho","Lo conocemos pero parece lejano","Lo sentimos como una amenaza real","Es parte de nuestra motivación de acción"],
-            index=["No lo pensamos mucho","Lo conocemos pero parece lejano","Lo sentimos como una amenaza real","Es parte de nuestra motivación de acción"].index(data.get("tao_cc_conciencia","Lo conocemos pero parece lejano")))
-        data["tao_cc_impacto"]= st.text_area(
-            "¿Han sentido el cambio climático en este lugar? (sequías, lluvias intensas, calor inusual…)",
-            value=data.get("tao_cc_impacto",""), height=80, placeholder="Ej: Los últimos veranos han sido más secos…")
-        data["tao_cc_respuesta"]= st.text_area(
-            "¿Qué acciones han tomado o piensan tomar frente al cambio climático?",
-            value=data.get("tao_cc_respuesta",""), height=80, placeholder="Ej: Guardar más agua, plantar árboles de sombra…")
-
-    elif crisis_active == 1:
-        data["tao_bio_conciencia"]= st.radio(
-            "¿Tienen conciencia de la crisis de biodiversidad?",
-            ["No la conocíamos","Sabemos que existe pero parece distante","La vemos en nuestro barrio","Es algo que sentimos profundamente"],
-            index=["No la conocíamos","Sabemos que existe pero parece distante","La vemos en nuestro barrio","Es algo que sentimos profundamente"].index(data.get("tao_bio_conciencia","Sabemos que existe pero parece distante")))
-        data["tao_bio_local"]= st.text_area(
-            "¿Han notado cambios en la biodiversidad local? (menos aves, menos insectos, desaparición de especies…)",
-            value=data.get("tao_bio_local",""), height=80, placeholder="Ej: Antes había muchas más mariposas en el barrio…")
-        data["tao_bio_accion"]= st.text_area(
-            "¿Qué podrían hacer en este espacio para contribuir a la biodiversidad local?",
-            value=data.get("tao_bio_accion",""), height=80, placeholder="Ej: Plantar nativas, dejar un rincón sin intervenir…")
-
-    elif crisis_active == 2:
-        data["tao_cont_conciencia"]= st.radio(
-            "¿Qué tan presente está la contaminación en su vida cotidiana?",
-            ["No lo pensamos","Es algo lejano","La vivimos en el barrio","Es una preocupación activa"],
-            index=["No lo pensamos","Es algo lejano","La vivimos en el barrio","Es una preocupación activa"].index(data.get("tao_cont_conciencia","Es algo lejano")))
-        data["tao_cont_tipos"]= st.multiselect(
-            "¿Qué tipos de contaminación identifican cerca o en este espacio?",
-            ["Aire / smog","Suelo contaminado","Ruido","Luz artificial excesiva","Plásticos y residuos","Agua contaminada","Ninguna visible"],
-            default=data.get("tao_cont_tipos",[]))
-        data["tao_cont_respuesta"]= st.text_area(
-            "¿Qué hacen o podrían hacer para reducir la contaminación desde este espacio?",
-            value=data.get("tao_cont_respuesta",""), height=80, placeholder="Ej: Reducir plásticos, usar productos naturales de limpieza…")
-    tab_nav_bottom("tao_crisis", CRISIS_TABS, crisis_active)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # ── T.6 Propósito y visión interior ──────────────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### 🔮 T.6 · Propósito y Visión Interior")
-    st.markdown(
-        '<div class="tao-quote-sm">'
-        '«知人者智，自知者明。» — Lao Tse, cap. 33<br>'
-        '<em>«El conocimiento de los demás es sabiduría. El conocimiento de uno mismo es iluminación.» '
-        'Chuang Tse añade: el sabio sigue el hilo natural de las cosas y no se afana en aparentar lo que no es.</em>'
-        '</div>', unsafe_allow_html=True)
-
-    data["tao_bienestar"]= st.radio(
-        "¿Desean que este espacio apoye su bienestar interior, no solo su productividad?",
-        ["No especialmente","Algo","Sí, mucho","Es lo más importante"],
-        index=["No especialmente","Algo","Sí, mucho","Es lo más importante"].index(data.get("tao_bienestar","Sí, mucho")), horizontal=True)
-    c11, c12 = st.columns(2)
-    with c11:
-        data["tao_naturaleza_rel"]= st.text_area(
-            "¿Qué tipo de relación con la naturaleza desean cultivar?",
-            value=data.get("tao_naturaleza_rel",""), height=90,
-            placeholder="Ej: Producir alimentos, tener silencio, que los niños sean parte de algo vivo…")
-        data["tao_aprender"]= st.text_area(
-            "¿Qué les gustaría aprender en conexión con este espacio?",
-            value=data.get("tao_aprender",""), height=90,
-            placeholder="Ej: Permacultura, compostaje, plantas medicinales…")
-    with c12:
-        data["tao_justicia"]= st.text_area(
-            "Buscar justicia sin reproducir lo que queremos cambiar es parte del Tao. "
-            "¿Practican alguna forma de transformación sin violencia? (persuadir, crear, modelar…)",
-            value=data.get("tao_justicia",""), height=90,
-            placeholder="Ej: Preferimos mostrar con el ejemplo antes que predicar…")
-        data["tao_palabra_esencial"]= st.text_area(
-            "Si resumieran en una o dos palabras lo más esencial de lo que buscan con este espacio, ¿cuáles serían?",
-            value=data.get("tao_palabra_esencial",""), height=90,
-            placeholder="Ej: Raíces. Abundancia simple. Conexión. Hogar vivo…")
-
-    # ── T.7 Alimentación saludable y actividad física ──────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown("### 🥗 T.7 · Alimentación Saludable y Actividad Física")
-    st.markdown(
-        '<div class="tao-quote-sm">'
-        '«Tratar el cuerpo bien es la primera forma de respetar la tierra que lo sostiene.»<br>'
-        '<em>La salud personal y la salud del ecosistema están profundamente conectadas. '
-        'Lo que comemos, cómo nos movemos y cómo descansamos forma parte de la misma red.</em>'
-        '</div>', unsafe_allow_html=True)
-    st.caption("Estas preguntas se relacionan con el Pétalo 5 de la Flor de la Permacultura: Salud y Bienestar Espiritual.")
-
-    f1, f2 = st.columns(2)
-    with f1:
-        opts_ali = ["No registrado","Poco — comemos principalmente procesados","Regular — mezcla de procesados y frescos",
-                    "Buena — mayoritariamente alimentos frescos","Muy buena — dieta basada en plantas y local",
-                    "Excelente — producimos parte de lo que comemos"]
-        data["sal_alimentacion"] = st.selectbox(
-            "¿Cómo describirían la calidad de su alimentación?",
-            opts_ali, index=opts_ali.index(data.get("sal_alimentacion","No registrado")))
-
-        opts_local = ["No registrado","No","A veces","Frecuentemente","Sí, priorizamos lo local"]
-        data["sal_alim_local"] = st.selectbox(
-            "¿Consumen alimentos locales o de productores cercanos?",
-            opts_local, index=opts_local.index(data.get("sal_alim_local","No registrado")))
-
-        opts_plantas = ["No registrado","No","A veces","Frecuentemente","Mayoritariamente basada en plantas"]
-        data["sal_alim_plantas"] = st.selectbox(
-            "¿Su alimentación incluye muchas plantas, frutas y verduras frescas?",
-            opts_plantas, index=opts_plantas.index(data.get("sal_alim_plantas","No registrado")))
-
-    with f2:
-        opts_ej = ["No registrado","No hacemos ejercicio regularmente","Caminatas ocasionales",
-                   "Ejercicio leve 1-2 veces/semana","Ejercicio moderado 3+ veces/semana",
-                   "Actividad física diaria integrada a la vida"]
-        data["sal_ejercicio"] = st.selectbox(
-            "¿Realizan actividad física regularmente?",
-            opts_ej, index=opts_ej.index(data.get("sal_ejercicio","No registrado")))
-
-        opts_nat = ["No registrado","Raramente","A veces","Frecuentemente","Es parte de nuestra rutina"]
-        data["sal_contacto_naturaleza"] = st.selectbox(
-            "¿Pasan tiempo en naturaleza, parques o espacios verdes?",
-            opts_nat, index=opts_nat.index(data.get("sal_contacto_naturaleza","No registrado")))
-
-        opts_des = ["No registrado","Poco — dormimos mal o poco","Regular","Bien","Muy bien — priorizamos el descanso"]
-        data["sal_descanso"] = st.selectbox(
-            "¿Cómo es la calidad del descanso y el sueño en el grupo?",
-            opts_des, index=opts_des.index(data.get("sal_descanso","No registrado")))
-
-    data["sal_practicas_text"] = st.text_area(
-        "¿Hay otras prácticas de salud o bienestar que quieran mencionar?",
-        value=data.get("sal_practicas_text",""), height=70,
-        placeholder="Ej: meditación, yoga, huerto terapéutico, cocina colectiva, remedios naturales…")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    data["tao_notas"]= st.text_area("📝 Notas del Tao de la Regeneración", value=data.get("tao_notas",""), height=80)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("---")
-    _, col_b, _ = st.columns([2,1,2])
+    _, col_b, _ = st.columns([2, 1, 2])
     with col_b:
         if not _readonly:
-            if st.button("💾 Guardar Tao", use_container_width=True, type="primary"):
+            if st.button("Guardar Tao", use_container_width=True, type="primary"):
                 vid = save_visit(data)
                 data["id"] = vid
                 st.session_state.visit_data = data
-                st.success("✅ Guardado.")
-    
+                st.success("Guardado.")
+
+
+# ========================================================================
+# RADAR CHART (reutilizable desde report.py)
+# ========================================================================
+
+def _render_tao_radar(valores, compact=True):
+    """Render radar chart for the 5 Tao dimensions. valores = list of 5 ints (0-5)."""
+    import plotly.graph_objects as go
+
+    labels = [d["titulo"] for d in TAO_DIMENSIONES]
+    vals = list(valores) + [valores[0]]
+    cats = list(labels) + [labels[0]]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(
+        r=vals, theta=cats, fill='toself',
+        fillcolor='rgba(45,105,78,0.15)',
+        line=dict(color='#2D6A4F', width=2),
+        marker=dict(size=6, color='#1B4332'),
+        name='Estado actual',
+    ))
+    fig.add_trace(go.Scatterpolar(
+        r=[5]*6, theta=cats, fill=None,
+        line=dict(color='#A8D5B5', width=1, dash='dot'),
+        name='Maximo',
+    ))
+
+    height = 320 if compact else 420
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(visible=True, range=[0, 5], tickvals=[1,2,3,4,5],
+                            tickfont=dict(size=9), gridcolor='#E8F5E9'),
+            angularaxis=dict(tickfont=dict(size=10 if compact else 11)),
+            bgcolor='rgba(255,255,255,0)',
+        ),
+        showlegend=False,
+        margin=dict(l=60, r=60, t=30, b=30),
+        height=height,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    filled = [v for v in valores if v > 0]
+    if filled:
+        avg = sum(filled) / len(filled)
+        total = sum(valores)
+        label = get_tao_label(total)
+        st.markdown(
+            f'<div style="text-align:center;padding:0.4rem;background:#F0FFF4;'
+            f'border-radius:8px;font-size:0.85rem;color:#1B4332;">'
+            f'Puntaje total: <strong>{total}/25</strong> &nbsp; | &nbsp; '
+            f'Promedio: <strong>{avg:.1f}/5</strong> &nbsp; | &nbsp; '
+            f'Nivel: <strong>{label}</strong></div>',
+            unsafe_allow_html=True)
+
+
+def get_tao_scores(data):
+    """Return dict with scores for external use."""
+    scores = {}
+    for dim in TAO_DIMENSIONES:
+        v = data.get(dim["id"], 0)
+        try:
+            scores[dim["id"]] = int(v)
+        except (ValueError, TypeError):
+            scores[dim["id"]] = 0
+    return scores
+
+
+def get_tao_total(data):
+    """Return total Tao score (0-25)."""
+    return sum(get_tao_scores(data).values())
+
+
+def get_tao_label(total):
+    """Return interpretive label for total score."""
+    if total == 0:
+        return "Sin evaluar"
+    if total <= 5:
+        return "Inicio del camino"
+    if total <= 10:
+        return "Semilla interior"
+    if total <= 15:
+        return "Brote consciente"
+    if total <= 20:
+        return "Crecimiento armonico"
+    return "Virtud regenerativa"

@@ -5,6 +5,10 @@ pandas>=2.0.0
 requests>=2.31.0
 python-docx>=1.1.0
 
+# Cuencas hidrograficas (shapefiles)
+geopandas>=0.14.0
+shapely>=2.0.0
+
 # Supabase — base de datos principal + almacenamiento de fotos
 
 # Google Drive — opcional, solo si se configura para backup adicional

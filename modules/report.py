@@ -190,6 +190,7 @@ REPORT_SECTIONS = {
     "vision":      "🌱 Visión y Estado Regenerativo",
     "datos":       "📋 Datos del Proyecto",
     "tao":         "☯️ Tao de la Regeneración",
+    "eco_conciencia": "🌍 Conciencia Ecológica",
     "ecologia":    "🔬 Observación Ecológica",
     "sistemas":    "🏙️ Contexto, Agua y Energía",
     "fotos":       "📷 Registro Fotográfico",
@@ -778,18 +779,115 @@ def render():
 
 
     # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 3 — TAO DE LA REGENERACIÓN
-    # ══════════════════════════════════════════════════════════════════
+    # SECCION 3 -- TAO DE LA REGENERACION (v2 -- 5 dimensiones)
+    # ==================================================================
     if _show("tao"):
-        st.markdown(f"### ☯️ Tao de la Regeneración &nbsp; {_status_badge('mod_tao')}", unsafe_allow_html=True)
+        st.markdown(f"### Tao de la Regeneracion &nbsp; {_status_badge('mod_tao')}", unsafe_allow_html=True)
         st.markdown(f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">{TAO_REFLEXION_SHORT}</div>', unsafe_allow_html=True)
-        for lbl, key in [("Sensación al llegar","tao_sensacion"),("Lo deseado","tao_deseado"),
-                         ("Lo no deseado","tao_no_deseado"),("Lo que llama la atención","tao_llama"),
-                         ("Relación con la naturaleza","tao_naturaleza_rel"),("Palabra esencial","tao_palabra_esencial")]:
+
+        # Import Tao module functions
+        try:
+            from modules.tao import (
+                TAO_DIMENSIONES, TAO_DISCLAIMER, _render_tao_radar,
+                get_tao_scores, get_tao_total, get_tao_label
+            )
+            scores = get_tao_scores(data)
+            valores = [scores[d["id"]] for d in TAO_DIMENSIONES]
+            total = get_tao_total(data)
+
+            if any(v > 0 for v in valores):
+                st.markdown("#### Radar de las 5 Dimensiones Taoistas")
+                _render_tao_radar(valores, compact=True)
+
+                # Show each dimension detail
+                for dim in TAO_DIMENSIONES:
+                    v = scores.get(dim["id"], 0)
+                    if v > 0:
+                        opt_text = dim["opciones"][v-1] if 1 <= v <= 5 else "Sin responder"
+                        _card(
+                            f"Dimension {dim['icono']}: {dim['titulo']}",
+                            f"Nivel {v}/5 -- {opt_text}",
+                            bg="#E8F5E9", border="#2D6A4F"
+                        )
+
+                # Disclaimer
+                st.markdown(
+                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem;'
+                    f'margin-top:0.5rem;font-size:0.8rem;color:#5D4037;border-left:3px solid #F9A825;">'
+                    f'{TAO_DISCLAIMER}</div>', unsafe_allow_html=True)
+            else:
+                st.caption("Las dimensiones del Tao no han sido evaluadas en este diagnostico.")
+
+            # Notas
+            notas = data.get("tao_notas", "")
+            if notas:
+                _card("Notas del Tao", notas, bg="#E8F5E9", border="#2D6A4F")
+
+        except Exception as e:
+            st.caption(f"Tao de la Regeneracion: {e}")
+
+        # Cuenca info
+        cuenca_nombre = data.get("cuenca_nombre", "")
+        subcuenca_nombre = data.get("subcuenca_nombre", "")
+        subsubcuenca_nombre = data.get("subsubcuenca_nombre", "")
+        if cuenca_nombre:
+            st.markdown("#### Informacion de Cuenca Hidrografica")
+            cols_c = st.columns(3)
+            with cols_c[0]:
+                link = data.get("cuenca_wiki_link", "")
+                label_html = f'<a href="{link}" target="_blank">{cuenca_nombre}</a>' if link else cuenca_nombre
+                _card("Cuenca", label_html, bg="#E3F2FD", border="#1565C0")
+            with cols_c[1]:
+                if subcuenca_nombre:
+                    link = data.get("subcuenca_wiki_link", "")
+                    label_html = f'<a href="{link}" target="_blank">{subcuenca_nombre}</a>' if link else subcuenca_nombre
+                    _card("Subcuenca", label_html, bg="#E3F2FD", border="#1565C0")
+            with cols_c[2]:
+                if subsubcuenca_nombre:
+                    link = data.get("subsubcuenca_wiki_link", "")
+                    label_html = f'<a href="{link}" target="_blank">{subsubcuenca_nombre}</a>' if link else subsubcuenca_nombre
+                    _card("Subsubcuenca", label_html, bg="#E3F2FD", border="#1565C0")
+
+            wiki_summary = data.get("cuenca_wiki_summary", "")
+            if wiki_summary:
+                wiki_source = data.get("cuenca_wiki_source", "")
+                st.markdown(
+                    f'<div style="background:#E3F2FD;border-radius:8px;padding:0.6rem;'
+                    f'margin-top:0.3rem;font-size:0.82rem;color:#1A237E;">'
+                    f'<strong>Sobre {wiki_source} (Wikipedia):</strong><br>{wiki_summary}</div>',
+                    unsafe_allow_html=True)
+
+        _ref_box([("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
+                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+                  ("Lao Tse (s. VI a.C.)", "Tao Te Ching", "https://es.wikipedia.org/wiki/Tao_Te_Ching")])
+        st.markdown("---")
+
+    # ==================================================================
+    # SECCION 3b -- CONCIENCIA ECOLOGICA
+    # ==================================================================
+    eco_has_data = any(data.get(k) for k in ["eco_cc_conciencia", "eco_bio_conciencia", "eco_cont_conciencia"])
+    if eco_has_data:
+        st.markdown("### Conciencia Ecologica", unsafe_allow_html=True)
+        st.markdown(
+            '<div style="background:#FFF3E0;border-radius:8px;padding:0.6rem;margin-bottom:0.8rem;'
+            'font-size:0.85rem;color:#4E342E;">'
+            'La triple crisis planetaria -- cambio climatico, perdida de biodiversidad '
+            'y contaminacion -- es el contexto en el que toda accion regenerativa se situa.</div>',
+            unsafe_allow_html=True)
+        for lbl, key in [("Cambio climatico", "eco_cc_conciencia"),
+                         ("Impacto local del clima", "eco_cc_impacto"),
+                         ("Respuesta al clima", "eco_cc_respuesta"),
+                         ("Biodiversidad", "eco_bio_conciencia"),
+                         ("Biodiversidad local", "eco_bio_local"),
+                         ("Acciones biodiversidad", "eco_bio_accion"),
+                         ("Contaminacion", "eco_cont_conciencia"),
+                         ("Tipos contaminacion", "eco_cont_tipos"),
+                         ("Respuesta contaminacion", "eco_cont_respuesta")]:
             v = data.get(key)
-            if v: _card(lbl, str(v), bg="#E8F5E9", border="#2D6A4F")
-        _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
-                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/")])
+            if v:
+                if isinstance(v, list):
+                    v = ", ".join(v)
+                _card(lbl, str(v), bg="#FFF8E1", border="#F57F17")
         st.markdown("---")
 
 

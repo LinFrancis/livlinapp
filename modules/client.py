@@ -189,6 +189,35 @@ def render():
             f'<a href="https://shademap.app/@{lat},{lon},15z" target="_blank">ShadowMap</a>'
             f'</div>', unsafe_allow_html=True)
 
+        # -- Cuenca identification --
+        cuenca_nombre = data.get("cuenca_nombre", "")
+        if cuenca_nombre:
+            sc = data.get("subcuenca_nombre", "")
+            ssc = data.get("subsubcuenca_nombre", "")
+            parts = [f"Cuenca: **{cuenca_nombre}**"]
+            if sc: parts.append(f"Subcuenca: **{sc}**")
+            if ssc: parts.append(f"Subsubcuenca: **{ssc}**")
+            st.markdown(
+                f'<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.8rem;'
+                f'margin-bottom:0.5rem;font-size:0.82rem;border-left:3px solid #1565C0;">'
+                f'{" | ".join(parts)}</div>', unsafe_allow_html=True)
+        else:
+            if not _readonly:
+                if st.button("Identificar cuenca hidrografica", key="btn_cuenca"):
+                    with st.spinner("Identificando cuenca..."):
+                        try:
+                            from utils.cuencas import get_cuenca_info
+                            result = get_cuenca_info(data)
+                            if result and result.get("cuenca_nombre"):
+                                st.session_state.visit_data = data
+                                save_visit(data)
+                                st.success(f"Cuenca: {result['cuenca_nombre']}")
+                                st.rerun()
+                            else:
+                                st.info("No se encontro cuenca para estas coordenadas.")
+                        except Exception as e:
+                            st.caption(f"Cuencas no disponible: {e}")
+
         # Interactive Folium map
         _render_folium_map(lat, lon, data, sat_mode)
 

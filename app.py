@@ -19,6 +19,7 @@ PAGES_ADMIN = {
     "🌿 Inicio":                               "home",
     "📋 M1 · Información + Intención":         "client",
     "☯️ Tao de la Regeneración":               "tao",
+    "🌍 Conciencia Ecológica":                 "conciencia_ecologica",
     "📷 Registro Fotográfico":                 "media",
     "🔬 M2–3 · Ecología + Cultivo":            "site_reading",
     "🏙️ M4–6 · Contexto + Agua + Energía":    "systems",
@@ -255,11 +256,40 @@ def _home():
         if st.button("Comenzar diagnóstico", use_container_width=True, type="primary"):
             st.session_state.page = "client"; st.rerun()
 
+    # -- MODO DEMO --
+    st.markdown("---")
+    st.markdown(
+        '<div style="text-align:center;padding:0.5rem;">'
+        '<span style="font-size:0.85rem;color:#40916C;font-weight:700;">Modo Demostracion</span><br>'
+        '<span style="font-size:0.78rem;color:#666;">Explora perfiles de ejemplo para conocer '
+        'como funciona la Indagacion Regenerativa en diferentes contextos.</span></div>',
+        unsafe_allow_html=True)
+
+    try:
+        from utils.demo_profiles import DEMO_PROFILES
+        cols_demo = st.columns(3)
+        for i, profile in enumerate(DEMO_PROFILES):
+            with cols_demo[i % 3]:
+                tipo = profile.get("proyecto_tipo_espacio", "")
+                desc_short = profile.get("proyecto_descripcion", "")[:120] + "..."
+                if st.button(
+                    f"{profile['proyecto_nombre']}\n{profile['proyecto_cliente']}",
+                    key=f"demo_{profile['id']}",
+                    use_container_width=True,
+                ):
+                    st.session_state.visit_data = dict(profile)
+                    st.session_state.page = "report"
+                    st.rerun()
+                st.caption(f"{tipo} -- {desc_short}")
+    except Exception as e:
+        st.caption(f"Demo no disponible: {e}")
+
 
 def _module_progress(data: dict) -> dict:
     checks = {
         "client":    [("proyecto_nombre",""), ("proyecto_cliente",""), ("geo_lat",None)],
-        "tao":       [("tao_deseado",""), ("tao_sensacion",""), ("tao_cc_conciencia","")],
+        "tao":       [("tao_d1_wu_wei",0), ("tao_d2_humildad",0), ("tao_d3_compasion",0)],
+        "conciencia_ecologica": [("eco_cc_conciencia",""), ("eco_bio_conciencia","")],
         "media":     [("media_count", 0)],
         "site_reading": [("suelo_tipo",""), ("sol_horas",None), ("cultivo_m2",None)],
         "systems":   [("ctx_cuenca",""), ("agua_consumo",None), ("ene_kwh_dia_calc",None)],
@@ -301,6 +331,7 @@ def main():
         "home":                   _home,
         "client":                 lambda: __import__("modules.client",             fromlist=["render"]).render(),
         "tao":                    lambda: __import__("modules.tao",                fromlist=["render"]).render(),
+        "conciencia_ecologica":   lambda: __import__("modules.conciencia_ecologica", fromlist=["render"]).render(),
         "media":                  lambda: __import__("modules.media_manager",      fromlist=["render"]).render(),
         "site_reading":           lambda: __import__("modules.site_reading",       fromlist=["render"]).render(),
         "systems":                lambda: __import__("modules.systems",            fromlist=["render"]).render(),

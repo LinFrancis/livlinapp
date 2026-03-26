@@ -99,14 +99,36 @@ def generate_docx(data:dict)->bytes:
     _kv(d,[("🌍 ERP",f"{erp}/10 — {le}"),("🌱 HRP",f"{hrp}/10 — {lh}"),("🌀 Brecha",f"{brecha} pts — {brecha_txt}")])
     d.add_page_break()
 
-    # ═══ TAO ═══
-    _H(d,"Tao de la Regeneración",1,C1,14)
+    # === TAO ===
+    _H(d,"Tao de la Regeneracion",1,C1,14)
     _box(d,TAO_REFLEXION_SHORT,c=C2)
-    tr=[(l,str(data.get(k,""))) for l,k in [("Sensación","tao_sensacion"),("Deseado","tao_deseado"),
-        ("No deseado","tao_no_deseado"),("Lo que llama","tao_llama"),("Naturaleza","tao_naturaleza_rel"),
-        ("Palabra esencial","tao_palabra_esencial"),("Conciencia","tao_cc_conciencia"),
-        ("Comunidad","tao_cc_comunidad"),("Creatividad","tao_cc_creatividad"),("Cuidado","tao_cc_cuidado")] if data.get(k)]
-    if tr: _kv(d,tr)
+    try:
+        from modules.tao import TAO_DIMENSIONES, get_tao_scores, get_tao_total, get_tao_label
+        scores = get_tao_scores(data)
+        total = get_tao_total(data)
+        label = get_tao_label(total)
+        _kv(d,[("Puntaje Total",f"{total}/25 -- {label}")])
+        tr = []
+        for dim in TAO_DIMENSIONES:
+            v = scores.get(dim["id"], 0)
+            if v > 0:
+                opt_text = dim["opciones"][v-1] if 1 <= v <= 5 else ""
+                tr.append((f"D{dim['icono']}: {dim['titulo']}", f"Nivel {v}/5 -- {opt_text}"))
+        if tr: _kv(d,tr)
+    except Exception:
+        pass
+    notas = data.get("tao_notas","")
+    if notas: _kv(d,[("Notas Tao",notas)])
+    # Cuenca
+    cuenca = data.get("cuenca_nombre","")
+    if cuenca:
+        _H(d,"Cuenca Hidrografica",2,C2,11)
+        tr = [("Cuenca",cuenca)]
+        sc = data.get("subcuenca_nombre","")
+        if sc: tr.append(("Subcuenca",sc))
+        ssc = data.get("subsubcuenca_nombre","")
+        if ssc: tr.append(("Subsubcuenca",ssc))
+        _kv(d,tr)
     d.add_page_break()
 
     # ═══ ECOLOGÍA ═══

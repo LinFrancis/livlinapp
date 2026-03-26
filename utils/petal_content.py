@@ -279,21 +279,20 @@ IPR_OBS_VS_POT = (
 )
 
 TAO_REFLEXION_SHORT = (
-    "«La regeneración no surge del control absoluto sobre la naturaleza. Surge cuando "
-    "aprendemos a cooperar con ella. No se trata de salvar la naturaleza como si fuera "
-    "algo externo a nosotros — somos naturaleza. Cuando cuidamos nuestra propia vida, "
-    "también cuidamos la red de vida de la cual formamos parte. Por eso el camino "
-    "regenerativo también es un camino interior: mente abierta, corazón abierto, "
-    "voluntad abierta. Como enseña el Tao, el agua transforma la roca no por violencia, "
-    "sino por persistencia.»"
+    "Las leyes de la regeneracion son las mismas que las leyes del Tao: "
+    "el retorno ciclico a lo esencial, la danza perpetua entre lo que muere "
+    "y lo que nace, la confianza en que la vida, cuando se le da espacio, "
+    "siempre retorna. Somos naturaleza: al cuidarnos, facilitamos que la "
+    "naturaleza se manifieste a traves nuestro. Las cinco dimensiones de "
+    "sabiduria taoista -- accion espontanea, humildad, compasion, fortalecer "
+    "lo esencial y retorno a la raiz -- son el marco interior de la regeneracion."
 )
 
 TAO_INVITACION = (
-    "Este diagnóstico es un momento dentro de un proceso más amplio. Cada espacio tiene "
-    "su propio ritmo de transformación — a veces comienza con algo pequeño: un huerto, "
-    "un compostador, una conversación entre vecinos. Lo importante es seguir caminando. "
-    "Cuando muchas personas comienzan a escuchar ese mismo pulso de vida, "
-    "los territorios cambian. www.livlin.cl · Potencial para una vida regenerativa. 🌱"
+    "Este diagnostico es un momento dentro de un proceso mas amplio. Cada espacio tiene "
+    "su propio ritmo de transformacion. A veces la regeneracion comienza con algo "
+    "pequeno: un huerto, un sistema de compostaje, una conversacion comunitaria. "
+    "Lo importante es seguir caminando. www.livlin.cl"
 )
 
 GLOBAL_REFS = [

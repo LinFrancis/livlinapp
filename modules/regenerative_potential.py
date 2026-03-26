@@ -405,6 +405,66 @@ padding:0.8rem;text-align:center;">
             key=f"{kp}_notas",
             placeholder="Contexto, condiciones específicas, oportunidades…")
 
+    # ── SALUD Y BIENESTAR (movido desde Tao T.7) ────────────────────────
+    st.markdown("---")
+    st.markdown("### Salud y Bienestar -- Petalo 5 Complementario")
+    st.markdown(
+        '<div style="background:#FFF8E1;border-radius:8px;padding:0.6rem;'
+        'margin-bottom:0.5rem;font-size:0.82rem;color:#5D4037;">'
+        'La salud personal y la salud del ecosistema estan profundamente conectadas. '
+        'Lo que comemos, como nos movemos y como descansamos forma parte de la misma red. '
+        'Estas preguntas complementan el Petalo 5: Salud y Bienestar Espiritual.</div>',
+        unsafe_allow_html=True)
+
+    f1, f2 = st.columns(2)
+    with f1:
+        opts_ali = ["No registrado","Poco -- comemos principalmente procesados","Regular -- mezcla de procesados y frescos",
+                    "Buena -- mayoritariamente alimentos frescos","Muy buena -- dieta basada en plantas y local",
+                    "Excelente -- producimos parte de lo que comemos"]
+        data["sal_alimentacion"] = st.selectbox(
+            "Como describirian la calidad de su alimentacion?",
+            opts_ali, index=opts_ali.index(data.get("sal_alimentacion","No registrado")),
+            disabled=_readonly)
+
+        opts_local = ["No registrado","No","A veces","Frecuentemente","Si, priorizamos lo local"]
+        data["sal_alim_local"] = st.selectbox(
+            "Consumen alimentos locales o de productores cercanos?",
+            opts_local, index=opts_local.index(data.get("sal_alim_local","No registrado")),
+            disabled=_readonly)
+
+        opts_plantas = ["No registrado","No","A veces","Frecuentemente","Mayoritariamente basada en plantas"]
+        data["sal_alim_plantas"] = st.selectbox(
+            "Su alimentacion incluye muchas plantas, frutas y verduras frescas?",
+            opts_plantas, index=opts_plantas.index(data.get("sal_alim_plantas","No registrado")),
+            disabled=_readonly)
+
+    with f2:
+        opts_ej = ["No registrado","No hacemos ejercicio regularmente","Caminatas ocasionales",
+                   "Ejercicio leve 1-2 veces/semana","Ejercicio moderado 3+ veces/semana",
+                   "Actividad fisica diaria integrada a la vida"]
+        data["sal_ejercicio"] = st.selectbox(
+            "Realizan actividad fisica regularmente?",
+            opts_ej, index=opts_ej.index(data.get("sal_ejercicio","No registrado")),
+            disabled=_readonly)
+
+        opts_nat = ["No registrado","Raramente","A veces","Frecuentemente","Es parte de nuestra rutina"]
+        data["sal_contacto_naturaleza"] = st.selectbox(
+            "Pasan tiempo en naturaleza, parques o espacios verdes?",
+            opts_nat, index=opts_nat.index(data.get("sal_contacto_naturaleza","No registrado")),
+            disabled=_readonly)
+
+        opts_des = ["No registrado","Poco -- dormimos mal o poco","Regular","Bien","Muy bien -- priorizamos el descanso"]
+        data["sal_descanso"] = st.selectbox(
+            "Como es la calidad del descanso y el sueno en el grupo?",
+            opts_des, index=opts_des.index(data.get("sal_descanso","No registrado")),
+            disabled=_readonly)
+
+    data["sal_practicas_text"] = st.text_area(
+        "Hay otras practicas de salud o bienestar que quieran mencionar?",
+        value=data.get("sal_practicas_text",""), height=70,
+        placeholder="Ej: meditacion, yoga, huerto terapeutico, cocina colectiva...",
+        disabled=_readonly)
+
     # ── Guardar ───────────────────────────────────────────────────────────
     st.markdown("---")
     if not _readonly:

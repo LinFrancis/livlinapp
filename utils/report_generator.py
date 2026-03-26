@@ -260,14 +260,31 @@ def generate_excel(data: dict) -> bytes:
         v=data.get(key,"")
         if v: r=_row(ws2,r,lbl,str(v))
     r=_sp(ws2,r)
-    r=_h(ws2,r,"🌀 Tao de la Regeneración")
-    for lbl,key in [("Sensación","tao_sensacion"),("Deseado","tao_deseado"),
-                    ("No deseado","tao_no_deseado"),("Lo que llama","tao_llama"),
-                    ("Naturaleza","tao_naturaleza_rel"),("Palabra esencial","tao_palabra_esencial"),
-                    ("Conciencia","tao_cc_conciencia"),("Comunidad","tao_cc_comunidad"),
-                    ("Creatividad","tao_cc_creatividad"),("Cuidado","tao_cc_cuidado")]:
-        v=data.get(key,"")
-        if v: r=_row(ws2,r,lbl,str(v))
+    r=_h(ws2,r,"Tao de la Regeneracion -- 5 Dimensiones")
+    try:
+        from modules.tao import TAO_DIMENSIONES, get_tao_scores, get_tao_total, get_tao_label
+        scores = get_tao_scores(data)
+        total = get_tao_total(data)
+        r=_row(ws2,r,"Puntaje Total",f"{total}/25 -- {get_tao_label(total)}")
+        for dim in TAO_DIMENSIONES:
+            v = scores.get(dim["id"], 0)
+            if v > 0:
+                opt_text = dim["opciones"][v-1] if 1 <= v <= 5 else ""
+                r=_row(ws2,r,f"D{dim['icono']}: {dim['titulo']}",f"Nivel {v}/5 -- {opt_text}")
+    except Exception:
+        pass
+    notas = data.get("tao_notas","")
+    if notas: r=_row(ws2,r,"Notas Tao",notas)
+    # Cuenca info
+    cuenca = data.get("cuenca_nombre","")
+    if cuenca:
+        r=_sp(ws2,r)
+        r=_h(ws2,r,"Cuenca Hidrografica")
+        r=_row(ws2,r,"Cuenca",cuenca)
+        sc = data.get("subcuenca_nombre","")
+        if sc: r=_row(ws2,r,"Subcuenca",sc)
+        ssc = data.get("subsubcuenca_nombre","")
+        if ssc: r=_row(ws2,r,"Subsubcuenca",ssc)
 
     # ═══ HOJA 3 — M2-3 (full ecology + climate) ═══
     ws3=wb.create_sheet("🔬 M2-3 Ecología")
