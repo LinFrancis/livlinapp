@@ -1,4 +1,4 @@
-"""Módulo Informe Final v8.0 — LivLin Indagación Regenerativa.
+"""Módulo Informe Final v9.0 — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -34,47 +34,8 @@ from utils.report_generator import generate_excel
 
 MASON_URL = "https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing"
 
-# ── Utility helpers ──────────────────────────────────────────────────
-def _safe_float(v, default=0.0):
-    try: return float(v)
-    except (TypeError, ValueError): return default
-
-def _val(data, key, default="No registrado"):
-    v = data.get(key)
-    if v in [None, "", [], 0, 0.0]: return default
-    return v
-
-def _show_field(label, value, empty_msg="No registrado"):
-    if value in [None, "", [], 0, 0.0]: return
-    st.markdown(
-        f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
-        f'<span style="font-size:0.75rem;color:#52B788;text-transform:uppercase;">{label}</span><br>'
-        f'<span style="font-size:0.88rem;color:#1B4332;">{value}</span></div>',
-        unsafe_allow_html=True)
-
-def _card(label, value, bg="#F0FFF4", fg="#1B4332", border="#52B788"):
-    if not value or value == "No registrado": return
-    st.markdown(
-        f'<div style="background:{bg};border-radius:8px;padding:0.6rem 0.8rem;'
-        f'margin-bottom:0.5rem;border-left:3px solid {border};">'
-        f'<div style="font-size:0.72rem;color:{border};text-transform:uppercase;margin-bottom:0.2rem;">{label}</div>'
-        f'<div style="font-size:0.88rem;color:{fg};line-height:1.5;">{value}</div></div>',
-        unsafe_allow_html=True)
-
-def _ref_box(refs):
-    """Renders a small reference box at the bottom of a section."""
-    if not refs: return
-    lines = "".join(
-        f'<div style="font-size:0.78rem;color:#555;padding:2px 0;">'
-        f'📖 {auth} — <em>{title}</em> '
-        f'<a href="{url}" target="_blank" style="color:#1565C0;font-size:0.75rem;">↗</a></div>'
-        for auth, title, url in refs
-    )
-    st.markdown(
-        f'<div style="background:#FAFAFA;border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.8rem;'
-        f'border-top:2px solid #D8F3DC;">'
-        f'<div style="font-size:0.7rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">📚 Referencias de esta sección</div>'
-        f'{lines}</div>', unsafe_allow_html=True)
+# ── Utility helpers (from shared module) ─────────────────────────────
+from utils.ui_helpers import safe_float as _safe_float, val as _val, card as _card, show_field as _show_field, ref_box as _ref_box
 
 def _list_from_semicolon(text):
     if not text: return []
@@ -260,7 +221,7 @@ def render():
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v8.0</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v9.0</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -340,7 +301,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe Final del Diagnóstico Regenerativo")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v8.0 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Visión completa · LivLin v9.0 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -403,7 +364,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v8.0</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v9.0</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -857,6 +818,24 @@ def render():
                     f'<strong>Sobre {wiki_source} (Wikipedia):</strong><br>{wiki_summary}</div>',
                     unsafe_allow_html=True)
 
+        # Health/wellbeing data (complementary to Petalo 5)
+        salud_fields = [
+            ("Alimentacion", "sal_alimentacion"),
+            ("Alimentos locales", "sal_alim_local"),
+            ("Base vegetal", "sal_alim_plantas"),
+            ("Actividad fisica", "sal_ejercicio"),
+            ("Contacto naturaleza", "sal_contacto_naturaleza"),
+            ("Descanso", "sal_descanso"),
+            ("Practicas de bienestar", "sal_practicas_text"),
+        ]
+        sal_has_data = any(data.get(k) and data.get(k) != "No registrado" for _, k in salud_fields)
+        if sal_has_data:
+            st.markdown("#### Salud y Bienestar")
+            for lbl, key in salud_fields:
+                v = data.get(key)
+                if v and v != "No registrado":
+                    _card(lbl, str(v), bg="#FFF8E1", border="#A67C00")
+
         _ref_box([("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
                   ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
                   ("Lao Tse (s. VI a.C.)", "Tao Te Ching", "https://es.wikipedia.org/wiki/Tao_Te_Ching")])
@@ -865,30 +844,31 @@ def render():
     # ==================================================================
     # SECCION 3b -- CONCIENCIA ECOLOGICA
     # ==================================================================
-    eco_has_data = any(data.get(k) for k in ["eco_cc_conciencia", "eco_bio_conciencia", "eco_cont_conciencia"])
-    if eco_has_data:
-        st.markdown("### Conciencia Ecologica", unsafe_allow_html=True)
-        st.markdown(
-            '<div style="background:#FFF3E0;border-radius:8px;padding:0.6rem;margin-bottom:0.8rem;'
-            'font-size:0.85rem;color:#4E342E;">'
-            'La triple crisis planetaria -- cambio climatico, perdida de biodiversidad '
-            'y contaminacion -- es el contexto en el que toda accion regenerativa se situa.</div>',
-            unsafe_allow_html=True)
-        for lbl, key in [("Cambio climatico", "eco_cc_conciencia"),
-                         ("Impacto local del clima", "eco_cc_impacto"),
-                         ("Respuesta al clima", "eco_cc_respuesta"),
-                         ("Biodiversidad", "eco_bio_conciencia"),
-                         ("Biodiversidad local", "eco_bio_local"),
-                         ("Acciones biodiversidad", "eco_bio_accion"),
-                         ("Contaminacion", "eco_cont_conciencia"),
-                         ("Tipos contaminacion", "eco_cont_tipos"),
-                         ("Respuesta contaminacion", "eco_cont_respuesta")]:
-            v = data.get(key)
-            if v:
-                if isinstance(v, list):
-                    v = ", ".join(v)
-                _card(lbl, str(v), bg="#FFF8E1", border="#F57F17")
-        st.markdown("---")
+    if _show("eco_conciencia"):
+        eco_has_data = any(data.get(k) for k in ["eco_cc_conciencia", "eco_bio_conciencia", "eco_cont_conciencia"])
+        if eco_has_data:
+            st.markdown(f"### Conciencia Ecologica &nbsp; {_status_badge('mod_eco')}", unsafe_allow_html=True)
+            st.markdown(
+                '<div style="background:#FFF3E0;border-radius:8px;padding:0.6rem;margin-bottom:0.8rem;'
+                'font-size:0.85rem;color:#4E342E;">'
+                'La triple crisis planetaria -- cambio climatico, perdida de biodiversidad '
+                'y contaminacion -- es el contexto en el que toda accion regenerativa se situa.</div>',
+                unsafe_allow_html=True)
+            for lbl, key in [("Cambio climatico", "eco_cc_conciencia"),
+                             ("Impacto local del clima", "eco_cc_impacto"),
+                             ("Respuesta al clima", "eco_cc_respuesta"),
+                             ("Biodiversidad", "eco_bio_conciencia"),
+                             ("Biodiversidad local", "eco_bio_local"),
+                             ("Acciones biodiversidad", "eco_bio_accion"),
+                             ("Contaminacion", "eco_cont_conciencia"),
+                             ("Tipos contaminacion", "eco_cont_tipos"),
+                             ("Respuesta contaminacion", "eco_cont_respuesta")]:
+                v = data.get(key)
+                if v:
+                    if isinstance(v, list):
+                        v = ", ".join(v)
+                    _card(lbl, str(v), bg="#FFF8E1", border="#F57F17")
+            st.markdown("---")
 
 
     # ══════════════════════════════════════════════════════════════════

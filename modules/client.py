@@ -158,20 +158,25 @@ def render():
     data["geo_sat_mode"] = sat_mode
 
     if geo_click and addr_display.strip():
-        with st.spinner("Buscando ubicación y clima…"):
-            from utils.geo_api import geocode_address, get_weather_now, wmo_weather_description, wind_direction_label, get_lunar_phase
+        with st.spinner("Buscando ubicacion y clima..."):
+            from utils.geo_api import geocode_address
             geo = geocode_address(addr_display)
         if geo:
             data.update({"geo_lat": float(geo["lat"]), "geo_lon": float(geo["lon"]),
                          "geo_display": geo["display_name"],
                          "geo_city": geo["city"], "geo_country": geo["country"]})
-            # Save immediately so coords survive rerun
+            # Auto-identify cuenca
+            try:
+                from utils.cuencas import get_cuenca_info
+                get_cuenca_info(data)
+            except Exception:
+                pass  # cuencas may not be available (geopandas)
             st.session_state.visit_data = data
             save_visit(data)
-            st.success(f"📍 {geo['display_name']}")
+            st.success(f"Ubicacion encontrada: {geo['display_name']}")
             st.rerun()
         else:
-            st.warning("No se encontró la dirección. Intenta con ciudad y país: 'Los Aromos 234, Ñuñoa, Santiago, Chile'")
+            st.warning("No se encontro la direccion. Intenta con ciudad y pais: 'Los Aromos 234, Nunoa, Santiago, Chile'")
 
     if data.get("geo_lat"):
         lat, lon = float(data["geo_lat"]), float(data["geo_lon"])

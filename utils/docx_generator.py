@@ -1,4 +1,4 @@
-"""Generador Word v8.0 — LivLin · ERP/HRP · Todas las secciones."""
+"""Generador Word v9.0 — LivLin · ERP/HRP · Todas las secciones."""
 import io, base64, json
 from datetime import datetime
 from pathlib import Path
@@ -85,7 +85,7 @@ def generate_docx(data:dict)->bytes:
     p2=d.add_paragraph(); p2.alignment=WD_ALIGN_PARAGRAPH.CENTER
     r2=p2.add_run("Diagnóstico de Permacultura Regenerativa"); r2.font.size=Pt(12); r2.font.color.rgb=C2
     p3=d.add_paragraph(); p3.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    r3=p3.add_run(f"LivLin v8.0 · {LIVLIN_TAGLINE} · www.livlin.cl"); r3.font.size=Pt(10); r3.font.color.rgb=C3; r3.italic=True
+    r3=p3.add_run(f"LivLin v9.0 · {LIVLIN_TAGLINE} · www.livlin.cl"); r3.font.size=Pt(10); r3.font.color.rgb=C3; r3.italic=True
     d.add_paragraph()
     rows=[("🏡 Espacio",nombre),("👤 Contacto",cliente),("📍 Ciudad",data.get("proyecto_ciudad","")),
           ("📅 Fecha",data.get("proyecto_fecha","") or str(datetime.now())[:10])]
@@ -279,6 +279,6 @@ def generate_docx(data:dict)->bytes:
     for a,t,u in GLOBAL_REFS:
         _p(d,f"• {a} — {t}",c=C1,sz=9,af=2); _p(d,f"  🔗 {u}",it=True,c=C3,sz=8,af=4)
     pp=d.add_paragraph(); pp.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    rr=pp.add_run(f"LivLin v8.0 · {str(datetime.now())[:10]}"); rr.font.size=Pt(8); rr.font.color.rgb=CG; rr.italic=True
+    rr=pp.add_run(f"LivLin v9.0 · {str(datetime.now())[:10]}"); rr.font.size=Pt(8); rr.font.color.rgb=CG; rr.italic=True
 
     buf=io.BytesIO(); d.save(buf); buf.seek(0); return buf.read()

@@ -1,11 +1,10 @@
 """Modulo Tao de la Regeneracion v2.0
 Basado en 'El Tao de la Regeneracion' -- 5 dimensiones de sabiduria taoista.
 Escala 1-5 por dimension. Radar de 5 ejes. Disclaimer interpretativo.
+
+NOTE: Data constants and scoring functions are at module level (no streamlit dependency).
+UI render functions use streamlit only when called.
 """
-import streamlit as st
-from utils.data_manager import save_visit
-from utils.module_status import render_module_status, is_module_active
-from utils.tab_nav import show_drive_save_status
 
 # ========================================================================
 # CONTENIDO: 5 dimensiones del Tao de la Regeneracion
@@ -49,16 +48,29 @@ TAO_DIMENSIONES = [
         "titulo": "Accion espontanea y oportuna",
         "subtitulo": "Wu wei, flexibilidad, oportunidad, no imposicion",
         "icono": "1",
-        "cita_tao": "El sabio se ocupa de no actuar y ensena sin palabras. Las diez mil cosas surgen y el no las rechaza. Produce sin poseer. Actua sin esperar nada.",
+        "cita_tao": "El sabio se ocupa de no actuar y ensena sin palabras. Las diez mil cosas surgen y el no las rechaza. Produce sin poseer. Actua sin esperar nada. Cuando la obra esta cumplida, no se apega a ella. Y precisamente por no apegarse, la obra perdura.",
         "cita_cap": "Tao Te Ching, Capitulo 2",
+        "cita_extra": "Lo blando y lo flexible es discipulo de la vida. Lo duro y lo rigido es discipulo de la muerte.",
+        "cita_extra_cap": "Capitulo 76",
         "descripcion": (
             "Quien camina por la via de la regeneracion reconoce que la naturaleza "
             "tiene su ritmo y actua en conciencia de ese ritmo, respetandolo y sin "
-            "pretender controlarlo ni forzarlo. La no-accion no empuja los acontecimientos, "
-            "sino que los acompana como el agua que fluye desde la montana y con la "
-            "constancia a traves del tiempo logra crear valles llenos de abundancia y vida. "
-            "Regenerar es doblarse sin romperse. Quien guia un proceso regenerativo no "
-            "busca reconocimiento; su poder esta en la coherencia."
+            "pretender controlarlo ni forzarlo. Sigue el Wu Wei, la no-accion: una "
+            "forma de actuar que no empuja los acontecimientos, sino que los acompana "
+            "como el agua que fluye desde la montana y con la constancia a traves del "
+            "tiempo logra crear valles llenos de abundancia y vida.\n\n"
+            "No-accion es lo contrario a permanecer paralizados. Es como la de quien "
+            "navega y pone las velas en la posicion adecuada para tomar el viento a "
+            "favor. Regenerar es doblarse sin romperse. Quien guia un proceso "
+            "regenerativo no busca reconocimiento; su poder esta en la coherencia, "
+            "en la capacidad de ceder el paso para que la tierra y las personas "
+            "encuentren su propio equilibrio.\n\n"
+            "En la practica, esto significa disenar sistemas de vida que se adapten "
+            "a la variabilidad del clima y, en lo social, evitar la confrontacion "
+            "esteril con quienes aun actuan desde la logica degenerativa. Como las "
+            "abejas, que no actuan buscando reconocimiento: actuan siguiendo un "
+            "impulso que les permite nutrir a sus nuevas generaciones mientras "
+            "favorecen la polinizacion y el aumento de la biodiversidad."
         ),
         "pregunta": (
             "En que medida nuestras decisiones e intervenciones en el espacio surgen "
@@ -80,13 +92,22 @@ TAO_DIMENSIONES = [
         "icono": "2",
         "cita_tao": "No hay mayor desgracia que no saber que es suficiente. No hay mayor defecto que el afan de obtener. Quien sabe que lo suficiente es suficiente, siempre tendra suficiente.",
         "cita_cap": "Tao Te Ching, Capitulo 46",
+        "cita_extra": "Mejor es detenerse a tiempo que llenar hasta el borde. Retirarse cuando la obra esta cumplida: ese es el camino del cielo.",
+        "cita_extra_cap": "Capitulo 9",
         "descripcion": (
             "La regeneracion surge desde abajo, desde el nivel de cada agente "
             "regenerativo que ejerce acciones concretas. Quien regenera se situa al "
             "servicio del territorio, aprende de los saberes ecologicos y de la "
-            "naturaleza en general. No llega como un salvador externo, sino como un "
-            "facilitador que escucha. Reducir lo superfluo, optar por lo local, "
-            "lo manual, lo duradero, es un acto de liberacion."
+            "naturaleza en general: de los ciclos del agua, de las plantas, del sol. "
+            "No llega como un salvador externo, sino como un facilitador que escucha.\n\n"
+            "Frente a la cultura del crecimiento infinito, en permacultura se promueve "
+            "el descenso creativo: no acumular mas de lo necesario, saber cuando parar, "
+            "reconocer los limites. Reducir lo superfluo, optar por lo local, lo manual, "
+            "lo duradero, es un acto de liberacion.\n\n"
+            "Los tres tesoros del Tao -- compasion, moderacion y humildad -- tienen "
+            "aqui su anclaje: la moderacion permite vivir con lo justo y frenar la "
+            "huella ecologica; la humildad impide pretender ser el primero y deja "
+            "espacio a otros, a la naturaleza, a las futuras generaciones."
         ),
         "pregunta": (
             "En que medida practicamos la humildad -- escuchando mas que imponiendo -- "
@@ -106,16 +127,25 @@ TAO_DIMENSIONES = [
         "titulo": "Compasion y no-juicio",
         "subtitulo": "Inclusividad, verdad sobria, compasion",
         "icono": "3",
-        "cita_tao": "Tengo tres tesoros que guardo y atesoro. El primero es la compasion. El segundo, la moderacion. El tercero, no atreverme a ser el primero bajo el cielo.",
+        "cita_tao": "Tengo tres tesoros que guardo y atesoro. El primero es la compasion. El segundo, la moderacion. El tercero, no atreverme a ser el primero bajo el cielo. Por la compasion se puede ser valiente.",
         "cita_cap": "Tao Te Ching, Capitulo 67",
+        "cita_extra": "El sabio es siempre buen salvador de las personas, por eso no abandona a nadie. La persona que no es buena es materia prima de la buena.",
+        "cita_extra_cap": "Capitulo 27",
         "descripcion": (
             "La compasion es la primera joya del sabio taoista: actuar con cuidado "
             "hacia todos los seres, humanos y no humanos, sin danar. En la regeneracion, "
             "esto se traduce en no abandonar a nadie, incluso a quienes hoy actuan "
-            "de modo degenerativo. La persona que no camina por el sendero de la "
-            "regeneracion no es un enemigo a combatir, sino materia prima de la "
-            "transformacion. La comunicacion en proyectos regenerativos huye de la "
-            "retorica vacia y del marketing verde."
+            "de modo degenerativo.\n\n"
+            "Los seres humanos somos interdependientes: la presencia del otro y sus "
+            "acciones tienen impacto en las nuestras. La persona que no camina por el "
+            "sendero de la regeneracion no es un enemigo a combatir, sino materia prima "
+            "de la transformacion. La tarea regenerativa no es solo condenar ni exigir "
+            "cambios, sino ofrecer condiciones para que la semilla de retorno hacia una "
+            "vida regenerativa germine en cada persona.\n\n"
+            "La comunicacion en proyectos regenerativos huye de la retorica vacia y "
+            "del marketing verde. Nombra las dificultades con transparencia, celebra "
+            "los logros sin apropiarselos. Las palabras verdaderas no son hermosas; "
+            "las hermosas no son verdaderas (Cap. 81)."
         ),
         "pregunta": (
             "En que medida somos capaces de relacionarnos sin juicios con quienes "
@@ -137,12 +167,22 @@ TAO_DIMENSIONES = [
         "icono": "4",
         "cita_tao": "Los cinco colores ciegan los ojos del hombre. Los cinco sabores estragan su paladar. Por eso el sabio se ocupa del vientre, no de los ojos. Elige lo interior y rechaza lo exterior.",
         "cita_cap": "Tao Te Ching, Capitulo 12",
+        "cita_extra": "La virtud superior no actua y no tiene proposito. El hombre superior se ocupa de lo grueso, no de lo fino. Se atiene al fruto, no a la flor.",
+        "cita_extra_cap": "Capitulo 38",
         "descripcion": (
             "La regeneracion no se agota en lo que se ve. Atiende a lo esencial "
             "-- la salud de las relaciones, la cohesion grupal, el bienestar interior -- "
             "antes que a las formas externas que deslumbran. Un proyecto es verdaderamente "
             "regenerativo si quienes participan se sienten mas vivos, mas conectados, "
-            "mas en paz. Si la raiz esta sana, el fruto sera duradero."
+            "mas en paz.\n\n"
+            "Esto requiere un trabajo sobre el deseo: reducir lo superfluo para dejar "
+            "espacio a lo que nutre. No se trata de ascetismo, sino de discernir entre "
+            "lo accesorio y lo profundo. En lo colectivo, significa disenar soluciones "
+            "pequenas y apropiadas antes que grandes infraestructuras; en lo personal, "
+            "soltar el afan de poseer, controlar o acumular reconocimiento.\n\n"
+            "Si la raiz esta sana, el fruto sera duradero. Por eso quien regenera "
+            "cuida primero la calidad de su presencia, la escucha, la capacidad de "
+            "estar presente sin forzar."
         ),
         "pregunta": (
             "En que medida priorizamos lo esencial -- cohesion, bienestar, calidad "
@@ -162,15 +202,24 @@ TAO_DIMENSIONES = [
         "titulo": "Retorno a la raiz",
         "subtitulo": "Anclaje en los ciclos naturales y comunitarios",
         "icono": "5",
-        "cita_tao": "Todas las cosas florecen, y cada una retorna a su raiz. Retornar a la raiz es la quietud. La quietud es retornar al destino. Retornar al destino es lo constante.",
+        "cita_tao": "Todas las cosas florecen, y cada una retorna a su raiz. Retornar a la raiz es la quietud. La quietud es retornar al destino. Retornar al destino es lo constante. Conocer lo constante es la iluminacion.",
         "cita_cap": "Tao Te Ching, Capitulo 16",
+        "cita_extra": "Cultiva la virtud en ti mismo y la virtud sera genuina. Cultivala en la familia y sera abundante. Cultivala en la aldea y sera duradera.",
+        "cita_extra_cap": "Capitulo 54",
         "descripcion": (
             "Regenerar es volver a los patrones primordiales: el ciclo del agua, "
             "la sucesion ecologica, la red simbiotica, la comunidad de apoyo mutuo. "
-            "La raiz es el Tao mismo, fuente inagotable de vida. Este retorno no es "
-            "nostalgia, sino anclaje: en la observacion de los ciclos, en la memoria "
-            "de los saberes locales, en la recuperacion de practicas tradicionales que "
-            "han sostenido la vida durante siglos."
+            "La raiz es el Tao mismo, fuente inagotable de vida. Quien regenera "
+            "actua como un canal de esa fuerza, sabiendo que no es el dueno, sino "
+            "un humilde participante del retorno.\n\n"
+            "Este retorno no es nostalgia, sino anclaje. En la practica, se expresa "
+            "en la observacion de los ciclos: cuando sembrar, cuando podar, cuando "
+            "esperar. Tambien en la memoria de los saberes locales y en la recuperacion "
+            "de practicas tradicionales que han sostenido la vida durante siglos.\n\n"
+            "Regenerar es plantar el Tao -- en la huerta, en el grupo, en la vida "
+            "cotidiana -- para que su virtud florezca en todas las escalas. Cada "
+            "accion regenerativa es un paso de retorno a lo esencial, una danza que "
+            "alinea la voluntad humana con la inteligencia de la vida."
         ),
         "pregunta": (
             "En que medida nuestras actividades cotidianas y decisiones de diseno "
@@ -214,7 +263,11 @@ TAO_DIM_IDS = [d["id"] for d in TAO_DIMENSIONES]
 # ========================================================================
 
 def render():
+    import streamlit as st
+    from utils.data_manager import save_visit
+    from utils.module_status import render_module_status, is_module_active
     from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    from utils.tab_nav import show_drive_save_status
     _readonly = _is_ro()
     if _readonly:
         render_readonly_notice()
@@ -259,6 +312,7 @@ def render():
         st.markdown(f"### Dimension {dim['icono']}: {dim['titulo']}")
         st.markdown(f"*{dim['subtitulo']}*")
 
+        # Primary quote
         st.markdown(
             f'<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;'
             f'margin:0.5rem 0;border-left:3px solid #40916C;">'
@@ -266,14 +320,28 @@ def render():
             f'<span style="font-size:0.75rem;color:#666;">-- {dim["cita_cap"]}</span>'
             f'</div>', unsafe_allow_html=True)
 
-        st.markdown(f'<div style="font-size:0.88rem;color:#333;margin:0.5rem 0;">{dim["descripcion"]}</div>',
-                    unsafe_allow_html=True)
+        # Description (convert \n\n to paragraph breaks)
+        desc_html = dim["descripcion"].replace("\n\n", "</p><p style='font-size:0.88rem;color:#333;margin:0.3rem 0;'>")
+        st.markdown(
+            f'<p style="font-size:0.88rem;color:#333;margin:0.5rem 0;">{desc_html}</p>',
+            unsafe_allow_html=True)
 
-        st.markdown(f'<div style="background:#E8F5E9;border-radius:8px;padding:0.6rem 0.8rem;'
-                    f'margin:0.5rem 0;">'
-                    f'<strong style="color:#1B4332;">Pregunta de reflexion:</strong><br>'
-                    f'<em style="color:#2D6A4F;">{dim["pregunta"]}</em></div>',
-                    unsafe_allow_html=True)
+        # Extra quote (if available)
+        if dim.get("cita_extra"):
+            st.markdown(
+                f'<div style="background:#FAFAFA;border-radius:6px;padding:0.4rem 0.7rem;'
+                f'margin:0.3rem 0;border-left:2px solid #A8D5B5;">'
+                f'<em style="color:#555;font-size:0.8rem;">&laquo;{dim["cita_extra"]}&raquo;</em>'
+                f' <span style="font-size:0.72rem;color:#888;">-- {dim.get("cita_extra_cap","")}</span>'
+                f'</div>', unsafe_allow_html=True)
+
+        # Reflection question
+        st.markdown(
+            f'<div style="background:#E8F5E9;border-radius:8px;padding:0.6rem 0.8rem;'
+            f'margin:0.5rem 0;">'
+            f'<strong style="color:#1B4332;">Pregunta de reflexion:</strong><br>'
+            f'<em style="color:#2D6A4F;">{dim["pregunta"]}</em></div>',
+            unsafe_allow_html=True)
 
         current_val = data.get(dim["id"], 0)
         if isinstance(current_val, str):
@@ -349,6 +417,7 @@ def render():
 
 def _render_tao_radar(valores, compact=True):
     """Render radar chart for the 5 Tao dimensions. valores = list of 5 ints (0-5)."""
+    import streamlit as st
     import plotly.graph_objects as go
 
     labels = [d["titulo"] for d in TAO_DIMENSIONES]
