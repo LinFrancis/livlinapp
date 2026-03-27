@@ -42,6 +42,10 @@ def _login_page():
     with cc:
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
+
+     st.markdown("---")
+    _, cc, _ = st.columns([0.5, 2, 0.5])
+    with cc:
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
         st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Bases para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
 
