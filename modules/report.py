@@ -1,4 +1,4 @@
-"""Módulo Informe Final v9.0 — LivLin Indagación Regenerativa.
+"""Modulo Informe Final — LivLin Indagación Regenerativa.
 ERP (Estado Regenerativo Presente) + HRP (Horizonte Regenerativo Potencial).
 Sidebar: Logo + Secciones + Descargas + Cerrar sesión.
 Visión y Estado Regenerativo: 3 tabs (Perspectiva Comparada, ERP, HRP).
@@ -157,6 +157,7 @@ REPORT_SECTIONS = {
     "fotos":       "📷 Registro Fotográfico",
     "sintesis":    "🗺️ Síntesis y Plan",
     "metodologia": "📐 Metodología",
+    "glosario":    "📗 Glosario de Acciones",
     "biblio":      "📚 Bibliografía",
 }
 
@@ -222,7 +223,7 @@ def render():
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa v9.0</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagacion Regenerativa</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -360,7 +361,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe de la Indagacion Regenerativa")
-    st.markdown('<p class="module-subtitle">Visión completa · LivLin v9.0 · ERP + HRP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Herramienta de Indagacion Regenerativa · LivLin</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -423,7 +424,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado del Diagnóstico · LivLin v9.0</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado de la Indagacion Regenerativa · LivLin</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -807,6 +808,43 @@ def render():
         # Map
         lat = _safe_float(data.get("geo_lat")); lon = _safe_float(data.get("geo_lon"))
         if lat and lon: _render_report_map(lat, lon, data)
+
+        # Cuenca hidrografica - Caracteristicas de la ubicacion
+        cuenca_nombre = data.get("cuenca_nombre", "")
+        if cuenca_nombre:
+            st.markdown("#### Caracteristicas de la ubicacion — Cuenca hidrografica")
+            st.markdown(
+                '<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;'
+                'font-size:0.82rem;color:#1A237E;line-height:1.6;">'
+                'La cuenca hidrografica define el territorio del agua: de donde viene, por donde fluye '
+                'y hacia donde va. Conocer la cuenca del espacio es fundamental para entender el ciclo '
+                'del agua y disenar soluciones regenerativas apropiadas.</div>', unsafe_allow_html=True)
+            subcuenca_nombre = data.get("subcuenca_nombre", "")
+            subsubcuenca_nombre = data.get("subsubcuenca_nombre", "")
+            cols_c = st.columns(3)
+            with cols_c[0]:
+                link = data.get("cuenca_wiki_link", "")
+                label_html = f'<a href="{link}" target="_blank">{cuenca_nombre}</a>' if link else cuenca_nombre
+                _card("Cuenca", label_html, bg="#E3F2FD", border="#1565C0")
+            with cols_c[1]:
+                if subcuenca_nombre:
+                    link = data.get("subcuenca_wiki_link", "")
+                    label_html = f'<a href="{link}" target="_blank">{subcuenca_nombre}</a>' if link else subcuenca_nombre
+                    _card("Subcuenca", label_html, bg="#E3F2FD", border="#1565C0")
+            with cols_c[2]:
+                if subsubcuenca_nombre:
+                    link = data.get("subsubcuenca_wiki_link", "")
+                    label_html = f'<a href="{link}" target="_blank">{subsubcuenca_nombre}</a>' if link else subsubcuenca_nombre
+                    _card("Subsubcuenca", label_html, bg="#E3F2FD", border="#1565C0")
+            wiki_summary = data.get("cuenca_wiki_summary", "")
+            if wiki_summary:
+                wiki_source = data.get("cuenca_wiki_source", "")
+                st.markdown(
+                    f'<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem;'
+                    f'margin-top:0.3rem;font-size:0.8rem;color:#1A237E;">'
+                    f'<strong>Sobre {wiki_source} (Wikipedia):</strong><br>{wiki_summary}</div>',
+                    unsafe_allow_html=True)
+
         _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
         st.markdown("---")
 
@@ -859,37 +897,6 @@ def render():
         except Exception as e:
             st.caption(f"Tao de la Regeneracion: {e}")
 
-        # Cuenca info
-        cuenca_nombre = data.get("cuenca_nombre", "")
-        subcuenca_nombre = data.get("subcuenca_nombre", "")
-        subsubcuenca_nombre = data.get("subsubcuenca_nombre", "")
-        if cuenca_nombre:
-            st.markdown("#### Informacion de Cuenca Hidrografica")
-            cols_c = st.columns(3)
-            with cols_c[0]:
-                link = data.get("cuenca_wiki_link", "")
-                label_html = f'<a href="{link}" target="_blank">{cuenca_nombre}</a>' if link else cuenca_nombre
-                _card("Cuenca", label_html, bg="#E3F2FD", border="#1565C0")
-            with cols_c[1]:
-                if subcuenca_nombre:
-                    link = data.get("subcuenca_wiki_link", "")
-                    label_html = f'<a href="{link}" target="_blank">{subcuenca_nombre}</a>' if link else subcuenca_nombre
-                    _card("Subcuenca", label_html, bg="#E3F2FD", border="#1565C0")
-            with cols_c[2]:
-                if subsubcuenca_nombre:
-                    link = data.get("subsubcuenca_wiki_link", "")
-                    label_html = f'<a href="{link}" target="_blank">{subsubcuenca_nombre}</a>' if link else subsubcuenca_nombre
-                    _card("Subsubcuenca", label_html, bg="#E3F2FD", border="#1565C0")
-
-            wiki_summary = data.get("cuenca_wiki_summary", "")
-            if wiki_summary:
-                wiki_source = data.get("cuenca_wiki_source", "")
-                st.markdown(
-                    f'<div style="background:#E3F2FD;border-radius:8px;padding:0.6rem;'
-                    f'margin-top:0.3rem;font-size:0.82rem;color:#1A237E;">'
-                    f'<strong>Sobre {wiki_source} (Wikipedia):</strong><br>{wiki_summary}</div>',
-                    unsafe_allow_html=True)
-
         # Health/wellbeing data (complementary to Petalo 5)
         salud_fields = [
             ("Alimentacion", "sal_alimentacion"),
@@ -908,9 +915,10 @@ def render():
                 if v and v != "No registrado":
                     _card(lbl, str(v), bg="#FFF8E1", border="#A67C00")
 
-        _ref_box([("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
-                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-                  ("Lao Tse (s. VI a.C.)", "Tao Te Ching", "https://es.wikipedia.org/wiki/Tao_Te_Ching")])
+        _ref_box([("Mason, F. (2026)", "El Tao para una vida regenerativa — LivLin", "https://drive.google.com/file/d/1MLOLcIso_inxbpIaoJfcdrZimVl9xHgj/view?usp=sharing"),
+                  ("Lao Tse (s. VI a.C.)", "Tao Te Ching — Texto completo en espanol (PDF)", "https://drive.google.com/file/d/1JAWwhCOyvZKrACoAk5bv5Jh2thxppLZh/view"),
+                  ("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
+                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/")])
         st.markdown("---")
 
     # ==================================================================
@@ -1165,6 +1173,38 @@ def render():
                 equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',e.get('kwh',0))} kWh/dia)" for e in equipos)
                 _card("Equipos electricos registrados", equip_text, bg="#FFF8E1", border="#F57C00")
 
+            # Solar potential info + links
+            sol_horas = _safe_float(data.get("sol_horas", 0))
+            if sol_horas > 0:
+                kwh_pot = round(sol_horas * 0.15, 2)  # kWh per m2 per day approx
+                st.markdown(
+                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-top:0.5rem;border-left:3px solid #F57C00;">'
+                    f'<div style="font-weight:700;color:#E65100;font-size:0.85rem;">Potencial de luz solar</div>'
+                    f'<div style="font-size:0.82rem;color:#5D4037;line-height:1.7;">'
+                    f'Este espacio recibe aproximadamente <strong>{sol_horas:.0f} horas de sol directo al dia</strong>. '
+                    f'Esto equivale a un recurso solar de aproximadamente <strong>{kwh_pot} kWh por m² al dia</strong>. '
+                    f'La energia solar es un recurso renovable clave para la transicion energetica y la autonomia del espacio.'
+                    f'</div>'
+                    f'<div style="font-size:0.78rem;color:#666;margin-top:0.5rem;line-height:1.6;">'
+                    f'<strong>Herramientas para evaluar tu potencial solar:</strong><br>'
+                    f'☀️ <a href="https://solar.minenergia.cl/inicio" target="_blank" style="color:#1565C0;">Calculadora Solar Minenergia</a> '
+                    f'— Calcula el ahorro al instalar un sistema fotovoltaico conectado a la red (Ley de Generacion Distribuida)<br>'
+                    f'💡 <a href="https://cuentadelaluz.cl/" target="_blank" style="color:#1565C0;">Cuenta de la Luz</a> '
+                    f'— Conoce el precio de la energia electrica en tu comuna'
+                    f'</div></div>', unsafe_allow_html=True)
+
+            st.markdown("**Materiales y Residuos**")
+            for k,l in [("res_compostan","Compostan residuos organicos"),("res_compost_tipo","Tipo de compostaje"),
+                        ("res_organico_kg","Residuos organicos (kg/semana)"),("res_tipos_generados","Tipos de residuos"),
+                        ("res_intentos_fallidos","Intentos fallidos de compostaje"),
+                        ("res_jardin_kg","Residuos de jardin (kg/semana)"),
+                        ("mat_notas","Notas sobre materiales")]:
+                v = data.get(k)
+                if v and str(v) not in ["No registrado",""]:
+                    if isinstance(v, list):
+                        v = ", ".join(str(x) for x in v)
+                    _card(l, str(v), bg="#F3E5F5", border="#7B1FA2")
+
         _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
                   ("Mollison, B. (1988)", "Permaculture: A Designers' Manual", "https://tagari.com"),
                   ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
@@ -1326,6 +1366,40 @@ def render():
             ("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
             ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework", "https://doi.org/10.1080/09613218.2012.62134"),
         ])
+        st.markdown("---")
+
+    # SECCION 9b -- GLOSARIO DE ACCIONES
+    if _show("glosario"):
+        st.markdown("### Glosario de Acciones Regenerativas")
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
+            'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
+            'Este glosario describe las <strong>208 acciones regenerativas</strong> incluidas en la '
+            'Herramienta de Indagacion Regenerativa, organizadas por los 7 petalos de la '
+            'Flor de la Permacultura. Si encuentras una accion en tu informe que no conoces, '
+            'aqui puedes saber de que se trata.</div>', unsafe_allow_html=True)
+
+        try:
+            from modules.regenerative_potential import _PETALOS_DATA, PETAL_ICONS
+            from utils.glosario import get_description
+            for i, petalo in enumerate(_PETALOS_DATA):
+                icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else ""
+                with st.expander(f"{icon} {petalo['nombre']}", expanded=False):
+                    if petalo.get("subtitulo"):
+                        st.caption(petalo["subtitulo"])
+                    for cat_key, actions in petalo["categorias"].items():
+                        cat_name = cat_key.replace("_", " ").title()
+                        st.markdown(f"**{cat_name}**")
+                        for action in actions:
+                            desc = get_description(action)
+                            st.markdown(
+                                f'<div style="padding:0.2rem 0 0.2rem 0.8rem;border-left:2px solid #A8D5B5;'
+                                f'margin:0.15rem 0;font-size:0.82rem;">'
+                                f'<strong style="color:#1B4332;">{action}</strong><br>'
+                                f'<span style="color:#555;">{desc}</span></div>',
+                                unsafe_allow_html=True)
+        except Exception as e:
+            st.caption(f"Glosario: {e}")
         st.markdown("---")
 
     if _show("biblio"):

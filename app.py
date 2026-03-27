@@ -1,4 +1,4 @@
-"""Indagación Regenerativa v9.0 — LivLin · Multi-usuario · www.livlin.cl"""
+"""Herramienta de Indagacion Regenerativa — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
@@ -43,7 +43,7 @@ def _login_page():
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnostico · LivLin v9.0</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Herramienta de Indagacion Regenerativa · LivLin</p>', unsafe_allow_html=True)
 
     # ── DEMO MODE ──────────────────────────────────────────────────────
     st.markdown("---")
@@ -107,7 +107,7 @@ def _login_page():
                 st.session_state.authenticated = True
                 st.session_state.current_user  = user
                 st.session_state.username      = user["username"]
-                st.session_state.pop("_visits_cache_v9.0", None)
+                st.session_state.pop("_visits_cache", None)
                 st.session_state.pop("_sb_status_cache", None)
                 if user.get("visit_id"):
                     v = get_visit(user["visit_id"])
@@ -121,7 +121,7 @@ def _login_page():
                 st.rerun()
             else:
                 st.error("Usuario o contrasena incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">v9.0 · LivLin Permacultura Regenerativa</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">LivLin · Permacultura Regenerativa</p>', unsafe_allow_html=True)
 
 
 def _sidebar():
@@ -279,7 +279,7 @@ def _home():
     st.markdown(
         '<div class="app-header">'
         '<h1>Herramienta de Indagacion Regenerativa</h1>'
-        '<p>Potencial para una vida regenerativa  ·  LivLin v9.0  ·  www.livlin.cl</p>'
+        '<p>Potencial para una vida regenerativa  ·  LivLin  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
     _, cc, _ = st.columns([1, 3, 1])
     with cc:

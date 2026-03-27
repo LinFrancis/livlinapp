@@ -287,6 +287,13 @@ def render():
             f'</div>', unsafe_allow_html=True)
         st.markdown(TAO_INTRO)
         st.info(TAO_DISCLAIMER)
+        st.markdown(
+            '<div style="font-size:0.8rem;color:#555;margin-top:0.5rem;line-height:1.6;">'
+            '<strong>Referencias:</strong><br>'
+            '📖 <a href="https://drive.google.com/file/d/1JAWwhCOyvZKrACoAk5bv5Jh2thxppLZh/view" target="_blank">Tao Te Ching — Texto completo en espanol (PDF)</a><br>'
+            '📖 <a href="https://drive.google.com/file/d/1MLOLcIso_inxbpIaoJfcdrZimVl9xHgj/view?usp=sharing" target="_blank">Mason, F. (2026) El Tao para una vida regenerativa — LivLin</a><br>'
+            '📖 <a href="https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing" target="_blank">Mason, F. (2025) Introduccion al enfoque de la regeneracion — LivLin</a>'
+            '</div>', unsafe_allow_html=True)
 
     data = st.session_state.visit_data
 

@@ -1,4 +1,4 @@
-"""Excel export v9.0 — LivLin · ERP/HRP, escala 0-10."""
+"""Excel export — LivLin · ERP/HRP, escala 0-10."""
 import io, json, base64, tempfile, os
 from pathlib import Path
 from openpyxl import Workbook
@@ -123,7 +123,7 @@ def generate_excel(data: dict) -> bytes:
     _wcol(ws0,[26,16,20,18,20,16])
     _add_logo(ws0, row=1, col=1, size_cm=2.2)
     ws0.merge_cells("B1:F1")
-    ws0["B1"]="🌿 LivLin · Indagación Regenerativa v9.0"
+    ws0["B1"]="🌿 LivLin · Indagacion Regenerativa"
     ws0["B1"].fill=_f(C1); ws0["B1"].font=Font(color=WHITE,bold=True,size=18,name="Calibri")
     ws0["B1"].alignment=Alignment(horizontal="center",vertical="center")
     ws0.row_dimensions[1].height=55
