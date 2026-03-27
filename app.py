@@ -51,7 +51,7 @@ def _login_page():
         '<div style="text-align:center;padding:0.3rem 0;">'
         '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
         '<span style="font-size:0.82rem;color:#555;">'
-        'Explora ejemplos de informes de resultados.'
+        'Explora ejemplos de informes de resultados. '
         'Cada uno muestra el potencial regenerativo de un espacio y presenta un plan de acción.</span></div>',
         unsafe_allow_html=True)
 
