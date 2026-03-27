@@ -387,7 +387,7 @@ def render():
             '<div style="font-size:1.2rem;font-weight:800;color:#1B4332;margin-bottom:0.4rem;">'
             f'Informe de {nombre} 🌿</div>'
             '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
-            'Este es el resultado de una <strong>Indagación Regenerativa</strong>  '
+            'Este es el resultado de una <strong>Indagación Regenerativa</strong>.  '
             'Aquí encontrarás un diagnostico detallado del estado actual '
             'y el potencial regenerativo de este espacio — desde la ecología del sitio hasta las practicas '
             'sustentables activas y las que se pueden incorporar.'
