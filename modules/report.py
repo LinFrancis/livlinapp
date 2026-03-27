@@ -467,13 +467,13 @@ def render():
                 </div>
                 <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
                     <div style="text-align:center;background:white;border-radius:12px;padding:0.8rem 1.2rem;border:2px solid #D8F3DC;min-width:120px;">
-                        <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">🌍 ERP</div>
+                        <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">🌍 Estado Regenerativo Presente (ERP) </div>
                         <div style="font-size:2.8rem;font-weight:900;color:#1B4332;line-height:1;">{erp_score}</div>
                         <div style="color:#52B788;font-size:0.75rem;">/10</div>
                         <div style="font-size:0.72rem;color:{color_erp};font-weight:600;">{label_erp}</div>
                     </div>
                     <div style="text-align:center;background:white;border-radius:12px;padding:0.8rem 1.2rem;border:2px dashed #52B788;min-width:120px;">
-                        <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">🌱 HRP</div>
+                        <div style="font-size:0.65rem;color:#888;text-transform:uppercase;">🌱 Horizonte Regenerativo Potencial (HRP)</div>
                         <div style="font-size:2.8rem;font-weight:900;color:#52B788;line-height:1;">{hrp_score}</div>
                         <div style="color:#52B788;font-size:0.75rem;">/10</div>
                         <div style="font-size:0.72rem;color:{color_hrp};font-weight:600;">{label_hrp}</div>
