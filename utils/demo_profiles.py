@@ -94,17 +94,17 @@ def _base_profile(pid, nombre, cliente, tipo, composicion, area, desc,
 # ════════════════════════════════════════════════════════════════════════════
 P1 = _base_profile(
     pid="demo_pareja_depto",
-    nombre="Departamento Barrio Italia",
-    cliente="Camila y Matias",
+    nombre="Alerce -- Pareja en departamento",
+    cliente="Ana y Diego",
     tipo="Departamento con terraza",
     composicion="Pareja sin hijos/as",
     area=65,
     desc=(
         "Departamento de 65m2 con terraza de 8m2 en Barrio Italia, Providencia. "
-        "Camila es disenadora y Matias trabaja en ingenieria ambiental. Quieren "
+        "Ana es disenadora y Diego trabaja en ingenieria ambiental. Quieren "
         "transformar su terraza en un espacio productivo y reducir su huella "
         "ecologica urbana. Tienen interes en compostaje bokashi, cultivo en "
-        "macetas y una vida mas consciente. Sus gatas Luna y Sol disfrutan "
+        "macetas y una vida mas consciente. Sus gatas disfrutan "
         "del sol en la terraza."
     ),
     lat=-33.4422, lon=-70.6280,
@@ -130,7 +130,7 @@ P1 = _base_profile(
         "sal_ejercicio": "Ejercicio leve 1-2 veces/semana",
         "sal_contacto_naturaleza": "A veces",
         "sal_descanso": "Regular",
-        "sal_practicas_text": "Matias hace yoga dos veces por semana. Camila cocina platos vegetarianos los fines de semana.",
+        "sal_practicas_text": "Diego hace yoga dos veces por semana. Ana cocina platos vegetarianos los fines de semana.",
     },
     suelo={
         "suelo_tipo": "No aplica (contenedores)",
@@ -204,7 +204,7 @@ P1 = _base_profile(
     ipr_obs=[2, 1, 1, 1, 2, 2, 0],
     ipr_tot=[5, 3, 3, 3, 4, 4, 2],
     sintesis={
-        "sint_fortalezas": "Alta motivacion de la pareja. Conocimiento ambiental profesional de Matias. Terraza con buen sol matutino. Barrio con acceso a feria y tiendas de plantas.",
+        "sint_fortalezas": "Alta motivacion de la pareja. Conocimiento ambiental profesional de Diego. Terraza con buen sol matutino. Barrio con acceso a feria y tiendas de plantas.",
         "sint_oportunidades": "Cultivo vertical en muros de terraza. Compostaje bokashi ya iniciado. Captacion de agua lluvia en canaleta. Conexion con vecinos del edificio para huerto colectivo en azotea.",
         "sint_limitaciones": "Espacio muy reducido (8m2 terraza). Poco tiempo libre entre semana. Sin contacto con vecinos del edificio. Sombra parcial en invierno.",
         "sint_quick_wins": "Instalar jardineras verticales en el muro soleado. Completar sistema bokashi. Poner bebedero para aves. Germinar microgreens en la cocina.",
@@ -222,24 +222,24 @@ P1 = _base_profile(
 # ════════════════════════════════════════════════════════════════════════════
 P2 = _base_profile(
     pid="demo_familia_casa",
-    nombre="Casa Familiar La Florida",
-    cliente="Familia Gonzalez-Munoz",
+    nombre="Quillay -- Familia con casa y patio",
+    cliente="Familia Rojas-Vera",
     tipo="Casa con patio/jardín",
     composicion="Familia con hijos/as menores",
     area=220,
     desc=(
         "Casa de 220m2 con patio delantero de 40m2 y patio trasero de 60m2 "
-        "en La Florida. Familia de 5: padres (Carolina profesora, Pedro "
-        "carpintero) y tres hijos (Sofia 4, Tomas 8, Valentina 12). "
+        "en La Florida. Familia de 5: padres (madre profesora, Jorge "
+        "carpintero) y tres hijos (Mia 4, Leo 8, Isa 12). "
         "El patio trasero tiene cesped, un limonero viejo y un naranjo. "
-        "La abuela Eliana vive a dos cuadras y conoce plantas medicinales. "
-        "Tienen un perro (Canelo) y dos gallinas (Pepa y Lola)."
+        "La abuela vive a dos cuadras y conoce plantas medicinales. "
+        "Tienen un perro y dos gallinas."
     ),
     lat=-33.5170, lon=-70.5980,
     geo_display="La Florida, Santiago, Chile",
     geo_city="Santiago",
     tao_scores=[2, 2, 3, 3, 2],
-    tao_notas="Familia con mucho entusiasmo. Los ninos son un motor de cambio. La abuela Eliana aporta saberes tradicionales de plantas medicinales. El desafio es el tiempo: ambos padres trabajan.",
+    tao_notas="Familia con mucho entusiasmo. Los ninos son un motor de cambio. La abuela aporta saberes tradicionales de plantas medicinales. El desafio es el tiempo: ambos padres trabajan.",
     eco_data={
         "eco_cc_conciencia": "Lo conocemos pero parece lejano",
         "eco_cc_impacto": "El patio se seca mucho en verano. Las gallinas sufren con el calor.",
@@ -258,7 +258,7 @@ P2 = _base_profile(
         "sal_ejercicio": "Caminatas ocasionales",
         "sal_contacto_naturaleza": "Frecuentemente",
         "sal_descanso": "Bien",
-        "sal_practicas_text": "Los ninos juegan mucho al aire libre. La abuela prepara aguas de hierbas. Carolina hace caminatas con el perro.",
+        "sal_practicas_text": "Los ninos juegan mucho al aire libre. La abuela prepara aguas de hierbas. La madre hace caminatas con el perro.",
     },
     suelo={
         "suelo_tipo": "Arcilloso-limoso",
@@ -290,7 +290,7 @@ P2 = _base_profile(
     fauna={
         "fauna_lombrices": "Pocas",
         "fauna_plagas": "Babosas en invierno. Pulgones en primavera.",
-        "fauna_aves_especies": "Zorzales, chincoles, tordos. Las gallinas Pepa y Lola.",
+        "fauna_aves_especies": "Zorzales, chincoles, tordos. Gallinas del huerto.",
     },
     cultivo={
         "cultivo_m2": 8,
@@ -335,7 +335,7 @@ P2 = _base_profile(
         "sint_fortalezas": "Gran superficie de patio (100m2 total). Frutales ya establecidos. Familia motivada con ninos como motor. Saberes de la abuela en plantas medicinales. Gallinas ya integradas. Buen sol.",
         "sint_oportunidades": "Ampliar huerto de 8 a 30m2 con camas elevadas. Instalar compostera de tres camaras. Captacion de agua lluvia desde techo (gran superficie). Jardin medicinal con la abuela. Conectar con huerto de la escuela.",
         "sint_limitaciones": "Suelo compactado y bajo en materia organica. Bermuda invasora. Riego solo manual. Ambos padres trabajan, tiempo limitado entre semana. Sin compostaje activo.",
-        "sint_quick_wins": "1. Construir compostera con pallets (Pedro es carpintero). 2. Incorporar mulch al suelo. 3. Sembrar abono verde en areas no cultivadas. 4. Instalar 2 camas elevadas.",
+        "sint_quick_wins": "1. Construir compostera con pallets (Jorge es carpintero). 2. Incorporar mulch al suelo. 3. Sembrar abono verde en areas no cultivadas. 4. Instalar 2 camas elevadas.",
         "sint_observaciones": "Caso con alto potencial: gran espacio, familia completa comprometida, saberes intergeneracionales. El cuello de botella es el suelo y el tiempo. Priorizamos compostaje y camas elevadas.",
     },
     plan={
@@ -350,13 +350,13 @@ P2 = _base_profile(
 # ════════════════════════════════════════════════════════════════════════════
 P3 = _base_profile(
     pid="demo_senora_condominio",
-    nombre="Condominio Los Jardines de Nunoa",
-    cliente="Maria Elena Torres",
+    nombre="Boldo -- Vecina lider en condominio",
+    cliente="Isabel Fuentes",
     tipo="Comunidad / copropiedad",
     composicion="Persona viviendo sola",
     area=85,
     desc=(
-        "Maria Elena (63) vive sola en un departamento de 85m2 en un condominio "
+        "Isabel (63) vive sola en un departamento de 85m2 en un condominio "
         "de 48 unidades en Nunoa. Areas verdes comunes: 200m2 de cesped con palmeras "
         "y arbustos ornamentales. Quiere proponer huerto comunitario, compostera "
         "colectiva y actividades de jardineria para vecinos. Ya tiene 6 vecinos "
@@ -366,7 +366,7 @@ P3 = _base_profile(
     geo_display="Nunoa, Santiago, Chile",
     geo_city="Santiago",
     tao_scores=[3, 3, 2, 2, 2],
-    tao_notas="Maria Elena tiene mucha energia y conexion con la tierra. Enfrenta resistencia institucional del condominio. Su fortaleza es la paciencia y su red de 6 vecinos aliados.",
+    tao_notas="Isabel tiene mucha energia y conexion con la tierra. Enfrenta resistencia institucional del condominio. Su fortaleza es la paciencia y su red de 6 vecinos aliados.",
     eco_data={
         "eco_cc_conciencia": "Es parte de nuestra motivacion de accion",
         "eco_cc_impacto": "El condominio gasta mucha agua regando cesped que se seca en verano.",
@@ -407,11 +407,11 @@ P3 = _base_profile(
     ipr_obs=[0, 0, 0, 1, 2, 1, 1],
     ipr_tot=[4, 2, 1, 4, 4, 3, 5],
     sintesis={
-        "sint_fortalezas": "Liderazgo de Maria Elena. 6 vecinos aliados. 200m2 de espacio comun disponible. Condominio con infraestructura de riego existente. Ubicacion con buena feria local.",
+        "sint_fortalezas": "Liderazgo de Isabel. 6 vecinos aliados. 200m2 de espacio comun disponible. Condominio con infraestructura de riego existente. Ubicacion con buena feria local.",
         "sint_oportunidades": "Huerto comunitario en 25m2 de cesped subutilizado. Compostera comunitaria (48 departamentos generan mucho organico). Talleres de jardineria para vecinos. Jardin de lluvia en area de drenaje.",
         "sint_limitaciones": "Resistencia de la administracion del condominio. Suelo muy compactado. Sin infraestructura de cultivo. Vecinos aun no convencidos en mayoria.",
         "sint_quick_wins": "1. Taller abierto de jardineria en area comun. 2. Macetas demostrativas con hierbas. 3. Presentar propuesta a comite de administracion. 4. Crear grupo de WhatsApp de vecinos verdes.",
-        "sint_observaciones": "El mayor potencial aqui es comunitario. Si Maria Elena logra mover al condominio, el impacto se multiplica por 48 familias. La estrategia debe ser gradual, sin imponer.",
+        "sint_observaciones": "El mayor potencial aqui es comunitario. Si Isabel logra mover al condominio, el impacto se multiplica por 48 familias. La estrategia debe ser gradual, sin imponer.",
     },
     plan={
         "plan_inmediatas": "1. Presentar propuesta de piloto (4m2 de huerto + compostera) a la administracion\n2. Organizar taller abierto de hierbas aromaticas en macetas\n3. Crear red de vecinos interesados (WhatsApp + reuniones mensuales)\n4. Instalar 6 macetas demostrativas de hierbas en areas comunes",
@@ -425,14 +425,14 @@ P3 = _base_profile(
 # ════════════════════════════════════════════════════════════════════════════
 P4 = _base_profile(
     pid="demo_restaurante",
-    nombre="Restaurante Raices del Maipo",
-    cliente="Francisco Araya",
+    nombre="Canelo -- Restaurante con terraza",
+    cliente="Andres Soto",
     tipo="Otro",
     composicion="Organización o institución",
     area=180,
     desc=(
         "Restaurante de cocina chilena contemporanea en Providencia. Terraza "
-        "de 45m2 y patio trasero de 30m2. Francisco (chef y dueno) quiere "
+        "de 45m2 y patio trasero de 30m2. Andres (chef y dueno) quiere "
         "transformar la terraza en jardin comestible, instalar compostera "
         "para residuos de cocina y crear conexion entre la comida y su origen. "
         "El restaurante genera 15kg de residuos organicos diarios. "
@@ -442,7 +442,7 @@ P4 = _base_profile(
     geo_display="Providencia, Santiago, Chile",
     geo_city="Santiago",
     tao_scores=[1, 2, 2, 2, 3],
-    tao_notas="El ritmo del restaurante es intenso. Francisco tiene vision clara pero el dia a dia absorbe. El equipo esta abierto al cambio. La conexion con productores locales ya existe parcialmente.",
+    tao_notas="El ritmo del restaurante es intenso. Andres tiene vision clara pero el dia a dia absorbe. El equipo esta abierto al cambio. La conexion con productores locales ya existe parcialmente.",
     eco_data={
         "eco_cc_conciencia": "Lo sentimos como una amenaza real",
         "eco_cc_impacto": "El calor extremo en verano afecta la terraza y el consumo energetico de refrigeracion.",
@@ -492,8 +492,8 @@ P4 = _base_profile(
 # ════════════════════════════════════════════════════════════════════════════
 P5 = _base_profile(
     pid="demo_escuela",
-    nombre="Escuela Republica de Colombia",
-    cliente="Equipo docente y apoderados",
+    nombre="Peumo -- Escuela con jardin",
+    cliente="Comunidad educativa",
     tipo="Escuela / jardín infantil",
     composicion="Grupo comunitario / vecinos",
     area=800,
@@ -557,8 +557,8 @@ P5 = _base_profile(
 # ════════════════════════════════════════════════════════════════════════════
 P6 = _base_profile(
     pid="demo_huerto_comunitario",
-    nombre="Huerto Comunitario Cerro Blanco",
-    cliente="Colectivo Verde Recoleta",
+    nombre="Maqui -- Huerto comunitario",
+    cliente="Colectivo Raices",
     tipo="Huerto comunitario",
     composicion="Comunidad intencional",
     area=350,

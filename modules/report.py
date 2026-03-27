@@ -247,34 +247,80 @@ def render():
             st.markdown("---")
 
             # ═══ C) DESCARGAR INFORME ═══
-            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">💾 DESCARGAR INFORME</div>', unsafe_allow_html=True)
-            safe_n = nombre.replace(" ", "_")
-            try:
-                xlsx_bytes = generate_excel(data)
-                st.download_button("📊 Descargar Excel", data=xlsx_bytes,
-                    file_name=f"LivLin_IR_{safe_n}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True, key="rpt_dl_xlsx")
-            except Exception as e:
-                st.caption(f"Excel no disponible: {e}")
-            try:
-                from utils.docx_generator import generate_docx
-                docx_bytes = generate_docx(data)
-                st.download_button("📝 Descargar Word", data=docx_bytes,
-                    file_name=f"LivLin_IR_{safe_n}.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True, key="rpt_dl_docx")
-            except Exception as e:
-                st.caption(f"Word no disponible: {e}")
-            st.markdown("---")
+            _is_demo = st.session_state.get("demo_mode", False)
 
-            # ═══ D) CERRAR SESIÓN ═══
-            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">🔒 SESIÓN</div>', unsafe_allow_html=True)
-            st.markdown(f'<div style="font-size:0.7rem;color:#555;margin-bottom:0.3rem;">👤 {data.get("proyecto_cliente","Usuario")}</div>', unsafe_allow_html=True)
-            if st.button("🚪 Cerrar sesión", use_container_width=True, key="rpt_logout"):
-                for k in list(st.session_state.keys()):
-                    del st.session_state[k]
-                st.rerun()
+            # Demo mode: profile switcher
+            if _is_demo:
+                st.markdown(
+                    '<div style="background:#FFF3E0;border-radius:8px;padding:0.5rem;margin-bottom:0.5rem;'
+                    'text-align:center;border:1px solid #FFB74D;">'
+                    '<div style="font-size:0.7rem;font-weight:700;color:#E65100;">MODO DEMOSTRACION</div>'
+                    '<div style="font-size:0.65rem;color:#BF360C;">Este informe es un ejemplo ficticio</div>'
+                    '</div>', unsafe_allow_html=True)
+                try:
+                    from utils.demo_profiles import list_demo_profiles, get_demo_profile
+                    profiles = list_demo_profiles()
+                    current_id = data.get("id", "")
+                    opciones = [f"{n}" for _, n, _, _, _ in profiles]
+                    current_idx = 0
+                    for j, (pid, *_) in enumerate(profiles):
+                        if pid == current_id:
+                            current_idx = j
+                            break
+                    sel_demo = st.selectbox("Cambiar perfil demo", opciones, index=current_idx, key="demo_switch")
+                    sel_idx = opciones.index(sel_demo)
+                    sel_pid = profiles[sel_idx][0]
+                    if sel_pid != current_id:
+                        new_profile = get_demo_profile(sel_pid)
+                        if new_profile:
+                            st.session_state.visit_data = new_profile
+                            st.session_state.current_user["space_name"] = new_profile.get("proyecto_nombre", "Demo")
+                            st.session_state.current_user["display_name"] = new_profile.get("proyecto_cliente", "Demo")
+                            st.rerun()
+                except Exception:
+                    pass
+                st.markdown("---")
+
+            if not _is_demo:
+                st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">💾 DESCARGAR INFORME</div>', unsafe_allow_html=True)
+                safe_n = nombre.replace(" ", "_")
+                try:
+                    xlsx_bytes = generate_excel(data)
+                    st.download_button("📊 Descargar Excel", data=xlsx_bytes,
+                        file_name=f"LivLin_IR_{safe_n}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        use_container_width=True, key="rpt_dl_xlsx")
+                except Exception as e:
+                    st.caption(f"Excel no disponible: {e}")
+                try:
+                    from utils.docx_generator import generate_docx
+                    docx_bytes = generate_docx(data)
+                    st.download_button("📝 Descargar Word", data=docx_bytes,
+                        file_name=f"LivLin_IR_{safe_n}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True, key="rpt_dl_docx")
+                except Exception as e:
+                    st.caption(f"Word no disponible: {e}")
+                st.markdown("---")
+
+            # ═══ D) CERRAR SESIÓN / SALIR DEMO ═══
+            if _is_demo:
+                st.markdown(
+                    '<div style="text-align:center;margin:0.5rem 0;">'
+                    '<a href="https://www.livlin.cl" target="_blank" style="font-size:0.78rem;'
+                    'color:#1B4332;font-weight:700;text-decoration:none;">Contacta a LivLin →</a></div>',
+                    unsafe_allow_html=True)
+                if st.button("Salir del modo demo", use_container_width=True, key="rpt_logout"):
+                    for k in list(st.session_state.keys()):
+                        del st.session_state[k]
+                    st.rerun()
+            else:
+                st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">🔒 SESION</div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="font-size:0.7rem;color:#555;margin-bottom:0.3rem;">👤 {data.get("proyecto_cliente","Usuario")}</div>', unsafe_allow_html=True)
+                if st.button("Cerrar sesion", use_container_width=True, key="rpt_logout"):
+                    for k in list(st.session_state.keys()):
+                        del st.session_state[k]
+                    st.rerun()
 
     active_sec = st.session_state.get("report_section", "all")
     def _show(sec_key):
@@ -282,21 +328,33 @@ def render():
 
 
     # ── Welcome message (client view) ─────────────────────────────
+    _is_demo_main = st.session_state.get("demo_mode", False)
     if readonly:
+        if _is_demo_main:
+            st.markdown(
+                '<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:14px;'
+                'padding:0.8rem 1.2rem;margin-bottom:0.8rem;border:1px solid #FFB74D;">'
+                '<div style="font-size:0.85rem;font-weight:700;color:#E65100;margin-bottom:0.3rem;">'
+                'Modo Demostracion</div>'
+                '<div style="font-size:0.82rem;color:#BF360C;line-height:1.6;">'
+                f'Este es un informe de ejemplo para <strong>{nombre}</strong>. '
+                'Los datos son ficticios y representan un caso tipico de diagnostico regenerativo. '
+                'Asi es como se ve el resultado que recibe cada cliente de LivLin.'
+                '</div></div>', unsafe_allow_html=True)
+
         st.markdown(
             '<div style="background:linear-gradient(135deg,#D8F3DC,#E8F5E9);border-radius:14px;'
             'padding:1.2rem 1.5rem;margin-bottom:1.2rem;border:1px solid #A8D5B5;">'
             '<div style="font-size:1.2rem;font-weight:800;color:#1B4332;margin-bottom:0.4rem;">'
-            f'¡Bienvenid@ al informe de tu espacio, {cliente}! 🌿</div>'
+            f'Informe de {nombre} 🌿</div>'
             '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
-            'Este es el resultado de la <strong>Indagación Regenerativa</strong> realizada por LivLin para tu espacio '
-            f'<strong>{nombre}</strong>. Aquí encontrarás un diagnóstico detallado del estado actual '
-            'y el potencial regenerativo de tu lugar — desde la ecología del sitio hasta las prácticas '
-            'de permacultura que ya están activas y las que puedes incorporar.'
+            'Este es el resultado de la <strong>Indagacion Regenerativa</strong> realizada por LivLin. '
+            'Aqui encontraras un diagnostico detallado del estado actual '
+            'y el potencial regenerativo de este espacio — desde la ecologia del sitio hasta las practicas '
+            'de permacultura activas y las que se pueden incorporar.'
             '<br><br>'
-            '📖 Navega las secciones usando el menú lateral. Cada sección profundiza en un aspecto diferente. '
-            'Al final encontrarás una síntesis con un plan de acción concreto. '
-            'Este informe es una herramienta viva: LivLin te acompaña en el camino hacia la regeneración.'
+            'Navega las secciones usando el menu lateral. Cada seccion profundiza en un aspecto diferente. '
+            'Al final encontraras una sintesis con un plan de accion concreto.'
             '</div></div>', unsafe_allow_html=True)
 
     # ── Header ────────────────────────────────────────────────────────
@@ -1116,41 +1174,65 @@ def render():
     # SECCIÓN 6 — REGISTRO FOTOGRÁFICO (restored from v6)
     # ══════════════════════════════════════════════════════════════════
     if _show("fotos"):
-        st.markdown("### 📷 Registro Fotográfico")
+        st.markdown("### 📷 Registro Fotografico")
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'Fotografías registradas durante el diagnóstico del espacio. '
-            'Documentan el estado actual, las condiciones ecológicas y las oportunidades identificadas.</div>', unsafe_allow_html=True)
+            'Fotografias registradas durante el diagnostico del espacio. '
+            'Documentan el estado actual, las condiciones ecologicas y las oportunidades identificadas.</div>', unsafe_allow_html=True)
 
-        visit_id = data.get("id", "")
         _photos_shown = False
-        if visit_id:
+
+        # Demo mode: load placeholder images from assets/demo/
+        if st.session_state.get("demo_mode", False):
             try:
-                from utils.supabase_db import is_configured
-                import base64
-                use_sb = is_configured()
-                if use_sb:
-                    from modules.media_manager import _sb_load_photos
-                    photos = _sb_load_photos(visit_id)
-                else:
-                    from modules.media_manager import _tmp_photos
-                    photos = _tmp_photos(visit_id)
-                if photos:
+                from pathlib import Path as _P
+                demo_dir = _P(__file__).parent.parent / "assets" / "demo"
+                demo_photos = [
+                    ("demo_foto_1.png", "Vista general del espacio"),
+                    ("demo_foto_2.png", "Detalle del suelo y vegetacion"),
+                    ("demo_foto_3.png", "Contexto urbano y entorno"),
+                ]
+                existing = [(demo_dir / fn, cap) for fn, cap in demo_photos if (demo_dir / fn).exists()]
+                if existing:
                     _photos_shown = True
-                    st.markdown(f"**{len(photos)} foto(s) del diagnóstico:**")
-                    n_cols = min(3, len(photos))
-                    cols_ph = st.columns(n_cols)
-                    for idx, ph in enumerate(photos):
-                        try:
-                            raw = base64.b64decode(ph["data"])
-                            with cols_ph[idx % n_cols]:
-                                st.image(raw, caption=ph.get("label",""), use_container_width=True)
-                                created = str(ph.get("created_at",""))[:16].replace("T"," ")
-                                if created: st.caption(f"{created}")
-                        except Exception: pass
-            except Exception as e:
-                st.caption(f"No se pudieron cargar las fotos: {e}")
+                    st.markdown(f"**{len(existing)} foto(s) del diagnostico:**")
+                    cols_ph = st.columns(min(3, len(existing)))
+                    for idx, (fpath, caption) in enumerate(existing):
+                        with cols_ph[idx % 3]:
+                            st.image(str(fpath), caption=caption, use_container_width=True)
+                    st.caption("*Imagenes de referencia — seran reemplazadas con fotos reales del espacio.*")
+            except Exception:
+                pass
+        else:
+            # Real mode: load from Supabase
+            visit_id = data.get("id", "")
+            if visit_id:
+                try:
+                    from utils.supabase_db import is_configured
+                    import base64
+                    use_sb = is_configured()
+                    if use_sb:
+                        from modules.media_manager import _sb_load_photos
+                        photos = _sb_load_photos(visit_id)
+                    else:
+                        from modules.media_manager import _tmp_photos
+                        photos = _tmp_photos(visit_id)
+                    if photos:
+                        _photos_shown = True
+                        st.markdown(f"**{len(photos)} foto(s) del diagnostico:**")
+                        n_cols = min(3, len(photos))
+                        cols_ph = st.columns(n_cols)
+                        for idx, ph in enumerate(photos):
+                            try:
+                                raw = base64.b64decode(ph["data"])
+                                with cols_ph[idx % n_cols]:
+                                    st.image(raw, caption=ph.get("label",""), use_container_width=True)
+                                    created = str(ph.get("created_at",""))[:16].replace("T"," ")
+                                    if created: st.caption(f"{created}")
+                            except Exception: pass
+                except Exception as e:
+                    st.caption(f"No se pudieron cargar las fotos: {e}")
         if not _photos_shown:
-            st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">No hay fotos registradas para este diagnóstico.</div>', unsafe_allow_html=True)
+            st.markdown('<div style="color:#999;font-style:italic;font-size:0.88rem;">No hay fotos registradas para este diagnostico.</div>', unsafe_allow_html=True)
         st.markdown("---")
 
 
@@ -1237,3 +1319,22 @@ def render():
                     use_container_width=True, key="dl_docx_admin")
             except Exception as e:
                 st.error(f"Error Word: {e}")
+
+    # ── Demo CTA at bottom ────────────────────────────────────────────
+    if st.session_state.get("demo_mode", False):
+        st.markdown("---")
+        st.markdown(
+            '<div style="background:linear-gradient(135deg,#D8F3DC,#E8F5E9);border-radius:14px;'
+            'padding:1.5rem 2rem;margin:1rem 0;text-align:center;border:1px solid #A8D5B5;">'
+            '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">'
+            'Quieres un diagnostico como este para tu espacio?</div>'
+            '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.7;margin-bottom:0.8rem;">'
+            'LivLin realiza diagnosticos regenerativos para hogares, organizaciones, '
+            'escuelas y comunidades. Cada espacio tiene un potencial unico esperando ser activado.'
+            '</div>'
+            '<a href="https://www.livlin.cl" target="_blank" style="display:inline-block;'
+            'background:#1B4332;color:white;padding:0.6rem 2rem;border-radius:8px;'
+            'text-decoration:none;font-weight:700;font-size:0.9rem;">Contacta a LivLin</a>'
+            '<div style="font-size:0.75rem;color:#40916C;margin-top:0.5rem;">'
+            'www.livlin.cl · Potencial para una vida regenerativa</div>'
+            '</div>', unsafe_allow_html=True)

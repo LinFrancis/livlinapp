@@ -43,44 +43,41 @@ def _login_page():
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Indagacion Regenerativa</h2>', unsafe_allow_html=True)
         st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnostico · LivLin v9.0</p>', unsafe_allow_html=True)
 
-    # ── DEMO MODE (visible to everyone, before login) ──────────────────
+    # ── DEMO MODE ──────────────────────────────────────────────────────
     st.markdown("---")
     st.markdown(
         '<div style="text-align:center;padding:0.3rem 0;">'
-        '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Conoce la herramienta</span><br>'
+        '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
         '<span style="font-size:0.82rem;color:#555;">'
-        'Explora diagnosticos de ejemplo y descubre como la Indagacion Regenerativa '
-        'puede transformar cualquier espacio.</span></div>',
+        'Explora diagnosticos de ejemplo para conocer como la Indagacion '
+        'Regenerativa puede transformar cualquier espacio.</span></div>',
         unsafe_allow_html=True)
 
     try:
-        from utils.demo_profiles import list_demo_profiles
+        from utils.demo_profiles import list_demo_profiles, get_demo_profile
         profiles = list_demo_profiles()
-        cols = st.columns(3)
-        for i, (pid, nombre, cliente, tipo, desc) in enumerate(profiles):
-            with cols[i % 3]:
-                st.markdown(
-                    f'<div style="background:#F0FFF4;border-radius:10px;padding:0.6rem;'
-                    f'margin-bottom:0.4rem;border:1px solid #A8D5B5;min-height:90px;">'
-                    f'<div style="font-size:0.82rem;font-weight:700;color:#1B4332;">{nombre}</div>'
-                    f'<div style="font-size:0.75rem;color:#40916C;">{cliente}</div>'
-                    f'<div style="font-size:0.7rem;color:#777;margin-top:0.2rem;">{tipo}</div>'
-                    f'</div>', unsafe_allow_html=True)
-                if st.button(f"Ver diagnostico", key=f"demo_{pid}", use_container_width=True):
-                    from utils.demo_profiles import get_demo_profile
-                    profile = get_demo_profile(pid)
-                    if profile:
-                        st.session_state.authenticated = True
-                        st.session_state.current_user = {
-                            "username": "demo", "role": "admin",
-                            "display_name": "Modo Demostracion",
-                            "space_name": profile.get("proyecto_nombre", "Demo"),
-                        }
-                        st.session_state.visit_data = profile
-                        st.session_state.page = "report"
-                        st.rerun()
+        opciones = ["Selecciona un perfil de ejemplo..."] + [
+            f"{nombre} — {desc_corta}" for _, nombre, _, _, desc_corta in profiles
+        ]
+        sel = st.selectbox("Perfil demo", opciones, index=0, key="demo_select", label_visibility="collapsed")
+        if sel != opciones[0]:
+            idx = opciones.index(sel) - 1
+            pid = profiles[idx][0]
+            if st.button("Ver informe de ejemplo", use_container_width=True, type="primary", key="btn_demo_go"):
+                profile = get_demo_profile(pid)
+                if profile:
+                    st.session_state.authenticated = True
+                    st.session_state.current_user = {
+                        "username": "demo", "role": "user",
+                        "display_name": profile.get("proyecto_cliente", "Demo"),
+                        "space_name": profile.get("proyecto_nombre", "Demo"),
+                    }
+                    st.session_state.visit_data = profile
+                    st.session_state.demo_mode = True
+                    st.session_state.page = "report"
+                    st.rerun()
     except Exception as e:
-        st.caption(f"Perfiles demo: {e}")
+        st.caption(f"Demo: {e}")
 
     st.markdown(
         '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
