@@ -453,7 +453,7 @@ def render():
             '<span style="color:#2E7D32;">6-8 Crecimiento</span> · '
             '<span style="color:#1B4332;">8-10 Abundancia</span>'
             '</div>'
-            f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;margin-top:0.3rem;">📄 Leer publicación oficial · Mason (2025)</a>'
+            f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;margin-top:0.3rem;">📄 Leer Introducción al Enfoque de la Regeneración · Mason (2025)</a>'
             '</div>', unsafe_allow_html=True)
 
         # ── Tarjetas de resultado ──
