@@ -51,8 +51,8 @@ def _login_page():
         '<div style="text-align:center;padding:0.3rem 0;">'
         '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
         '<span style="font-size:0.82rem;color:#555;">'
-        'Explora ejemplos de informes de resultados con información clave para el diseño de otros futuros posibles.'
-        'Cada uno muestra el potencial regenerativo un espacio y sugiere lineas de acción a corto, mediano y largo plazo.</span></div>',
+        'Explora ejemplos de informes de resultados.'
+        'Cada uno muestra el potencial regenerativo de un espacio y presenta un plan de acción.</span></div>',
         unsafe_allow_html=True)
 
     try:
@@ -272,7 +272,7 @@ def _sidebar():
             st.session_state.current_user  = {}
             st.session_state.visit_data    = {}
             st.rerun()
-        st.caption("LivLin · Permacultura Regenerativa")
+        st.caption("LivLin · Servicios para una vida regenerativa")
 
 
 def _home():
@@ -292,7 +292,7 @@ def _home():
     cols = st.columns(3)
     for col, (icon, title, desc) in zip(cols, [
         ("🌸", "Flor de la Permacultura", "Mapea las prácticas activas y el potencial en los 7 pétalos de la flor de la permacultura. Genera indicadores ERP y HRP."),
-        ("🌍", "Observación Ecológica",   "Leye el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad."),
+        ("🌍", "Análisis de Sectores",   "Lee el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad."),
         ("🗺️", "Plan de Acción",          "Hoja de ruta en 3 horizontes: acciones inmediatas, estacionales y estructurales."),
     ]):
         with col:
