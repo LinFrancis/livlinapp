@@ -18,16 +18,16 @@ if CSS_FILE.exists():
 
 # ── Pages ──────────────────────────────────────────────────────────────────
 PAGES_ADMIN = {
-    "🌿 Inicio":                               "home",
-    "📋 M1 · Información + Intención":         "client",
-    "☯️ Tao de la Regeneración":               "tao",
-    "🌍 Conciencia Ecológica":                 "conciencia_ecologica",
-    "📷 Registro Fotográfico":                 "media",
-    "🔬 M2–3 · Ecología + Cultivo":            "site_reading",
-    "🏙️ M4–6 · Contexto + Agua + Energía":    "systems",
-    "🌸 M7 · Flor de la Permacultura":         "regenerative_potential",
-    "🗺️ M9 · Síntesis + Plan":                "action_plan",
-    "📊 Informe Final":                        "report",
+    "Inicio":                               "home",
+    "M1 · Información + Intención":         "client",
+    "Tao Vida Regenerativa":               "tao",
+    "Conciencia Ecológica":                 "conciencia_ecologica",
+    "Registro Fotográfico":                 "media",
+    "M2–3 · Ecología + Cultivo":            "site_reading",
+    "M4–6 · Contexto + Agua + Energía":    "systems",
+    "M7 · Flor de la Permacultura":         "regenerative_potential",
+    "M9 · Síntesis + Plan":                "action_plan",
+    "Informe Final":                        "report",
     "⚙️ Administración":                       "admin",
 }
 # Cliente SOLO ve el informe final
@@ -142,10 +142,10 @@ def _sidebar():
             st.image(str(logo_path), use_container_width=True)
         else:
             st.markdown('<div style="text-align:center;padding:0.5rem 0;">'
-                '<span style="font-family:Georgia;font-size:1.3rem;font-weight:800;color:#1B4332;">🌿 LivLin</span></div>',
+                '<span style="font-family:Georgia;font-size:1.3rem;font-weight:800;color:#1B4332;"> LivLin</span></div>',
                 unsafe_allow_html=True)
         st.markdown('<div style="text-align:center;padding:0 0 0.4rem;">'
-            '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Potencial para una vida regenerativa</span></div>',
+            '<span style="font-size:0.72rem;color:#40916C;font-style:italic;">Servicios para una vida regenerativa</span></div>',
             unsafe_allow_html=True)
         st.markdown("---")
 
