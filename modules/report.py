@@ -186,16 +186,16 @@ def _stacked_bar(names, erp_vals, gap_vals, title="", height=420):
 
 # ── Section registry ────────────────────────────────────────────────
 REPORT_SECTIONS = {
-    "vision":           "🌱 Visión y Estado Regenerativo",
-    "datos":            "📋 Datos del Proyecto",
-    "tao":              "☯️ Tao de la Regeneración",
-    "eco_conciencia":   "🌍 Conciencia Ecológica",
-    "analisis_sectores":"🔬 Análisis de Sectores",
-    "fotos":            "📷 Registro Fotográfico",
-    "sintesis":         "🗺️ Síntesis y Plan",
-    "metodologia":      "📐 Metodología",
-    "glosario":         "📗 Glosario de Acciones",
-    "biblio":           "📚 Bibliografía",
+    "vision":           "Potencial Regenerativo",
+    "datos":            "Datos del Proyecto",
+    "tao":              "Tao vida regenerativa",
+    "eco_conciencia":   "Conciencia Ecológica",
+    "analisis_sectores":"Análisis de Sectores",
+    "fotos":            "Registro Fotográfico",
+    "sintesis":         "Síntesis y Plan",
+    "metodologia":      "Metodología",
+    "glosario":         "Glosario de Acciones",
+    "biblio":           "Recursos",
 }
 
 
@@ -377,8 +377,8 @@ def render():
                 'Modo Demostracion</div>'
                 '<div style="font-size:0.82rem;color:#BF360C;line-height:1.6;">'
                 f'Este es un informe de ejemplo para <strong>{nombre}</strong>. '
-                'Los datos son ficticios y representan un caso tipico de diagnostico regenerativo. '
-                'Asi es como se ve el resultado que recibe cada cliente de LivLin.'
+                'Los datos son ficticios y representan un caso de indagación regenerativa. '
+                'Esta es la vista de resultados para quienes contratan el servicio de diseño de ecosistema regenerativo en Livlin.'
                 '</div></div>', unsafe_allow_html=True)
 
         st.markdown(
@@ -387,10 +387,10 @@ def render():
             '<div style="font-size:1.2rem;font-weight:800;color:#1B4332;margin-bottom:0.4rem;">'
             f'Informe de {nombre} 🌿</div>'
             '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
-            'Este es el resultado de la <strong>Indagacion Regenerativa</strong> realizada por LivLin. '
+            'Este es el resultado de una <strong>Indagacion Regenerativa</strong>  '
             'Aqui encontraras un diagnostico detallado del estado actual '
             'y el potencial regenerativo de este espacio — desde la ecologia del sitio hasta las practicas '
-            'de permacultura activas y las que se pueden incorporar.'
+            'sustentables activas y las que se pueden incorporar.'
             '<br><br>'
             'Navega las secciones usando el menu lateral. Cada seccion profundiza en un aspecto diferente. '
             'Al final encontraras una sintesis con un plan de accion concreto.'
@@ -404,7 +404,7 @@ def render():
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
     # ══════════════════════════════════════════════════════════════════
     if _show("vision"):
-        st.markdown("### 🌱 Visión y Estado Regenerativo")
+        st.markdown("###Potencial regenerativo")
 
         # ── Intro narrativo: ¿Qué es la regeneración? ──
         st.markdown(
@@ -418,7 +418,7 @@ def render():
             'y fortalece la relación entre las personas y su territorio (Holmgren, 2002; Mang & Reed, 2012).'
             '</div>'
             '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
-            'Este informe utiliza dos indicadores complementarios diseñados por LivLin para describir '
+            'Este informe utiliza dos indicadores complementarios para describir '
             'el estado y el potencial regenerativo de tu espacio:</div>'
             '<div style="display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:0.8rem;">'
             '  <div style="flex:1;min-width:200px;background:white;border-radius:10px;padding:0.8rem;border-left:4px solid #1B4332;">'
@@ -426,9 +426,9 @@ def render():
             '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
             '      Es la <em>fotografía</em> del momento actual. Captura las prácticas, ciclos y relaciones '
             '      que ya están activas en tu espacio. Se calcula como <strong>80% de la Flor de la Permacultura</strong> '
-            '      (prácticas observadas en los 7 pétalos de Holmgren) + <strong>20% de sub-indicadores ecológicos</strong> '
+            '      (prácticas observadas en sus 7 pétalos) + <strong>20% de sub-indicadores ecológicos</strong> '
             '      (suelo, agua, sol, biodiversidad, energía y materiales). '
-            '      Un ERP alto indica que el espacio ya tiene prácticas regenerativas consolidadas.</div>'
+            '      Un ERP alto indica que el espacio ya tiene prácticas regenerativas y sustentables consolidadas.</div>'
             '  </div>'
             '  <div style="flex:1;min-width:200px;background:white;border-radius:10px;padding:0.8rem;border-left:4px solid #52B788;">'
             '    <div style="font-weight:800;color:#2D6A4F;font-size:0.88rem;">🌱 HRP — Horizonte Regenerativo Potencial</div>'
