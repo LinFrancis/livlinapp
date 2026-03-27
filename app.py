@@ -5,11 +5,21 @@ import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 _FAVICON = Path(__file__).parent / "assets" / "favicon.png"
+
 st.set_page_config(
     page_title="LivLin — Indagacion Regenerativa",
     page_icon=str(_FAVICON) if _FAVICON.exists() else "🌱",
     layout="wide",
-    initial_sidebar_state="expanded")
+    initial_sidebar_state="expanded",
+    theme={
+        "base": "light",
+        "primaryColor": "#1B4332",
+        "backgroundColor": "#FAFFF9",
+        "secondaryBackgroundColor": "#F2FBF4",
+        "textColor": "#1B4332",
+        "font": "sans serif"
+    }
+)
 
 CSS_FILE = Path(__file__).parent / "style.css"
 if CSS_FILE.exists():
