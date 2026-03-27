@@ -47,47 +47,49 @@ def _login_page():
 
     # ── DEMO MODE ──────────────────────────────────────────────────────
     st.markdown("---")
-    st.markdown(
-        '<div style="text-align:center;padding:0.3rem 0;">'
-        '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
-        '<span style="font-size:0.82rem;color:#555;">'
-        'Explora ejemplos de informes de resultados. '
-        'Cada uno muestra el potencial regenerativo de un espacio y presenta un plan de acción.</span></div>',
-        unsafe_allow_html=True)
-
-    try:
-        from utils.demo_profiles import list_demo_profiles, get_demo_profile
-        profiles = list_demo_profiles()
-        opciones = ["Selecciona un perfil de ejemplo..."] + [
-            f"{nombre} — {desc_corta}" for _, nombre, _, _, desc_corta in profiles
-        ]
-        sel = st.selectbox("Perfil demo", opciones, index=0, key="demo_select", label_visibility="collapsed")
-        if sel != opciones[0]:
-            idx = opciones.index(sel) - 1
-            pid = profiles[idx][0]
-            if st.button("Ver informe de ejemplo", use_container_width=True, type="primary", key="btn_demo_go"):
-                profile = get_demo_profile(pid)
-                if profile:
-                    st.session_state.authenticated = True
-                    st.session_state.current_user = {
-                        "username": "demo", "role": "user",
-                        "display_name": profile.get("proyecto_cliente", "Demo"),
-                        "space_name": profile.get("proyecto_nombre", "Demo"),
-                    }
-                    st.session_state.visit_data = profile
-                    st.session_state.demo_mode = True
-                    st.session_state.page = "report"
-                    st.rerun()
-    except Exception as e:
-        st.caption(f"Demo: {e}")
-
-    st.markdown(
-        '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
-        '<span style="font-size:0.8rem;color:#40916C;">'
-        'Aplica este enfoque en tu espacio  '
-        '<a href="https://www.livlin.cl/?lang=es#contact" target="_blank" style="color:#1B4332;font-weight:700;">'
-        'Contacta a LivLin</a></span></div>',
-        unsafe_allow_html=True)
+    _, cc, _ = st.columns([1.5, 1, 1.5])
+    with cc:
+        st.markdown(
+            '<div style="text-align:center;padding:0.3rem 0;">'
+            '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
+            '<span style="font-size:0.82rem;color:#555;">'
+            'Explora ejemplos de informes de resultados. '
+            'Cada uno muestra el potencial regenerativo de un espacio y presenta un plan de acción.</span></div>',
+            unsafe_allow_html=True)
+    
+        try:
+            from utils.demo_profiles import list_demo_profiles, get_demo_profile
+            profiles = list_demo_profiles()
+            opciones = ["Selecciona un perfil de ejemplo..."] + [
+                f"{nombre} — {desc_corta}" for _, nombre, _, _, desc_corta in profiles
+            ]
+            sel = st.selectbox("Perfil demo", opciones, index=0, key="demo_select", label_visibility="collapsed")
+            if sel != opciones[0]:
+                idx = opciones.index(sel) - 1
+                pid = profiles[idx][0]
+                if st.button("Ver informe de ejemplo", use_container_width=True, type="primary", key="btn_demo_go"):
+                    profile = get_demo_profile(pid)
+                    if profile:
+                        st.session_state.authenticated = True
+                        st.session_state.current_user = {
+                            "username": "demo", "role": "user",
+                            "display_name": profile.get("proyecto_cliente", "Demo"),
+                            "space_name": profile.get("proyecto_nombre", "Demo"),
+                        }
+                        st.session_state.visit_data = profile
+                        st.session_state.demo_mode = True
+                        st.session_state.page = "report"
+                        st.rerun()
+        except Exception as e:
+            st.caption(f"Demo: {e}")
+    
+        st.markdown(
+            '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
+            '<span style="font-size:0.8rem;color:#40916C;">'
+            'Aplica este enfoque en tu espacio  '
+            '<a href="https://www.livlin.cl/?lang=es#contact" target="_blank" style="color:#1B4332;font-weight:700;">'
+            'Contacta a LivLin</a></span></div>',
+            unsafe_allow_html=True)
 
     # ── LOGIN FORM ─────────────────────────────────────────────────────
     st.markdown("---")
