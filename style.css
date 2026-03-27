@@ -7,6 +7,19 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
+/* ── FORCE LIGHT MODE ──────────────────────────────────────────────────── */
+html, body, .stApp {
+    color-scheme: light !important;
+    background: #FAFFF9 !important;
+}
+* {
+    color-scheme: light !important;
+}
+[data-testid="stApp"], [data-baseweb] {
+    background-color: #FAFFF9 !important;
+    color: #1B4332 !important;
+}
+
 /* ── Variables ──────────────────────────────────────────────────────────── */
 :root {
     --c1: #1B4332;   /* verde bosque oscuro — logo primario */
