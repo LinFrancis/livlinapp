@@ -1418,10 +1418,11 @@ def render():
             'aqui puedes saber de que se trata.</div>', unsafe_allow_html=True)
 
         try:
-            from modules.regenerative_potential import _PETALOS_DATA, PETAL_ICONS
+            from modules.regenerative_potential import _PETALOS_DATA
+            from modules.regenerative_potential import PETAL_ICONS as _GLOSS_ICONS
             from utils.glosario import get_description
             for i, petalo in enumerate(_PETALOS_DATA):
-                icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else ""
+                icon = _GLOSS_ICONS[i] if i < len(_GLOSS_ICONS) else ""
                 with st.expander(f"{icon} {petalo['nombre']}", expanded=False):
                     if petalo.get("subtitulo"):
                         st.caption(petalo["subtitulo"])

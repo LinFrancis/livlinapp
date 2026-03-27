@@ -6,7 +6,7 @@ from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
 _FAVICON = Path(__file__).parent / "assets" / "favicon.png"
 st.set_page_config(
-    page_title="LivLin — Herramienta de Indagacion Regenerativa",
+    page_title="LivLin — Indagacion Regenerativa",
     page_icon=str(_FAVICON) if _FAVICON.exists() else "🌱",
     layout="wide",
     initial_sidebar_state="expanded")
@@ -43,7 +43,7 @@ def _login_page():
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Herramienta de Indagacion Regenerativa · LivLin</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Bases para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
 
     # ── DEMO MODE ──────────────────────────────────────────────────────
     st.markdown("---")
@@ -51,8 +51,8 @@ def _login_page():
         '<div style="text-align:center;padding:0.3rem 0;">'
         '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
         '<span style="font-size:0.82rem;color:#555;">'
-        'Explora diagnosticos de ejemplo para conocer como la Indagacion '
-        'Regenerativa puede transformar cualquier espacio.</span></div>',
+        'Explora ejemplos de informes de resultados con información clave para el diseño de otros futuros posibles.'
+        'Cada uno muestra el potencial regenerativo un espacio y sugiere lineas de acción a corto, mediano y largo plazo.</span></div>',
         unsafe_allow_html=True)
 
     try:
@@ -84,7 +84,7 @@ def _login_page():
     st.markdown(
         '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
         '<span style="font-size:0.8rem;color:#40916C;">'
-        'Quieres hacer esto mismo para tu espacio? '
+        '¿Quieres hacer esto mismo para tu espacio? '
         '<a href="https://www.livlin.cl" target="_blank" style="color:#1B4332;font-weight:700;">'
         'Contacta a LivLin</a></span></div>',
         unsafe_allow_html=True)
@@ -93,7 +93,7 @@ def _login_page():
     st.markdown("---")
     _, lc, _ = st.columns([1.5, 1, 1.5])
     with lc:
-        st.markdown('<p style="text-align:center;font-size:0.85rem;color:#888;margin-bottom:0.3rem;">Acceso para facilitadores</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align:center;font-size:0.85rem;color:#888;margin-bottom:0.3rem;">Acceso Miembros</p>', unsafe_allow_html=True)
         uname = st.text_input("Usuario", placeholder="Ej: francis", key="login_user")
         pwd   = st.text_input("Contrasena", type="password", key="login_pwd")
         if st.button("Ingresar", use_container_width=True, type="primary", key="btn_login"):
@@ -291,8 +291,8 @@ def _home():
             '</p>', unsafe_allow_html=True)
     cols = st.columns(3)
     for col, (icon, title, desc) in zip(cols, [
-        ("🌸", "Flor de la Permacultura", "Mapea las prácticas activas y el potencial en los 7 pétalos de Holmgren. Genera el ERP y HRP."),
-        ("🌍", "Observación Ecológica",   "Lee el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad."),
+        ("🌸", "Flor de la Permacultura", "Mapea las prácticas activas y el potencial en los 7 pétalos de la flor de la permacultura. Genera indicadores ERP y HRP."),
+        ("🌍", "Observación Ecológica",   "Leye el sitio antes de diseñar: suelo, agua, sol, viento, biodiversidad."),
         ("🗺️", "Plan de Acción",          "Hoja de ruta en 3 horizontes: acciones inmediatas, estacionales y estructurales."),
     ]):
         with col:
