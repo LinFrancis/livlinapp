@@ -65,7 +65,7 @@ h1, h2, h3, h4, h5, h6, p, span, div, label,
     color: #1B4332 !important;
 }
 .nav-active .stButton > button {
-    background: rgba(64,145,108,0.15) !important;
+    background: rgba(64,145,108,0.08) !important;
     border-color: #40916C !important;
     border-left: 3px solid #40916C !important;
     font-weight: 700 !important;
