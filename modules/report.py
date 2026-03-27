@@ -34,8 +34,46 @@ from utils.report_generator import generate_excel
 
 MASON_URL = "https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing"
 
-# ── Utility helpers (from shared module) ─────────────────────────────
-from utils.ui_helpers import safe_float as _safe_float, val as _val, card as _card, show_field as _show_field, ref_box as _ref_box
+# ── Utility helpers (inline to avoid import chain issues) ────────────
+def _safe_float(v, default=0.0):
+    try: return float(v)
+    except (TypeError, ValueError): return default
+
+def _val(data, key, default="No registrado"):
+    v = data.get(key)
+    if v in [None, "", [], 0, 0.0]: return default
+    return v
+
+def _show_field(label, value, empty_msg="No registrado"):
+    if value in [None, "", [], 0, 0.0]: return
+    st.markdown(
+        f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
+        f'<span style="font-size:0.75rem;color:#52B788;text-transform:uppercase;">{label}</span><br>'
+        f'<span style="font-size:0.88rem;color:#1B4332;">{value}</span></div>',
+        unsafe_allow_html=True)
+
+def _card(label, value, bg="#F0FFF4", fg="#1B4332", border="#52B788"):
+    if not value or value == "No registrado": return
+    st.markdown(
+        f'<div style="background:{bg};border-radius:8px;padding:0.6rem 0.8rem;'
+        f'margin-bottom:0.5rem;border-left:3px solid {border};">'
+        f'<div style="font-size:0.72rem;color:{border};text-transform:uppercase;margin-bottom:0.2rem;">{label}</div>'
+        f'<div style="font-size:0.88rem;color:{fg};line-height:1.5;">{value}</div></div>',
+        unsafe_allow_html=True)
+
+def _ref_box(refs):
+    if not refs: return
+    lines = "".join(
+        f'<div style="font-size:0.78rem;color:#555;padding:2px 0;">'
+        f'📖 {auth} — <em>{title}</em> '
+        f'<a href="{url}" target="_blank" style="color:#1565C0;font-size:0.75rem;">↗</a></div>'
+        for auth, title, url in refs
+    )
+    st.markdown(
+        f'<div style="background:#FAFAFA;border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.8rem;'
+        f'border-top:2px solid #D8F3DC;">'
+        f'<div style="font-size:0.7rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">📚 Referencias de esta seccion</div>'
+        f'{lines}</div>', unsafe_allow_html=True)
 
 def _list_from_semicolon(text):
     if not text: return []
