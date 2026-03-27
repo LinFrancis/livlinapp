@@ -1456,12 +1456,7 @@ def render():
                 f'<em style="color:#333;">{title}</em> '
                 f'<a href="{url}" target="_blank" style="color:#1565C0;font-size:0.82rem;">↗ Acceder</a></div>', unsafe_allow_html=True)
 
-        st.markdown("---")
-        st.markdown(f'<div style="text-align:center;padding:1rem;">'
-            f'<div style="font-size:1rem;font-weight:800;color:#1B4332;">🌿 {LIVLIN_TAGLINE}</div>'
-            f'<div style="font-size:0.85rem;color:#52B788;margin-top:0.3rem;">{LIVLIN_URL}</div>'
-            f'<div style="font-size:0.8rem;color:#888;margin-top:0.5rem;">{LIVLIN_SERVICES_PITCH[:200]}...</div>'
-            f'</div>', unsafe_allow_html=True)
+    
 
 
     # ── Downloads (admin view, bottom of page) ────────────────────────
