@@ -260,7 +260,7 @@ def render():
             st.markdown(
                 '<div style="text-align:center;padding:0.1rem 0 0.5rem;">'
                 '<div style="font-size:0.9rem;font-weight:800;color:#1B4332;">LivLin</div>'
-                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagacion Regenerativa</div>'
+                '<div style="font-size:0.65rem;color:#40916C;font-style:italic;">Indagación Regenerativa</div>'
                 '</div>', unsafe_allow_html=True)
 
             # Nombre del diagnóstico
@@ -387,18 +387,18 @@ def render():
             '<div style="font-size:1.2rem;font-weight:800;color:#1B4332;margin-bottom:0.4rem;">'
             f'Informe de {nombre} 🌿</div>'
             '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
-            'Este es el resultado de una <strong>Indagacion Regenerativa</strong>  '
-            'Aqui encontraras un diagnostico detallado del estado actual '
-            'y el potencial regenerativo de este espacio — desde la ecologia del sitio hasta las practicas '
+            'Este es el resultado de una <strong>Indagación Regenerativa</strong>  '
+            'Aquí encontrarás un diagnostico detallado del estado actual '
+            'y el potencial regenerativo de este espacio — desde la ecología del sitio hasta las practicas '
             'sustentables activas y las que se pueden incorporar.'
             '<br><br>'
-            'Navega las secciones usando el menu lateral. Cada seccion profundiza en un aspecto diferente. '
-            'Al final encontraras una sintesis con un plan de accion concreto.'
+            'Navega las secciones usando el menu lateral. Cada sección profundiza en un aspecto diferente. '
+            'Al final encontrarás una síntesis con un plan de accion concreto.'
             '</div></div>', unsafe_allow_html=True)
 
     # ── Header ────────────────────────────────────────────────────────
-    st.markdown("## Informe de la Indagacion Regenerativa")
-    st.markdown('<p class="module-subtitle">Herramienta de Indagacion Regenerativa · LivLin</p>', unsafe_allow_html=True)
+    st.markdown("## Informe de la Indagación Regenerativa")
+    st.markdown('<p class="module-subtitle">Herramienta de Indagación Regenerativa · LivLin</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -461,7 +461,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado de la Indagacion Regenerativa · LivLin</div>
+                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado de la Indagación Regenerativa · LivLin</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -1363,11 +1363,11 @@ def render():
     # ══════════════════════════════════════════════════════════════════
     # SECCION 9 -- METODOLOGIA
     if _show("metodologia"):
-        st.markdown("### Metodologia de la Indagacion Regenerativa")
+        st.markdown("### Metodologia de la Indagación Regenerativa")
         st.markdown(
             '<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;margin-bottom:1rem;'
             'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
-            'La <strong>Herramienta de Indagacion Regenerativa</strong> de LivLin evalua el potencial '
+            'La <strong>Herramienta de Indagación Regenerativa</strong> de LivLin evalua el potencial '
             'regenerativo de un espacio a traves de multiples dimensiones interconectadas. '
             'El diagnostico se realiza mediante una visita presencial de una persona facilitadora '
             'certificada, que observa, conversa y registra las condiciones del espacio y las '
@@ -1418,7 +1418,7 @@ def render():
             '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
             'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
             'Este glosario describe las <strong>208 acciones regenerativas</strong> incluidas en la '
-            'Herramienta de Indagacion Regenerativa, organizadas por los 7 petalos de la '
+            'Herramienta de Indagación Regenerativa, organizadas por los 7 petalos de la '
             'Flor de la Permacultura. Si encuentras una accion en tu informe que no conoces, '
             'aqui puedes saber de que se trata.</div>', unsafe_allow_html=True)
 
