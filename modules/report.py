@@ -156,6 +156,7 @@ REPORT_SECTIONS = {
     "sistemas":    "🏙️ Contexto, Agua y Energía",
     "fotos":       "📷 Registro Fotográfico",
     "sintesis":    "🗺️ Síntesis y Plan",
+    "metodologia": "📐 Metodología",
     "biblio":      "📚 Bibliografía",
 }
 
@@ -358,7 +359,7 @@ def render():
             '</div></div>', unsafe_allow_html=True)
 
     # ── Header ────────────────────────────────────────────────────────
-    st.markdown("## Informe Final del Diagnóstico Regenerativo")
+    st.markdown("## Informe de la Indagacion Regenerativa")
     st.markdown('<p class="module-subtitle">Visión completa · LivLin v9.0 · ERP + HRP</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
@@ -571,17 +572,30 @@ def render():
                 otros_new = data.get(f"petalo_{i}_otros_new", [])
                 has_practices = any(obs_data.values()) or otros_obs or any(new_data.values()) or otros_new
                 if has_practices:
+                    st.markdown(
+                        '<div style="background:#FAFAFA;border-radius:8px;padding:0.5rem 0.7rem;margin:0.5rem 0;'
+                        'font-size:0.82rem;color:#333;border-left:3px solid #52B788;">'
+                        '<strong>Acciones identificadas en este petalo:</strong> '
+                        'A la izquierda, las practicas que ya estan activas en este espacio. '
+                        'A la derecha, las acciones con potencial concreto de realizacion que la persona '
+                        'facilitadora identifico durante la visita. Cada accion potencial es un paso '
+                        'que LivLin puede acompanar para hacerlo realidad.</div>',
+                        unsafe_allow_html=True)
                     pc1, pc2 = st.columns(2)
                     with pc1:
-                        st.markdown("**✅ Prácticas ya activas (ERP):**")
+                        st.markdown("**Lo que ya esta activo:**")
                         for k, v in obs_data.items():
                             if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#E8F5E9", border="#1B4332")
-                        if otros_obs: _card("Otras", " · ".join(otros_obs), bg="#E8F5E9", border="#1B4332")
+                        if otros_obs: _card("Otras practicas", " · ".join(otros_obs), bg="#E8F5E9", border="#1B4332")
+                        if not any(obs_data.values()) and not otros_obs:
+                            st.caption("Aun no se registran practicas activas en este petalo.")
                     with pc2:
-                        st.markdown("**🌱 Prácticas por activar (→ HRP):**")
+                        st.markdown("**Potencial identificado:**")
                         for k, v in new_data.items():
                             if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#FFFDE7", border="#FFA726")
-                        if otros_new: _card("Otras", " · ".join(otros_new), bg="#FFFDE7", border="#FFA726")
+                        if otros_new: _card("Otras oportunidades", " · ".join(otros_new), bg="#FFFDE7", border="#FFA726")
+                        if not any(new_data.values()) and not otros_new:
+                            st.caption("Sin acciones potenciales adicionales identificadas.")
 
             # ── Sub-indicadores M2-6 ──
             if cross:
@@ -1148,21 +1162,8 @@ def render():
             # Equipos eléctricos
             equipos = data.get("equipos_electricos", [])
             if isinstance(equipos, list) and equipos:
-                equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',e.get('kwh',0))} kWh/día)" for e in equipos)
-                _card("Equipos eléctricos registrados", equip_text, bg="#FFF8E1", border="#F57C00")
-
-            # Solar calculator output
-            sol_horas = _safe_float(data.get("sol_horas", 0))
-            if sol_horas > 0 and kwh > 0:
-                paneles_100w = max(1, round(kwh / (0.1 * sol_horas)))
-                st.markdown(
-                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem;margin-top:0.5rem;border-left:3px solid #F57C00;">'
-                    f'<div style="font-weight:700;color:#E65100;font-size:0.85rem;">☀️ Estimación solar</div>'
-                    f'<div style="font-size:0.82rem;color:#5D4037;line-height:1.6;">'
-                    f'Con <strong>{sol_horas:.0f} horas sol/día</strong> y un consumo de <strong>{kwh:.1f} kWh/día</strong>, '
-                    f'se necesitarían aprox. <strong>{paneles_100w} paneles de 100W</strong> (o {max(1,round(paneles_100w/4))} de 400W) '
-                    f'para cubrir el consumo. Cada panel de 100W produce ~{round(0.1*sol_horas,2)} kWh/día en esta ubicación.</div></div>',
-                    unsafe_allow_html=True)
+                equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',e.get('kwh',0))} kWh/dia)" for e in equipos)
+                _card("Equipos electricos registrados", equip_text, bg="#FFF8E1", border="#F57C00")
 
         _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
                   ("Mollison, B. (1988)", "Permaculture: A Designers' Manual", "https://tagari.com"),
@@ -1277,6 +1278,56 @@ def render():
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 10 — BIBLIOGRAFÍA
     # ══════════════════════════════════════════════════════════════════
+    # SECCION 9 -- METODOLOGIA
+    if _show("metodologia"):
+        st.markdown("### Metodologia de la Indagacion Regenerativa")
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;margin-bottom:1rem;'
+            'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
+            'La <strong>Herramienta de Indagacion Regenerativa</strong> de LivLin evalua el potencial '
+            'regenerativo de un espacio a traves de multiples dimensiones interconectadas. '
+            'El diagnostico se realiza mediante una visita presencial de una persona facilitadora '
+            'certificada, que observa, conversa y registra las condiciones del espacio y las '
+            'practicas de quienes lo habitan.</div>', unsafe_allow_html=True)
+
+        st.markdown("#### Flor de la Permacultura y el IPR")
+        st.markdown(
+            'El instrumento central se basa en los **7 petalos de la Flor de la Permacultura** '
+            '(Holmgren, 2002), que representan los ambitos fundamentales de la vida '
+            'cotidiana que deben transformarse para una cultura regenerativa:\n\n'
+            '1. **Administracion de la Tierra y la Naturaleza** — agricultura urbana, suelo, biodiversidad, agua\n'
+            '2. **Entorno Construido** — bioconstruccion, diseno bioclimatico\n'
+            '3. **Herramientas y Tecnologia** — energia renovable, tecnologia simple\n'
+            '4. **Educacion y Cultura** — saberes locales, arte comunitario, redes\n'
+            '5. **Salud y Bienestar Espiritual** — alimentacion, plantas medicinales\n'
+            '6. **Finanzas y Economia** — mercados locales, economias solidarias\n'
+            '7. **Tenencia de la Tierra y Gobernanza** — participacion, organizacion territorial\n\n'
+            'Para cada petalo, la persona facilitadora registra las **practicas ya activas** (observadas) '
+            'y las **practicas con potencial concreto de realizacion**. Solo se registra como potencial '
+            'aquello que la persona facilitadora evalua como razonablemente factible para ese espacio.')
+
+        st.markdown("#### ERP y HRP")
+        st.markdown(
+            '**ERP (Estado Regenerativo Presente)** — Fotografia del momento actual. '
+            '80% Flor de la Permacultura (practicas observadas) + 20% sub-indicadores ecologicos. '
+            'Escala 0-10.\n\n'
+            '**HRP (Horizonte Regenerativo Potencial)** — Lo que el espacio puede alcanzar. '
+            '100% Flor proyectada (observadas + potenciales). Escala 0-10.\n\n'
+            'La **brecha** entre ERP y HRP es el campo de accion concreto.')
+
+        st.markdown("#### Tao de la Regeneracion")
+        st.markdown(
+            '5 dimensiones de sabiduria taoista (accion espontanea, humildad, compasion, '
+            'fortalecer lo esencial, retorno a la raiz). Escala 1-5 por dimension, '
+            'puntaje total 5-25. Radar de 5 ejes.')
+
+        _ref_box([
+            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+            ("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
+            ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework", "https://doi.org/10.1080/09613218.2012.62134"),
+        ])
+        st.markdown("---")
+
     if _show("biblio"):
         st.markdown("### 📚 Bibliografía y Recursos")
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'

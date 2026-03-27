@@ -33,6 +33,7 @@ def _base_profile(pid, nombre, cliente, tipo, composicion, area, desc,
                   suelo, sol, viento, veg, fauna, cultivo,
                   ctx, agua, energia, residuos,
                   ipr_obs, ipr_tot,
+                  petalos_acciones,
                   sintesis, plan):
     """Build a complete demo profile dict."""
     d = {
@@ -84,9 +85,118 @@ def _base_profile(pid, nombre, cliente, tipo, composicion, area, desc,
     d.update(agua)
     d.update(energia)
     d.update(residuos)
+    # ── Petal actions (observed + potential) ──
+    d.update(petalos_acciones)
     d.update(sintesis)
     d.update(plan)
     return d
+
+
+# ── Petal action data per profile ───────────────────────────────────────
+# petalo_{i}_obs = observed, petalo_{i}_pot_new = potential
+# 0:Tierra 1:Entorno 2:Herramientas 3:Educacion 4:Salud 5:Finanzas 6:Gobernanza
+
+_P1_ACC = {
+    "petalo_0_obs": {"produccion_alimentaria_urbana": ["Cultivo de microgreens", "Huertos en macetas recicladas"]},
+    "petalo_0_pot_new": {"produccion_alimentaria_urbana": ["Huertos verticales en muros o cercos", "Germinados en casa"], "suelo_vivo": ["Compostaje bokashi"]},
+    "petalo_1_obs": {"naturaleza_en_edificios": ["Balcones verdes"]},
+    "petalo_1_pot_new": {"naturaleza_en_edificios": ["Jardines verticales comestibles", "Muros verdes"]},
+    "petalo_2_obs": {"energia_domestica": ["Usar ampolletas LED"]},
+    "petalo_2_pot_new": {"alimentos": ["Fermentacion de alimentos", "Conservas caseras"]},
+    "petalo_3_obs": {"desarrollo_personal_regenerativo": ["Estudiar sobre regeneracion"]},
+    "petalo_3_pot_new": {"educacion_comunitaria": ["Talleres de compostaje"], "redes": ["Redes de huertos urbanos"]},
+    "petalo_4_obs": {"salud_fisica": ["Alimentacion basada en plantas", "Consumo de alimentos locales"]},
+    "petalo_4_pot_new": {"salud_mental": ["Jardineria terapeutica"], "medicina_natural": ["Cultivo de plantas medicinales"]},
+    "petalo_5_obs": {"consumo_responsable": ["Compras a productores locales", "Reduccion de consumo"]},
+    "petalo_5_pot_new": {"consumo_responsable": ["Comprar a granel"], "economia_local": ["Canastas comunitarias"]},
+    "petalo_6_obs": {},
+    "petalo_6_pot_new": {"vida_comunitaria": ["Conectar con vecinos", "Participar en huertos comunitarios"]},
+}
+
+_P2_ACC = {
+    "petalo_0_obs": {"produccion_alimentaria_urbana": ["Huertos en patios comunitarios", "Jardines comestibles en patios pequenos"], "suelo_vivo": ["Fabricacion de te de compost"], "biodiversidad_urbana": ["Plantacion de arboles frutales urbanos"]},
+    "petalo_0_pot_new": {"produccion_alimentaria_urbana": ["Huertos en azoteas o techos planos", "Cultivo de hongos comestibles", "Cultivo de microgreens"], "suelo_vivo": ["Vermicompostaje domestico", "Compostaje comunitario en el barrio", "Produccion de biochar"], "biodiversidad_urbana": ["Corredores de polinizadores", "Jardines para abejas nativas", "Refugios para insectos"], "agua": ["Captacion de agua lluvia en casas", "Riego por goteo casero"]},
+    "petalo_1_obs": {"reutilizacion_materiales": ["Uso de pallets para jardineria"]},
+    "petalo_1_pot_new": {"energia_pasiva": ["Sombreamiento natural con plantas", "Pergolas verdes"], "naturaleza_en_edificios": ["Patios interiores con vegetacion"]},
+    "petalo_2_obs": {"alimentos": ["Conservas caseras"], "movilidad": ["Uso de bicicleta"]},
+    "petalo_2_pot_new": {"alimentos": ["Fermentacion de alimentos", "Deshidratacion solar"], "energia": ["Calentadores solares de agua"]},
+    "petalo_3_obs": {"educacion_practica": ["Aprendizaje basado en huertos"], "desarrollo_personal_regenerativo": ["Practicar agroecologia"]},
+    "petalo_3_pot_new": {"educacion_comunitaria": ["Talleres de compostaje", "Intercambio de saberes tradicionales"], "cultura_regenerativa": ["Intercambio de plantas"]},
+    "petalo_4_obs": {"salud_fisica": ["Consumo de alimentos locales"], "medicina_natural": ["Preparacion de infusiones"]},
+    "petalo_4_pot_new": {"salud_mental": ["Jardineria terapeutica", "Espacios de contemplacion"], "medicina_natural": ["Cultivo de plantas medicinales", "Preparacion de tinturas"]},
+    "petalo_5_obs": {"consumo_responsable": ["Compras a productores locales", "Reparacion de objetos", "Reutilizacion de materiales"]},
+    "petalo_5_pot_new": {"economia_local": ["Mercados agroecologicos", "Canastas comunitarias"], "consumo_responsable": ["Comprar a granel"]},
+    "petalo_6_obs": {"vida_comunitaria": ["Conectar con vecinos"]},
+    "petalo_6_pot_new": {"organizacion_comunitaria": ["Asambleas barriales"], "gestion_espacios": ["Creacion de huertos comunitarios"], "participacion_ciudadana": ["Defensa de areas verdes"]},
+}
+
+_P3_ACC = {
+    "petalo_0_obs": {},
+    "petalo_0_pot_new": {"produccion_alimentaria_urbana": ["Huertos en patios comunitarios", "Jardines comestibles en patios pequenos", "Microhuertos en ventanas"], "suelo_vivo": ["Compostaje comunitario en el barrio"]},
+    "petalo_1_obs": {},
+    "petalo_1_pot_new": {"espacios_multifuncionales": ["Huertos en condominios", "Espacios de compostaje en edificios"]},
+    "petalo_2_obs": {},
+    "petalo_2_pot_new": {"agua": ["Sistemas de almacenamiento de agua"]},
+    "petalo_3_obs": {"desarrollo_personal_regenerativo": ["Estudiar sobre regeneracion"]},
+    "petalo_3_pot_new": {"educacion_comunitaria": ["Talleres de huertos urbanos", "Talleres de compostaje", "Intercambio de saberes tradicionales"]},
+    "petalo_4_obs": {"salud_fisica": ["Alimentacion basada en plantas", "Consumo de alimentos locales"]},
+    "petalo_4_pot_new": {"salud_mental": ["Jardineria terapeutica"], "comunidad": ["Grupos de apoyo comunitario"]},
+    "petalo_5_obs": {"consumo_responsable": ["Compras a productores locales"]},
+    "petalo_5_pot_new": {"economia_local": ["Ferias de intercambio", "Canastas comunitarias"]},
+    "petalo_6_obs": {"vida_comunitaria": ["Conectar con vecinos"]},
+    "petalo_6_pot_new": {"organizacion_comunitaria": ["Asambleas barriales", "Consejos comunitarios"], "gestion_espacios": ["Creacion de huertos comunitarios", "Jardines comunitarios"], "participacion_ciudadana": ["Participacion en planificacion urbana"]},
+}
+
+_P4_ACC = {
+    "petalo_0_obs": {"produccion_alimentaria_urbana": ["Cultivo de microgreens"]},
+    "petalo_0_pot_new": {"produccion_alimentaria_urbana": ["Huertos verticales en muros o cercos", "Jardines comestibles en patios pequenos", "Cultivo de hongos comestibles"], "suelo_vivo": ["Compostaje bokashi"]},
+    "petalo_1_obs": {},
+    "petalo_1_pot_new": {"naturaleza_en_edificios": ["Muros verdes", "Jardines verticales comestibles"]},
+    "petalo_2_obs": {"energia_domestica": ["Usar ampolletas LED"]},
+    "petalo_2_pot_new": {"alimentos": ["Fermentacion de alimentos", "Deshidratacion solar"]},
+    "petalo_3_obs": {},
+    "petalo_3_pot_new": {"educacion_comunitaria": ["Talleres de compostaje"], "cultura_regenerativa": ["Ferias de agricultura urbana"]},
+    "petalo_4_obs": {"salud_fisica": ["Alimentacion basada en plantas"]},
+    "petalo_4_pot_new": {"medicina_natural": ["Cultivo de plantas medicinales"]},
+    "petalo_5_obs": {"consumo_responsable": ["Compras a productores locales", "Reduccion de consumo"]},
+    "petalo_5_pot_new": {"emprendimientos_regenerativos": ["Produccion de alimentos locales", "Educacion ambiental"], "economia_local": ["Mercados agroecologicos"]},
+    "petalo_6_obs": {},
+    "petalo_6_pot_new": {"redes_territoriales": ["Redes de resiliencia comunitaria"]},
+}
+
+_P5_ACC = {
+    "petalo_0_obs": {},
+    "petalo_0_pot_new": {"produccion_alimentaria_urbana": ["Huertos escolares", "Jardines comestibles en patios pequenos", "Guerrilla gardening", "Cultivo de microgreens"], "suelo_vivo": ["Compostaje comunitario en el barrio", "Creacion de suelo vivo en macetas"], "biodiversidad_urbana": ["Jardines de mariposas", "Refugios para insectos", "Bebederos para aves"]},
+    "petalo_1_obs": {},
+    "petalo_1_pot_new": {"naturaleza_en_edificios": ["Techos verdes", "Patios interiores con vegetacion"], "espacios_multifuncionales": ["Talleres compartidos"]},
+    "petalo_2_obs": {},
+    "petalo_2_pot_new": {"tecnologias_simples": ["Sistemas de riego automatizado de bajo consumo"], "agua": ["Sistemas de almacenamiento de agua"]},
+    "petalo_3_obs": {"educacion_practica": ["Aprendizaje basado en huertos"]},
+    "petalo_3_pot_new": {"educacion_comunitaria": ["Talleres de agroecologia urbana", "Talleres de compostaje", "Talleres de huertos urbanos", "Cursos de diseno regenerativo"], "educacion_practica": ["Programas educativos en jardines escolares"]},
+    "petalo_4_obs": {},
+    "petalo_4_pot_new": {"salud_mental": ["Jardineria terapeutica", "Espacios de contemplacion"], "movimiento": ["Caminatas ecologicas"]},
+    "petalo_5_obs": {},
+    "petalo_5_pot_new": {"economia_local": ["Ferias de intercambio"], "consumo_responsable": ["Reduccion de consumo"]},
+    "petalo_6_obs": {"vida_comunitaria": ["Participar en organizaciones locales"]},
+    "petalo_6_pot_new": {"organizacion_comunitaria": ["Mesas ambientales locales"], "gestion_espacios": ["Creacion de huertos comunitarios", "Jardines comunitarios"], "participacion_ciudadana": ["Presupuestos participativos"]},
+}
+
+_P6_ACC = {
+    "petalo_0_obs": {"produccion_alimentaria_urbana": ["Huertos en patios comunitarios", "Huertos en espacios publicos recuperados", "Cultivo de microgreens"], "suelo_vivo": ["Vermicompostaje domestico", "Compostaje comunitario en el barrio", "Uso de microorganismos eficientes", "Fabricacion de te de compost"], "biodiversidad_urbana": ["Plantacion de arboles frutales urbanos", "Jardines para abejas nativas", "Plantacion de especies nativas en jardines"], "agua": ["Captacion de agua lluvia en casas", "Riego por goteo casero"], "semillas": ["Guardar semillas en casa", "Intercambio de semillas entre vecinos"]},
+    "petalo_0_pot_new": {"produccion_alimentaria_urbana": ["Cultivo de hongos comestibles", "Cultivo acuaponico domestico"], "suelo_vivo": ["Produccion de biochar"], "biodiversidad_urbana": ["Corredores de polinizadores", "Restauracion de pequenos espacios degradados"], "agua": ["Jardines de lluvia urbanos"]},
+    "petalo_1_obs": {"reutilizacion_materiales": ["Uso de pallets para jardineria", "Construccion con materiales reciclados"]},
+    "petalo_1_pot_new": {"energia_pasiva": ["Sombreamiento natural con plantas"], "reutilizacion_materiales": ["Construccion de mini invernaderos"]},
+    "petalo_2_obs": {"alimentos": ["Fermentacion de alimentos", "Conservas caseras"]},
+    "petalo_2_pot_new": {"alimentos": ["Deshidratacion solar", "Almacenamiento natural de alimentos"], "energia": ["Cocinas solares"]},
+    "petalo_3_obs": {"educacion_comunitaria": ["Talleres de agroecologia urbana", "Talleres de compostaje", "Talleres de huertos urbanos"], "educacion_practica": ["Aprendizaje basado en huertos"]},
+    "petalo_3_pot_new": {"educacion_comunitaria": ["Cursos de diseno regenerativo", "Intercambio de saberes tradicionales"], "cultura_regenerativa": ["Festivales de semillas", "Intercambio de plantas"]},
+    "petalo_4_obs": {"salud_fisica": ["Alimentacion basada en plantas", "Cocina saludable comunitaria"], "movimiento": ["Caminatas ecologicas"]},
+    "petalo_4_pot_new": {"salud_mental": ["Jardineria terapeutica", "Banos de bosque urbanos"], "medicina_natural": ["Cultivo de plantas medicinales"]},
+    "petalo_5_obs": {"economia_local": ["Ferias de intercambio"], "consumo_responsable": ["Compras a productores locales", "Reutilizacion de materiales"]},
+    "petalo_5_pot_new": {"economia_local": ["Mercados agroecologicos", "Agricultura apoyada por la comunidad (CSA)"], "emprendimientos_regenerativos": ["Viveros urbanos"]},
+    "petalo_6_obs": {"organizacion_comunitaria": ["Asambleas barriales"], "gestion_espacios": ["Creacion de huertos comunitarios"], "participacion_ciudadana": ["Defensa de areas verdes"], "vida_comunitaria": ["Participar en organizaciones locales"]},
+    "petalo_6_pot_new": {"redes_territoriales": ["Redes de agroecologia urbana", "Redes de transicion urbana"], "modelos_propiedad": ["Fideicomisos de tierra comunitaria"]},
+}
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -203,6 +313,7 @@ P1 = _base_profile(
     },
     ipr_obs=[2, 1, 1, 1, 2, 2, 0],
     ipr_tot=[5, 3, 3, 3, 4, 4, 2],
+    petalos_acciones=_P1_ACC,
     sintesis={
         "sint_fortalezas": "Alta motivacion de la pareja. Conocimiento ambiental profesional de Diego. Terraza con buen sol matutino. Barrio con acceso a feria y tiendas de plantas.",
         "sint_oportunidades": "Cultivo vertical en muros de terraza. Compostaje bokashi ya iniciado. Captacion de agua lluvia en canaleta. Conexion con vecinos del edificio para huerto colectivo en azotea.",
@@ -331,6 +442,7 @@ P2 = _base_profile(
     },
     ipr_obs=[4, 1, 2, 2, 2, 3, 1],
     ipr_tot=[9, 4, 4, 5, 5, 6, 4],
+    petalos_acciones=_P2_ACC,
     sintesis={
         "sint_fortalezas": "Gran superficie de patio (100m2 total). Frutales ya establecidos. Familia motivada con ninos como motor. Saberes de la abuela en plantas medicinales. Gallinas ya integradas. Buen sol.",
         "sint_oportunidades": "Ampliar huerto de 8 a 30m2 con camas elevadas. Instalar compostera de tres camaras. Captacion de agua lluvia desde techo (gran superficie). Jardin medicinal con la abuela. Conectar con huerto de la escuela.",
@@ -406,6 +518,7 @@ P3 = _base_profile(
     residuos={"res_compostan": "No", "res_compost_tipo": "Ninguno", "res_organico_kg": 2, "res_tipos_generados": ["Orgánicos", "Plásticos", "Cartón"]},
     ipr_obs=[0, 0, 0, 1, 2, 1, 1],
     ipr_tot=[4, 2, 1, 4, 4, 3, 5],
+    petalos_acciones=_P3_ACC,
     sintesis={
         "sint_fortalezas": "Liderazgo de Isabel. 6 vecinos aliados. 200m2 de espacio comun disponible. Condominio con infraestructura de riego existente. Ubicacion con buena feria local.",
         "sint_oportunidades": "Huerto comunitario en 25m2 de cesped subutilizado. Compostera comunitaria (48 departamentos generan mucho organico). Talleres de jardineria para vecinos. Jardin de lluvia en area de drenaje.",
@@ -474,6 +587,7 @@ P4 = _base_profile(
     residuos={"res_compostan": "No", "res_compost_tipo": "Ninguno", "res_organico_kg": 15, "res_tipos_generados": ["Orgánicos", "Plásticos", "Cartón", "Vidrio", "Aceite usado"]},
     ipr_obs=[1, 0, 1, 0, 1, 2, 0],
     ipr_tot=[5, 2, 3, 3, 3, 5, 1],
+    petalos_acciones=_P4_ACC,
     sintesis={
         "sint_fortalezas": "15kg diarios de organico = recurso enorme para compost. Chef comprometido. Terraza con buen sol. Red de proveedores locales. Visibilidad publica del restaurante.",
         "sint_oportunidades": "Compostera comercial para 15kg/dia. Huerto de hierbas aromaticas en terraza (ahorro en compras). Muro verde comestible visible a clientes. Eliminar plasticos. Narrativa gastronomica regenerativa.",
@@ -539,6 +653,7 @@ P5 = _base_profile(
     residuos={"res_compostan": "No", "res_compost_tipo": "Ninguno", "res_organico_kg": 20, "res_tipos_generados": ["Orgánicos", "Plásticos", "Cartón", "Tetrapak"]},
     ipr_obs=[0, 0, 0, 1, 0, 0, 1],
     ipr_tot=[6, 3, 2, 6, 3, 2, 5],
+    petalos_acciones=_P5_ACC,
     sintesis={
         "sint_fortalezas": "Gran superficie disponible (500m2 patio). 420 estudiantes como aprendices y agentes de cambio. 16 adultos comprometidos. Apoyo del director y municipio. Pimientos nativos ya existentes.",
         "sint_oportunidades": "Huerto pedagogico integrado al curriculum. Mini bosque comestible (Miyawaki). Captacion de agua lluvia del techo (gran superficie). Compostera escolar con residuos de 420 almuerzos. Laboratorio vivo de biodiversidad.",
@@ -606,6 +721,7 @@ P6 = _base_profile(
     residuos={"res_compostan": "Si", "res_compost_tipo": "Compostaje aeróbico + vermicompostaje", "res_organico_kg": 25, "res_tipos_generados": ["Orgánicos", "Cartón"]},
     ipr_obs=[7, 2, 2, 4, 3, 3, 4],
     ipr_tot=[12, 4, 4, 7, 5, 5, 7],
+    petalos_acciones=_P6_ACC,
     sintesis={
         "sint_fortalezas": "350m2 con excelente sol. Colectivo de 18 personas organizado. 8 meses de experiencia. Compostaje activo y productivo. Captacion de agua lluvia ya instalada. Biodiversidad emergente. Conexion con redes locales.",
         "sint_oportunidades": "Diseno agroforestal del terreno completo. Vivero de nativas para restauracion del cerro. Talleres abiertos para el barrio. Mercado comunitario semanal. Programa de voluntariado. Conexion con circuito de huertos de Recoleta.",

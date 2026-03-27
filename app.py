@@ -4,9 +4,11 @@ from pathlib import Path
 import streamlit as st
 from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 
+_FAVICON = Path(__file__).parent / "assets" / "favicon.png"
 st.set_page_config(
-    page_title="Indagación Regenerativa · LivLin v9.0",
-    page_icon="🌿", layout="wide",
+    page_title="LivLin — Herramienta de Indagacion Regenerativa",
+    page_icon=str(_FAVICON) if _FAVICON.exists() else "🌱",
+    layout="wide",
     initial_sidebar_state="expanded")
 
 CSS_FILE = Path(__file__).parent / "style.css"
@@ -40,7 +42,7 @@ def _login_page():
     with cc:
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
-        st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Indagacion Regenerativa</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
         st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Instrumento de diagnostico · LivLin v9.0</p>', unsafe_allow_html=True)
 
     # ── DEMO MODE ──────────────────────────────────────────────────────
@@ -276,7 +278,7 @@ def _sidebar():
 def _home():
     st.markdown(
         '<div class="app-header">'
-        '<h1>Indagación Regenerativa</h1>'
+        '<h1>Herramienta de Indagacion Regenerativa</h1>'
         '<p>Potencial para una vida regenerativa  ·  LivLin v9.0  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
     _, cc, _ = st.columns([1, 3, 1])
