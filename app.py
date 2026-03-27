@@ -38,7 +38,7 @@ PAGES_CLIENT = {
 
 def _login_page():
     logo_path = Path(__file__).parent / "assets" / "logolivlin.png"
-    _, cc, _ = st.columns([1.5, 1, 1.5])
+    _, cc, _ = st.columns([0.5, 2, 0.5])
     with cc:
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
