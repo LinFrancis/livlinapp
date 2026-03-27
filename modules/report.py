@@ -1491,7 +1491,7 @@ def render():
             '<div style="background:linear-gradient(135deg,#D8F3DC,#E8F5E9);border-radius:14px;'
             'padding:1.5rem 2rem;margin:1rem 0;text-align:center;border:1px solid #A8D5B5;">'
             '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">'
-            'Quieres un diagnostico como este para tu espacio?</div>'
+            '¿Quieres un diagnostico como este para tu espacio?</div>'
             '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.7;margin-bottom:0.8rem;">'
             'LivLin realiza diagnosticos regenerativos para hogares, organizaciones, '
             'escuelas y comunidades. Cada espacio tiene un potencial unico esperando ser activado.'
