@@ -47,7 +47,7 @@ def _login_page():
 
     # ── DEMO MODE ──────────────────────────────────────────────────────
     st.markdown("---")
-    _, cc, _ = st.columns([1.5, 1, 1.5])
+    _, cc, _ = st.columns([0.5, 2, 0.5])
     with cc:
         st.markdown(
             '<div style="text-align:center;padding:0.3rem 0;">'
