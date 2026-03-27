@@ -186,17 +186,16 @@ def _stacked_bar(names, erp_vals, gap_vals, title="", height=420):
 
 # ── Section registry ────────────────────────────────────────────────
 REPORT_SECTIONS = {
-    "vision":      "🌱 Visión y Estado Regenerativo",
-    "datos":       "📋 Datos del Proyecto",
-    "tao":         "☯️ Tao de la Regeneración",
-    "eco_conciencia": "🌍 Conciencia Ecológica",
-    "ecologia":    "🔬 Observación Ecológica",
-    "sistemas":    "🏙️ Contexto, Agua y Energía",
-    "fotos":       "📷 Registro Fotográfico",
-    "sintesis":    "🗺️ Síntesis y Plan",
-    "metodologia": "📐 Metodología",
-    "glosario":    "📗 Glosario de Acciones",
-    "biblio":      "📚 Bibliografía",
+    "vision":           "🌱 Visión y Estado Regenerativo",
+    "datos":            "📋 Datos del Proyecto",
+    "tao":              "☯️ Tao de la Regeneración",
+    "eco_conciencia":   "🌍 Conciencia Ecológica",
+    "analisis_sectores":"🔬 Análisis de Sectores",
+    "fotos":            "📷 Registro Fotográfico",
+    "sintesis":         "🗺️ Síntesis y Plan",
+    "metodologia":      "📐 Metodología",
+    "glosario":         "📗 Glosario de Acciones",
+    "biblio":           "📚 Bibliografía",
 }
 
 
@@ -508,8 +507,8 @@ def render():
             '👉 <strong>Explora las secciones del informe</strong> usando el menú lateral: '
             '<em>📋 Datos del Proyecto</em>, '
             '<em>☯️ Tao de la Regeneración</em> (intención y visión), '
-            '<em>🔬 Observación Ecológica</em> (suelo, agua, sol, clima, biodiversidad), '
-            '<em>🏙️ Contexto, Agua y Energía</em> (flujos y sistemas), '
+            '<em>🔬 Análisis de Sectores</em> (suelo, agua, sol, clima, biodiversidad, contexto, energía y materiales), '
+            
             '<em>📷 Registro Fotográfico</em> y '
             '<em>🗺️ Síntesis y Plan</em> (hoja de ruta en 3 horizontes).'
             '</div></div>', unsafe_allow_html=True)
@@ -989,16 +988,25 @@ def render():
             st.markdown("---")
 
 
-    # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 4 — OBSERVACIÓN ECOLÓGICA (restored from v6)
-    # ══════════════════════════════════════════════════════════════════
-    if _show("ecologia"):
-        st.markdown(f"### 🔬 Observación Ecológica &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
-        st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'Registro de las características físicas y ecológicas del espacio. '
-            'Sigue el primer principio de Holmgren: "Observar e interactuar antes de diseñar." '
-            'La lectura del sitio revela las condiciones reales de suelo, agua, sol, viento y vida '
-            'que definirán todas las decisiones de diseño regenerativo.</div>', unsafe_allow_html=True)
+    # ==================================================================
+    # SECCION 4 -- ANALISIS DE SECTORES (Ecologia + Contexto + Sistemas)
+    # ==================================================================
+    if _show("analisis_sectores"):
+        st.markdown("### Analisis de Sectores")
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
+            'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
+            'Al aplicar el analisis de sectores, se integra la observacion cuidadosa del espacio, '
+            'su entorno y las necesidades de quienes lo habitan. Este analisis es fundamental '
+            'para el diseno de ecosistemas regenerativos: antes de intervenir, '
+            'es necesario comprender las condiciones reales del lugar.</div>', unsafe_allow_html=True)
+
+        # ── 4a. Observacion Ecologica ──
+        st.markdown(f"#### Observacion Ecologica &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
+        st.markdown(
+            '<div style="background:#E8F5E9;border-radius:6px;padding:0.5rem;margin-bottom:0.8rem;font-size:0.82rem;color:#2D6A4F;">'
+            'Lectura del sitio: suelo, agua, sol, viento y biodiversidad. '
+            'Sigue el primer principio de Holmgren: observar e interactuar antes de disenar.</div>', unsafe_allow_html=True)
 
         # Surface metrics
         area_tot = _safe_float(data.get("proyecto_area") or data.get("proyecto_superficie"))
@@ -1017,16 +1025,19 @@ def render():
         c1, c2 = st.columns(2)
         with c1:
             st.markdown("**Suelo**")
+            st.caption("Tipo, compactacion, materia organica, drenaje y condiciones generales del sustrato.")
             for k,l in [("suelo_tipo","Tipo"),("suelo_compactacion","Compactación"),("suelo_materia_organica","Materia orgánica"),
                         ("suelo_drenaje","Drenaje"),("suelo_color","Color"),("suelo_olor","Olor"),("suelo_notas","Notas")]:
                 _card(l, str(data.get(k,"")) if data.get(k) else "")
-            st.markdown("**Vegetación**")
+            st.markdown("**Vegetacion**")
+            st.caption("Especies presentes, diversidad vegetal e invasoras identificadas.")
             veg = data.get("veg_tipos",[])
             if isinstance(veg, list) and veg: _card("Tipos de vegetación", ", ".join(veg))
             for k,l in [("veg_especies","Especies identificadas"),("veg_invasoras","Invasoras"),("eco_notas","Notas ecológicas")]:
                 _card(l, str(data.get(k,"")) if data.get(k) else "")
         with c2:
             st.markdown("**Flujos naturales**")
+            st.caption("Horas de sol, orientacion, patron de vientos y flujo de agua lluvia.")
             for k,l in [("sol_horas","Horas sol/día"),("sol_horas_invierno","Sol invierno"),("sol_horas_verano","Sol verano"),
                         ("sol_orientacion","Orientación"),("sol_zonas_max","Zonas soleadas"),("sol_sombra_perm","Sombra permanente"),
                         ("viento_direccion","Dirección viento"),("viento_protegidas","Zonas protegidas"),("viento_expuestas","Zonas expuestas"),
@@ -1085,6 +1096,7 @@ def render():
                 pass
 
         st.markdown("**Cultivo**")
+        st.caption("Superficie cultivable actual y futura, produccion existente y potencial de expansion.")
         for k,l in [("cultivo_produce_hoy","Produce hoy"),("cultivo_interes","Interés en producir"),
                     ("cultivo_frutales","Frutales"),("cultivo_verticales","Verticales"),
                     ("cultivo_plantas_actuales","Plantas actuales"),("cultivo_notas","Notas cultivo")]:
@@ -1094,6 +1106,7 @@ def render():
         fauna_fields = [("fauna_lombrices","Lombrices"),("fauna_plagas","Plagas"),("fauna_aves_especies","Aves")]
         if any(data.get(k) for k,_ in fauna_fields):
             st.markdown("**Fauna observada**")
+            st.caption("Lombrices, polinizadores, aves y otros indicadores de salud del ecosistema.")
             cf = st.columns(3)
             for col,(k,l) in zip(cf,fauna_fields):
                 with col: _card(l, str(data.get(k,"")) if data.get(k) else "")
@@ -1116,19 +1129,17 @@ def render():
                   ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
         st.markdown("---")
 
-
-    # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 5 — SISTEMAS (restored from v6)
-    # ══════════════════════════════════════════════════════════════════
-    if _show("sistemas"):
-        st.markdown(f"### 🏙️ Contexto, Agua, Energía y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
-        st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'Análisis de los flujos vitales: contexto del entorno, gestión del agua, energía y materiales. '
-            'Cerrar estos ciclos es la base de la autonomía regenerativa (Holmgren, 2002; Mollison, 1988).</div>', unsafe_allow_html=True)
+        # ── 4b. Contexto, Agua, Energia y Materiales ──
+        st.markdown(f"#### Contexto, Agua, Energia y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
+        st.markdown(
+            '<div style="background:#E8F5E9;border-radius:6px;padding:0.5rem;margin-bottom:0.8rem;font-size:0.82rem;color:#2D6A4F;">'
+            'Analisis de los flujos vitales del espacio: entorno urbano, gestion del agua, consumo energetico '
+            'y ciclos de materiales. Cerrar estos ciclos es la base de la autonomia regenerativa.</div>', unsafe_allow_html=True)
 
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("**🏘️ Contexto del entorno**")
+            st.markdown("**Contexto del entorno**")
+            st.caption("Relacion con el barrio, vecinos, actores locales y acceso a areas verdes.")
             for k,l in [("ctx_ind_verde","Percepción entorno verde"),("ctx_cuenca","Cuenca hidrográfica"),
                         ("ctx_vecinos","Relación con vecinos"),("ctx_participacion","Participación barrial"),
                         ("ctx_distancia_parques","Distancia al parque más cercano (m)")]:
@@ -1147,17 +1158,9 @@ def render():
                 act_text = "; ".join(f"{a.get('nombre','')} ({a.get('tipo','')}, {a.get('relacion','')})" for a in actores)
                 _card("Actores territoriales identificados", act_text, bg="#E8F5E9", border="#2E7D32")
 
-            st.markdown("**♻️ Materiales y residuos**")
-            for k,l in [("mat_notas","Notas materiales"),("res_ind_general","Percepción residuos"),
-                        ("res_compostan","Compostaje activo"),("res_compost_tipo","Tipo de compostaje"),
-                        ("res_separan","Separación reciclables"),("res_reutilizan","Reutilización"),
-                        ("res_intentos_fallidos","Intentos fallidos de compostaje")]:
-                v = data.get(k)
-                if v and str(v) not in ["No","Ninguno","No registrado",""]:
-                    _card(l, str(v), bg="#F3E5F5", border="#6A1B9A")
-
         with c2:
-            st.markdown("**💧 Gestión del agua**")
+            st.markdown("**Gestion del agua**")
+            st.caption("Fuentes, consumo, captacion de lluvia, reutilizacion de aguas grises y riego.")
             for k,l in [("agua_ind_general","Percepción agua"),("agua_fuente","Fuente principal"),
                         ("agua_captacion_lluvia","Captación lluvia"),("agua_grises","Aguas grises"),
                         ("agua_riego_sistema","Sistema riego"),("agua_fugas","Fugas"),
@@ -1182,7 +1185,8 @@ def render():
                       f"{litros_cap:,.0f} L/año · Techo: {techo:.0f} m² · Precip: {prec:.0f} mm · Efic: {efic:.0f}%",
                       bg="#E3F2FD", border="#1565C0")
 
-            st.markdown("**⚡ Energía**")
+            st.markdown("**Energia**")
+            st.caption("Fuente, consumo, eficiencia y potencial de transicion a renovables.")
             for k,l in [("ene_ind_general","Percepción energía"),("ene_fuente","Fuente principal"),
                         ("ene_led","Iluminación LED"),("ene_solar_interes","Interés solar"),
                         ("ene_regleta","Uso de regletas con interruptor"),("ene_circuitos","Circuitos separados"),
@@ -1232,6 +1236,7 @@ def render():
                     f'</div></div>', unsafe_allow_html=True)
 
             st.markdown("**Materiales y Residuos**")
+            st.caption("Compostaje, tipos de residuos, volumen de organicos y oportunidades de cierre de ciclos.")
             for k,l in [("res_compostan","Compostan residuos organicos"),("res_compost_tipo","Tipo de compostaje"),
                         ("res_organico_kg","Residuos organicos (kg/semana)"),("res_tipos_generados","Tipos de residuos"),
                         ("res_intentos_fallidos","Intentos fallidos de compostaje"),

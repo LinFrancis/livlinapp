@@ -305,6 +305,8 @@ GLOBAL_REFS = [
     ("Schumacher, E.F. (1973)", "Small is Beautiful: Economics as if People Mattered", "https://www.schumachercollege.org.uk"),
     ("IPES-Food (2017)", "Too big to feed: Exploring the impacts of mega-mergers", "https://www.ipes-food.org"),
     ("Mason, F. (2025)", "Introducción al enfoque de la regeneración. LivLin — Publicación oficial", "https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing"),
+    ("Mason, F. (2026)", "El Tao para una vida regenerativa. LivLin — Publicación oficial", "https://drive.google.com/file/d/1MLOLcIso_inxbpIaoJfcdrZimVl9xHgj/view?usp=sharing"),
+    ("Lao Tse (s. VI a.C.)", "Tao Te Ching — Texto completo en español (PDF)", "https://drive.google.com/file/d/1JAWwhCOyvZKrACoAk5bv5Jh2thxppLZh/view"),
     ("Lawton, G.", "Introducción a la Permacultura (video)", "https://youtu.be/-5N9Q8KtB5w"),
     ("Capra, F.", "Visión sistémica de la vida (video)", "https://youtu.be/O33uA_9kj4U"),
     ("Reed, B.", "Desarrollo y Diseño Regenerativo (video)", "https://youtu.be/pBuN9CtUVAw"),
