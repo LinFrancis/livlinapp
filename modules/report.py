@@ -404,7 +404,7 @@ def render():
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
     # ══════════════════════════════════════════════════════════════════
     if _show("vision"):
-        st.markdown("###Potencial regenerativo")
+        st.markdown("### Potencial regenerativo")
 
         # ── Intro narrativo: ¿Qué es la regeneración? ──
         st.markdown(
