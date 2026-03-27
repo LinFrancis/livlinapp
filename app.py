@@ -43,7 +43,7 @@ def _login_page():
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
 
-     st.markdown("---")
+st.markdown("---")
     _, cc, _ = st.columns([0.5, 2, 0.5])
     with cc:
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
