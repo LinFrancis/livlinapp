@@ -44,20 +44,17 @@ def _login_page():
             st.image(str(logo_path), use_container_width=True)
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
         st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Bases para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
-# ── DEMO MODE ──────────────────────────────────────────────────────
-st.markdown("---")
 
-# Crear columnas: vacía (1) | contenido (2) | vacía (1)
-col1, col2, col3 = st.columns([1, 2, 1])
-
-with col2:  # TODO EL CÓDIGO VA AQUÍ DENTRO
+    # ── DEMO MODE ──────────────────────────────────────────────────────
+    st.markdown("---")
     st.markdown(
         '<div style="text-align:center;padding:0.3rem 0;">'
         '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
         '<span style="font-size:0.82rem;color:#555;">'
-        'Explora ejemplos de informes de resultados. '
+        'Explora ejemplos de informes de resultados.'
         'Cada uno muestra el potencial regenerativo de un espacio y presenta un plan de acción.</span></div>',
         unsafe_allow_html=True)
+
     try:
         from utils.demo_profiles import list_demo_profiles, get_demo_profile
         profiles = list_demo_profiles()
@@ -83,11 +80,12 @@ with col2:  # TODO EL CÓDIGO VA AQUÍ DENTRO
                     st.rerun()
     except Exception as e:
         st.caption(f"Demo: {e}")
+
     st.markdown(
         '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
         '<span style="font-size:0.8rem;color:#40916C;">'
-        'Solicita tu diagnóstico aquí: '
-        '<a href="https://www.livlin.cl/?lang=es#contact" target="_blank" style="color:#1B4332;font-weight:700;">'
+        'Solicita el servicio de diseño de ecosistemas regenerativos para tu espacio'
+        '<a href="https://www.livlin.cl" target="_blank" style="color:#1B4332;font-weight:700;">'
         'Contacta a LivLin</a></span></div>',
         unsafe_allow_html=True)
 
