@@ -274,7 +274,7 @@ def render():
             st.markdown("---")
 
             # ═══ B) SECCIONES DEL INFORME ═══
-            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">📖 SECCIONES DEL INFORME</div>', unsafe_allow_html=True)
+            st.markdown('<div style="font-size:0.72rem;color:#1B4332;font-weight:700;margin-bottom:0.4rem;">SECCIONES DEL INFORME</div>', unsafe_allow_html=True)
             if st.button("📖 Ver informe completo", use_container_width=True, key="rpt_nav_all",
                          type="primary" if st.session_state.report_section == "all" else "secondary"):
                 st.session_state.report_section = "all"; st.rerun()
