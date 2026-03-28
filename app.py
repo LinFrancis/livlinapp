@@ -1,4 +1,4 @@
-"""Herramienta de Indagacion Regenerativa — LivLin · Multi-usuario · www.livlin.cl"""
+"""Herramienta de Indagación Regenerativa — LivLin · Multi-usuario · www.livlin.cl"""
 import pandas as pd  # noqa: pre-load
 from pathlib import Path
 import streamlit as st
@@ -7,7 +7,7 @@ from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 _FAVICON = Path(__file__).parent / "assets" / "favicon.png"
 
 st.set_page_config(
-    page_title="LivLin — Indagacion Regenerativa APP",
+    page_title="LivLin — Indagación Regenerativa APP",
     page_icon=str(_FAVICON) if _FAVICON.exists() else "🌱",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -48,7 +48,7 @@ def _login_page():
 
     _, cc, _ = st.columns([0.5, 2, 0.5])
     with cc:
-        st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagacion Regenerativa</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagación Regenerativa</h2>', unsafe_allow_html=True)
         st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Bases para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
 
     # ── DEMO MODE ──────────────────────────────────────────────────────
@@ -286,7 +286,7 @@ def _sidebar():
 def _home():
     st.markdown(
         '<div class="app-header">'
-        '<h1>Herramienta de Indagacion Regenerativa</h1>'
+        '<h1>Herramienta de Indagación Regenerativa</h1>'
         '<p>Potencial para una vida regenerativa  ·  LivLin  ·  www.livlin.cl</p>'
         '</div>', unsafe_allow_html=True)
     _, cc, _ = st.columns([1, 3, 1])
