@@ -59,8 +59,8 @@ def _login_page():
             '<div style="text-align:center;padding:0.3rem 0;">'
             '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostracion</span><br>'
             '<span style="font-size:0.82rem;color:#555;">'
-            'Explora ejemplos de informes de resultados. '
-            'Cada uno muestra el potencial regenerativo de un espacio y presenta un plan de acción.</span></div>',
+            'Explora ejemplos de informes aplicables a tu espacio.'
+            ' Explora potenciales regenerativos  y planes de acción.</span></div>',
             unsafe_allow_html=True)
     
         try:
@@ -92,7 +92,7 @@ def _login_page():
         st.markdown(
             '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
             '<span style="font-size:0.8rem;color:#40916C;">'
-            'Aplica este enfoque en tu espacio  '
+            'Resultados para tu espacio  '
             '<a href="https://www.livlin.cl/?lang=es#contact" target="_blank" style="color:#1B4332;font-weight:700;">'
             'Contacta a LivLin</a></span></div>',
             unsafe_allow_html=True)
