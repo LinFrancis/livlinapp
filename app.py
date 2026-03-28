@@ -7,7 +7,7 @@ from utils.data_manager import load_visits, delete_visit, DATA_FILE, get_visit
 _FAVICON = Path(__file__).parent / "assets" / "favicon.png"
 
 st.set_page_config(
-    page_title="LivLin — Indagacion Regenerativa",
+    page_title="LivLin — Indagacion Regenerativa APP",
     page_icon=str(_FAVICON) if _FAVICON.exists() else "🌱",
     layout="wide",
     initial_sidebar_state="expanded",
