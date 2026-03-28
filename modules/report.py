@@ -100,7 +100,7 @@ def _radar_erp(domain_obs, height=380, title=""):
     r_obs = [domain_obs[p] for p in PETAL_ORDER] + [domain_obs[PETAL_ORDER[0]]]
     theta = labels + [labels[0]]
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=r_obs, theta=theta, name="ERP — Estado presente",
+    fig.add_trace(go.Scatterpolar(r=r_obs, theta=theta, name="ERP — Estado regenerativo presente",
         fill="toself", fillcolor="rgba(27,67,50,0.22)", line=dict(color="#1B4332", width=2.5), marker=dict(size=7, color="#1B4332")))
     fig.update_layout(polar=dict(bgcolor="rgba(240,255,244,0.4)",
         radialaxis=dict(visible=True, range=[0,10], tickvals=[2,4,6,8,10], tickfont=dict(size=9,color="#2D6A4F"), gridcolor="rgba(45,106,79,0.2)"),
@@ -115,7 +115,7 @@ def _radar_hrp(domain_tot, height=380, title=""):
     r_tot = [domain_tot[p] for p in PETAL_ORDER] + [domain_tot[PETAL_ORDER[0]]]
     theta = labels + [labels[0]]
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=r_tot, theta=theta, name="HRP — Horizonte potencial",
+    fig.add_trace(go.Scatterpolar(r=r_tot, theta=theta, name="HRP — Horizonte regenerativo potencial",
         fill="toself", fillcolor="rgba(82,183,136,0.15)", line=dict(color="#52B788", width=2, dash="dash")))
     fig.update_layout(polar=dict(bgcolor="rgba(240,255,244,0.4)",
         radialaxis=dict(visible=True, range=[0,10], tickvals=[2,4,6,8,10], tickfont=dict(size=9,color="#2D6A4F"), gridcolor="rgba(45,106,79,0.2)"),
@@ -131,7 +131,7 @@ def _dual_radar(domain_obs, domain_tot, height=400, title=""):
     r_tot = [domain_tot[p] for p in PETAL_ORDER] + [domain_tot[PETAL_ORDER[0]]]
     theta = labels + [labels[0]]
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=r_tot, theta=theta, name="HRP · Horizonte potencial",
+    fig.add_trace(go.Scatterpolar(r=r_tot, theta=theta, name="HRP · Horizonte regenerativo potencial",
         fill="toself", fillcolor="rgba(82,183,136,0.10)", line=dict(color="#52B788", width=2, dash="dash")))
     fig.add_trace(go.Scatterpolar(r=r_obs, theta=theta, name="ERP · Estado presente",
         fill="toself", fillcolor="rgba(27,67,50,0.22)", line=dict(color="#1B4332", width=2.5), marker=dict(size=7, color="#1B4332")))
@@ -171,7 +171,7 @@ def _render_report_map(lat, lon, data):
 # ── Stacked bar chart helper ─────────────────────────────────────────
 def _stacked_bar(names, erp_vals, gap_vals, title="", height=420):
     fig = go.Figure()
-    fig.add_trace(go.Bar(name="ERP (estado presente)", y=names, x=erp_vals, orientation="h",
+    fig.add_trace(go.Bar(name="ERP (estado regenerativo presente)", y=names, x=erp_vals, orientation="h",
         marker_color="#1B4332", text=[f"{v:.0f}" for v in erp_vals], textposition="inside",
         textfont=dict(color="white", size=11)))
     fig.add_trace(go.Bar(name="Brecha → HRP", y=names, x=gap_vals, orientation="h",
@@ -188,7 +188,7 @@ def _stacked_bar(names, erp_vals, gap_vals, title="", height=420):
 REPORT_SECTIONS = {
     "vision":           "Potencial Regenerativo",
     "datos":            "Datos del Proyecto",
-    "tao":              "Tao vida regenerativa",
+    "tao":              "Tao Vida Regenerativa",
     "eco_conciencia":   "Conciencia Ecológica",
     "analisis_sectores":"Análisis de Sectores",
     "fotos":            "Registro Fotográfico",
@@ -377,8 +377,8 @@ def render():
                 'Modo Demostracion</div>'
                 '<div style="font-size:0.82rem;color:#BF360C;line-height:1.6;">'
                 f'Este es un informe de ejemplo para <strong>{nombre}</strong>. '
-                'Los datos son ficticios y representan un caso de indagación regenerativa. '
-                'Esta es la vista de resultados para quienes contratan el servicio de diseño de ecosistema regenerativo en Livlin.'
+                'Los datos son ficticios. '
+                'Esta es la vista de resultados para quienes contratan el servicio de indagación regenerativa para el diseño de ecosistemas regenerativos en Livlin.'
                 '</div></div>', unsafe_allow_html=True)
 
         st.markdown(
@@ -388,9 +388,9 @@ def render():
             f'Informe de {nombre} 🌿</div>'
             '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
             'Este es el resultado de una <strong>Indagación Regenerativa</strong>.  '
-            'Aquí encontrarás un diagnostico detallado del estado actual '
-            'y el potencial regenerativo de este espacio — desde la ecología del sitio hasta las practicas '
-            'sustentables activas y las que se pueden incorporar.'
+            'Todo tiene potencial regenerativo. Aprender a reconocer este potencial y activarlo es clave para nuevos futuros posibles. '
+            'Aquí encontrarás un informe detallado del Estado Regenerativo Presente (ERP) '
+            'y el Horizonte Regenerativo Potencial (HRP) de este espacio.'
             '<br><br>'
             'Navega las secciones usando el menu lateral. Cada sección profundiza en un aspecto diferente. '
             'Al final encontrarás una síntesis con un plan de accion concreto.'
@@ -398,7 +398,7 @@ def render():
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe de la Indagación Regenerativa")
-    st.markdown('<p class="module-subtitle">Herramienta de Indagación Regenerativa · LivLin</p>', unsafe_allow_html=True)
+    st.markdown('<p class="module-subtitle">Resultados claves para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
@@ -412,10 +412,11 @@ def render():
             '<div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Antes de leer este informe</div>'
             '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar un espacio?</div>'
             '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
+            'En LivLin, regenerar es volver a lo esencial de lo esencial. Así, <em>cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida</em>.  '
             'Regenerar no es simplemente «mejorar» o «hacer sostenible» un lugar. Es activar los procesos vivos '
-            'que permiten a un espacio evolucionar hacia mayor vitalidad, diversidad y conexión. '
-            'Un espacio regenerativo produce alimentos, cicla agua, genera energía, construye comunidad '
-            'y fortalece la relación entre las personas y su territorio (Holmgren, 2002; Mang & Reed, 2012).'
+            'que permiten a un espacio evolucionar hacia mayor vitalidad, biodiversidad y conexión. '
+            'Un espacio regenerativo favorece las condiciones para la continuidad de la vida. Produce alimentos, favorece los ciclos del agua, hace uso sabio de la energía, construye comunidad '
+            'y fortalece la relación entre las personas y su territorio.'
             '</div>'
             '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
             'Este informe utiliza dos indicadores complementarios para describir '
@@ -425,8 +426,8 @@ def render():
             '    <div style="font-weight:800;color:#1B4332;font-size:0.88rem;">🌍 ERP — Estado Regenerativo Presente</div>'
             '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
             '      Es la <em>fotografía</em> del momento actual. Captura las prácticas, ciclos y relaciones '
-            '      que ya están activas en tu espacio. Se calcula como <strong>80% de la Flor de la Permacultura</strong> '
-            '      (prácticas observadas en sus 7 pétalos) + <strong>20% de sub-indicadores ecológicos</strong> '
+            '      que ya están activas en tu espacio. Se calcula siguiendo el modelo de la <strong>Flor de la Permacultura</strong> '
+            '      (prácticas observadas en sus 7 pétalos) + otros  indicadores de un <strong>análisis de sectores</strong> '
             '      (suelo, agua, sol, biodiversidad, energía y materiales). '
             '      Un ERP alto indica que el espacio ya tiene prácticas regenerativas y sustentables consolidadas.</div>'
             '  </div>'
@@ -434,17 +435,20 @@ def render():
             '    <div style="font-weight:800;color:#2D6A4F;font-size:0.88rem;">🌱 HRP — Horizonte Regenerativo Potencial</div>'
             '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
             '      Es la <em>proyección</em> de lo que tu espacio puede llegar a ser si se activan las prácticas '
-            '      potenciales identificadas durante el diagnóstico. Se calcula como <strong>100% de la Flor de la Permacultura proyectada</strong> '
+            '      potenciales identificadas durante el diagnóstico. Se calcula como <strong>100% de las acciones proyectadas siguiendo el modelo de la Flor de la Permacultura</strong> '
             '      (observadas + potenciales). Un HRP alto indica un gran margen para seguir creciendo.</div>'
-            '  </div>'
             '</div>'
             '<div style="background:rgba(255,167,38,0.08);border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.8rem;">'
             '  <div style="font-weight:800;color:#E65100;font-size:0.88rem;">🌀 Brecha = HRP − ERP → Campo de acción</div>'
             '  <div style="font-size:0.82rem;color:#5D4037;line-height:1.6;margin-top:0.3rem;">'
             '    La diferencia entre el HRP y el ERP señala exactamente <em>cuánto potencial hay por activar</em>. '
             '    Una brecha grande no es negativa — significa que hay mucho espacio para crecer. '
-            '    Una brecha pequeña indica que el espacio ya está cerca de su máximo potencial identificado.</div>'
+            '    Una brecha pequeña indica que el espacio ya está cerca de su máximo potencial identificado. Sin embargo, interpretar con cautela. El potencial regenerativo es inconmesurable. Siempre se puede desarrollar más.</div>'
             '</div>'
+            
+
+
+
             '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:0.5rem;">'
             '📖 <strong>Escala de niveles (0-10):</strong> '
             '<span style="color:#B71C1C;">0-2 Sin inicio</span> · '
@@ -456,7 +460,9 @@ def render():
             f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;margin-top:0.3rem;">📄 Leer Introducción al Enfoque de la Regeneración · Mason (2025)</a>'
             '</div>', unsafe_allow_html=True)
 
-        # ── Tarjetas de resultado ──
+
+      
+        # # ── Tarjetas de resultado ──
         st.markdown(f"""
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
@@ -505,12 +511,12 @@ def render():
             '</div>'
             '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-top:0.5rem;">'
             '👉 <strong>Explora las secciones del informe</strong> usando el menú lateral: '
-            '<em>📋 Datos del Proyecto</em>, '
-            '<em>☯️ Tao de la Regeneración</em> (intención y visión), '
-            '<em>🔬 Análisis de Sectores</em> (suelo, agua, sol, clima, biodiversidad, contexto, energía y materiales), '
+            '<em>Datos del Proyecto</em>, '
+            '<em>Tao Vida Regenerativa</em> (intención y visión), '
+            '<em>Análisis de Sectores</em> (suelo, agua, sol, clima, biodiversidad, contexto, energía y materiales), '
             
-            '<em>📷 Registro Fotográfico</em> y '
-            '<em>🗺️ Síntesis y Plan</em> (hoja de ruta en 3 horizontes).'
+            '<em>Registro Fotográfico</em> y '
+            '<em>Síntesis y Plan</em> (hoja de ruta en 3 horizontes).'
             '</div></div>', unsafe_allow_html=True)
 
         # ── 3 TABS ────────────────────────────────────────────────────
@@ -613,11 +619,9 @@ def render():
                     st.markdown(
                         '<div style="background:#FAFAFA;border-radius:8px;padding:0.5rem 0.7rem;margin:0.5rem 0;'
                         'font-size:0.82rem;color:#333;border-left:3px solid #52B788;">'
-                        '<strong>Acciones identificadas en este petalo:</strong> '
-                        'A la izquierda, las practicas que ya estan activas en este espacio. '
-                        'A la derecha, las acciones con potencial concreto de realizacion que la persona '
-                        'facilitadora identifico durante la visita. Cada accion potencial es un paso '
-                        'que LivLin puede acompanar para hacerlo realidad.</div>',
+                        '<strong>Acciones en este pétalo:</strong> '
+                        'Por un lado, prácticas ya activas. '
+                        'Por otro, acciones con potencial de implementación que LivLin puede acompañar </div>',
                         unsafe_allow_html=True)
                     pc1, pc2 = st.columns(2)
                     with pc1:

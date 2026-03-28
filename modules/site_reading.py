@@ -17,7 +17,7 @@ def render():
     _readonly = _is_ro()
     if _readonly:
         render_readonly_notice()
-    st.markdown("## 🔬 Módulos 2–3 — Observación Ecológica + Flujos + Cultivo")
+    st.markdown("## Módulos 2–3 — Observación Ecológica + Flujos + Cultivo")
     st.markdown('<p class="module-subtitle">Registro de las características del espacio, '
                 'flujos naturales y potencial productivo.</p>', unsafe_allow_html=True)
     data = st.session_state.visit_data
