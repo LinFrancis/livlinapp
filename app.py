@@ -103,7 +103,7 @@ def _login_page():
     with lc:
         st.markdown('<p style="text-align:center;font-size:0.85rem;color:#888;margin-bottom:0.3rem;">Acceso Miembros</p>', unsafe_allow_html=True)
         uname = st.text_input("Usuario", placeholder="Ej: francis", key="login_user")
-        pwd   = st.text_input("Contrasena", type="password", key="login_pwd")
+        pwd   = st.text_input("Contraseña", type="password", key="login_pwd")
         if st.button("Ingresar", use_container_width=True, type="primary", key="btn_login"):
             from utils.users import authenticate, refresh_from_supabase
             try:
@@ -128,7 +128,7 @@ def _login_page():
                 st.session_state.page = "home" if role == "admin" else "report"
                 st.rerun()
             else:
-                st.error("Usuario o contrasena incorrectos.")
+                st.error("Usuario o Contraseña incorrectos.")
         st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">LivLin · Servicios para una vida regenerativa</p>', unsafe_allow_html=True)
 
 
