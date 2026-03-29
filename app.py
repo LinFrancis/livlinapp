@@ -59,7 +59,7 @@ def _login_page():
             '<div style="text-align:center;padding:0.3rem 0;">'
             '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostración</span><br>'
             '<span style="font-size:0.82rem;color:#555;">'
-            'Explora informes aplicables a tu espacio:'
+            'Explora informes profesionales aplicables a tu espacio:'
             ' conoce potenciales regenerativos y planes de acción.</span></div>',
             unsafe_allow_html=True)
     
