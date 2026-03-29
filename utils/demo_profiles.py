@@ -26,6 +26,78 @@ _CUENCA_MAIPO = {
 }
 
 
+def _make_geo_solar(sol_anual, sol_invierno=None, sol_verano=None):
+    """Generate a geo_solar dict from sol_horas values, matching geo_api.py format.
+    Uses a seasonal curve for Santiago (Chile) based on annual/winter/summer hours.
+    panel_100w_kwh_day = monthly_kwh_m2 * 0.1 * 0.8 (100W panel, 80% efficiency)
+    """
+    months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
+              "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    # Santiago seasonal radiation curve (relative weights, Jan=peak, Jun=trough)
+    _curve = [1.0, 0.95, 0.80, 0.62, 0.48, 0.40,
+               0.43, 0.55, 0.70, 0.85, 0.95, 1.02]
+    # Scale curve so annual average matches sol_anual (using kWh/m2/day = sol_horas * 0.15)
+    base_kwh = sol_anual * 0.15
+    curve_avg = sum(_curve) / len(_curve)
+    monthly_kwh = [round(base_kwh * w / curve_avg, 2) for w in _curve]
+    # Override winter/summer months if provided
+    if sol_invierno is not None:
+        win_kwh = sol_invierno * 0.15
+        monthly_kwh[5] = round(win_kwh, 2)   # Jun (peak winter)
+        monthly_kwh[6] = round(win_kwh * 1.07, 2)  # Jul
+    if sol_verano is not None:
+        sum_kwh = sol_verano * 0.15
+        monthly_kwh[0] = round(sum_kwh, 2)   # Ene (peak summer)
+        monthly_kwh[11] = round(sum_kwh * 0.98, 2)  # Dic
+    annual_avg = round(sum(monthly_kwh) / 12, 2)
+    panel_kwh = [round(v * 0.1 * 0.8, 2) for v in monthly_kwh]
+    return str({
+        "months": months,
+        "monthly_kwh_m2": monthly_kwh,
+        "annual_avg_kwh_m2": annual_avg,
+        "panel_100w_kwh_day": panel_kwh,
+    })
+
+
+def _make_geo_clima(sol_anual=6, sol_invierno=None, sol_verano=None):
+    """Generate realistic geo_clima_anual dict for Santiago (Mediterranean climate).
+    Scaled slightly by sol_horas to reflect sunnier/cloudier micro-climates.
+    """
+    months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
+              "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    # Base Santiago climate (30-year avg approximation)
+    t_max = [29.5, 28.8, 26.0, 21.5, 16.2, 12.5, 12.0, 13.8, 16.8, 21.2, 25.5, 28.2]
+    t_min = [13.8, 13.2, 11.0,  7.8,  4.8,  2.8,  2.5,  3.5,  5.8,  8.5, 11.0, 13.0]
+    prec  = [  2,    3,    8,   18,   55,   72,   68,   52,   28,   12,    5,    3]
+    # Scale temps slightly by solar hours (sunnier = warmer)
+    factor = sol_anual / 6.0
+    t_max = [round(v * (0.95 + 0.05 * factor), 1) for v in t_max]
+    t_min = [round(v * (0.95 + 0.05 * factor), 1) for v in t_min]
+    prec  = [round(v * (1.1 - 0.1 * factor), 1) for v in prec]
+    # Stats
+    t_max_media = round(sum(t_max) / 12, 1)
+    t_min_media = round(sum(t_min) / 12, 1)
+    prec_anual  = round(sum(prec), 0)
+    mes_caluroso = months[t_max.index(max(t_max))]
+    mes_frio     = months[t_min.index(min(t_min))]
+    abs_max = max(t_max)
+    abs_min = min(t_min)
+    return str({
+        "months":              months,
+        "t_max":               t_max,
+        "t_min":               t_min,
+        "prec":                prec,
+        "mes_mas_caluroso":    mes_caluroso,
+        "mes_mas_frio":        mes_frio,
+        "t_max_media":         t_max_media,
+        "t_min_media":         t_min_media,
+        "prec_anual":          prec_anual,
+        "abs_max_ultimo_anio": abs_max,
+        "abs_min_ultimo_anio": abs_min,
+        "anio_referencia":     2025,
+    })
+
+
 def _base_profile(pid, nombre, cliente, tipo, composicion, area, desc,
                   lat, lon, geo_display, geo_city,
                   tao_scores, tao_notas,
@@ -77,12 +149,58 @@ def _base_profile(pid, nombre, cliente, tipo, composicion, area, desc,
     d.update(salud_data)
     d.update(suelo)
     d.update(sol)
+    # Auto-generate geo_solar from sol_horas so demo reports show panel 100W data
+    if sol.get("sol_horas") and not d.get("geo_solar"):
+        d["geo_solar"] = _make_geo_solar(
+            sol["sol_horas"],
+            sol.get("sol_horas_invierno"),
+            sol.get("sol_horas_verano"),
+        )
     d.update(viento)
     d.update(veg)
     d.update(fauna)
     d.update(cultivo)
     d.update(ctx)
     d.update(agua)
+    # Auto-generate climate data and water-harvest fields for demos
+    if not d.get("geo_clima_anual"):
+        d["geo_clima_anual"] = _make_geo_clima(
+            sol.get("sol_horas", 6),
+            sol.get("sol_horas_invierno"),
+            sol.get("sol_horas_verano"),
+        )
+        # Parse prec_anual into agua_prec_anual so water-harvest calc works
+        try:
+            import ast as _ast_dp
+            cl = _ast_dp.literal_eval(d["geo_clima_anual"])
+            if not d.get("agua_prec_anual") or float(d.get("agua_prec_anual", 0)) == 0:
+                d["agua_prec_anual"] = float(cl.get("prec_anual", 0))
+        except Exception:
+            pass
+    # Roof area for water-harvest: default 40% of total project area if not set
+    if not d.get("agua_techo_m2") or float(d.get("agua_techo_m2", 0)) == 0:
+        d["agua_techo_m2"] = round(area * 0.40, 0)
+    if not d.get("agua_efic_captacion"):
+        d["agua_efic_captacion"] = 80
+    # Recalculate litros captacion
+    try:
+        prec_v = float(d.get("agua_prec_anual", 0))
+        techo_v = float(d.get("agua_techo_m2", 0))
+        efic_v  = float(d.get("agua_efic_captacion", 80))
+        if prec_v > 0 and techo_v > 0:
+            d["agua_litros_captacion_anual"] = round(prec_v * techo_v * efic_v / 100)
+    except Exception:
+        pass
+    # Save clima metrics for quick access
+    try:
+        import ast as _ast_dp2
+        cl2 = _ast_dp2.literal_eval(d["geo_clima_anual"])
+        d.setdefault("clima_mes_caluroso", cl2.get("mes_mas_caluroso", ""))
+        d.setdefault("clima_mes_frio",     cl2.get("mes_mas_frio", ""))
+        d.setdefault("clima_t_max_abs",    cl2.get("abs_max_ultimo_anio"))
+        d.setdefault("clima_t_min_abs",    cl2.get("abs_min_ultimo_anio"))
+    except Exception:
+        pass
     d.update(energia)
     d.update(residuos)
     # ── Petal actions (observed + potential) ──

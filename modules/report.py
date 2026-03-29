@@ -69,11 +69,11 @@ def _ref_box(refs):
         f'<a href="{url}" target="_blank" style="color:#1565C0;font-size:0.75rem;">↗</a></div>'
         for auth, title, url in refs
     )
-    st.markdown(
-        f'<div style="background:#FAFAFA;border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.8rem;'
-        f'border-top:2px solid #D8F3DC;">'
-        f'<div style="font-size:0.7rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">📚 Referencias de esta seccion</div>'
-        f'{lines}</div>', unsafe_allow_html=True)
+    # st.markdown(
+    #     f'<div style="background:#FAFAFA;border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.8rem;'
+    #     f'border-top:2px solid #D8F3DC;">'
+    #     f'<div style="font-size:0.7rem;color:#40916C;font-weight:700;margin-bottom:0.3rem;">📚 Referencias de esta seccion</div>'
+    #     f'{lines}</div>', unsafe_allow_html=True)
 
 def _list_from_semicolon(text):
     if not text: return []
@@ -449,14 +449,14 @@ def render():
 
 
 
-            '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:0.5rem;">'
-            '📖 <strong>Escala de niveles (0-10):</strong> '
-            '<span style="color:#B71C1C;">0-2 Sin inicio</span> · '
-            '<span style="color:#E65100;">2-4 Semilla</span> · '
-            '<span style="color:#F9A825;">4-6 Brote</span> · '
-            '<span style="color:#2E7D32;">6-8 Crecimiento</span> · '
-            '<span style="color:#1B4332;">8-10 Abundancia</span>'
-            '</div>'
+            # '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:0.5rem;">'
+            # '📖 <strong>Escala de niveles (0-10):</strong> '
+            # '<span style="color:#B71C1C;">0-2 Sin inicio</span> · '
+            # '<span style="color:#E65100;">2-4 Semilla</span> · '
+            # '<span style="color:#F9A825;">4-6 Brote</span> · '
+            # '<span style="color:#2E7D32;">6-8 Crecimiento</span> · '
+            # '<span style="color:#1B4332;">8-10 Abundancia</span>'
+            # '</div>'
             f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;margin-top:0.3rem;">📄 Leer Introducción al Enfoque de la Regeneración · Mason (2025)</a>'
             '</div>', unsafe_allow_html=True)
 
@@ -467,7 +467,7 @@ def render():
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;">Resultado de la Indagación Regenerativa · LivLin</div>
+                    <div style="font-size:1rem;color:#52B788;text-transform:uppercase;">Resultados</div>
                     <div style="font-size:1.5rem;font-weight:800;color:#1B4332;margin:0.2rem 0;">{nombre}</div>
                     <div style="color:#555;font-size:0.88rem;">{cliente} · {ciudad} · {fecha}</div>
                 </div>
@@ -498,6 +498,19 @@ def render():
             </div>
         </div>""", unsafe_allow_html=True)
 
+          # ── Motivacional ──
+        # st.markdown(
+        #     f'<div style="background:linear-gradient(135deg,#E8F5E9,#D8F3DC);border-radius:12px;padding:1rem;margin-top:1rem;text-align:center;">'
+        #     f'<div style="font-size:1rem;font-weight:800;color:#1B4332;">🌿 Tu espacio tiene un camino claro hacia la regeneración</div>'
+        #     f'<div style="font-size:0.88rem;color:#2D6A4F;margin-top:0.4rem;line-height:1.6;">'
+        #     f'Con un ERP de <strong>{erp_score}/10</strong> y un HRP de <strong>{hrp_score}/10</strong>, '
+        #     f'hay <strong>{brecha} puntos de potencial por activar</strong>. '
+        #     f'Cada práctica nueva que incorpores acerca tu espacio a su máximo potencial regenerativo. '
+        #     f'LivLin te acompaña en este camino. 🌱</div>'
+        #     f'</div>', unsafe_allow_html=True)
+
+        
+
         # ── Interpretación narrativa del resultado ──
         st.markdown(
             '<div style="background:#FAFAFA;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;border-left:4px solid #52B788;">'
@@ -507,7 +520,7 @@ def render():
             f'lo que indica el nivel de prácticas regenerativas que ya están activas. '
             f'Al mismo tiempo, el <strong>HRP de {hrp_score}/10 ({label_hrp})</strong> muestra '
             f'el horizonte al que puede llegar si se implementan las prácticas potenciales identificadas. '
-            f'La brecha de <strong>{brecha} puntos</strong> representa el campo de acción disponible.'
+            f'La brecha de <strong>{brecha} puntos</strong> representa el campo de acción disponible. Livlin te acompaña en este camino.'
             '</div>'
             '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-top:0.5rem;">'
             '👉 <strong>Explora las secciones del informe</strong> usando el menú lateral: '
@@ -536,11 +549,11 @@ def render():
                 '(lo que puede llegar a ser). La diferencia entre ambas áreas es tu <strong>campo de acción</strong>.</div>', unsafe_allow_html=True)
             st.plotly_chart(_dual_radar(domain_obs, domain_tot, title="Flor de la Permacultura — ERP vs HRP"), use_container_width=True, key="r_comp_dual")
 
-            # ── Barras 7 pétalos ──
-            petal_names = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
-            p_erp = [domain_obs[p] for p in PETAL_ORDER]
-            p_gap = [max(0, round(domain_tot[p] - domain_obs[p], 1)) for p in PETAL_ORDER]
-            st.plotly_chart(_stacked_bar(petal_names, p_erp, p_gap, title="7 Pétalos — ERP + Brecha → HRP", height=350), use_container_width=True, key="bar_comp_pet")
+            # # ── Barras 7 pétalos ──
+            # petal_names = [f"{FLOWER_DOMAINS[p]['icon']} {p}" for p in PETAL_ORDER]
+            # p_erp = [domain_obs[p] for p in PETAL_ORDER]
+            # p_gap = [max(0, round(domain_tot[p] - domain_obs[p], 1)) for p in PETAL_ORDER]
+            # st.plotly_chart(_stacked_bar(petal_names, p_erp, p_gap, title="7 Pétalos — ERP + Brecha → HRP", height=350), use_container_width=True, key="bar_comp_pet")
 
             # ── Detalle pétalo a pétalo con definición + prácticas ──
             st.markdown("---")
@@ -569,79 +582,109 @@ def render():
                 lv_e, _ = _score_to_level(e_score)
                 lv_h, _ = _score_to_level(h_score)
                 gap = round(h_score - e_score, 1)
+                petal_info = PETAL_DESC.get(p_name, {})
+                interp_e = get_petal_interp(p_name, e_score, "erp")
+                interp_h = get_petal_interp(p_name, h_score, "hrp")
+                obs_data = data.get(f"petalo_{i}_obs", {})
+                new_data = data.get(f"petalo_{i}_pot_new", {})
+                otros_obs = data.get(f"petalo_{i}_otros_obs", [])
+                otros_new = data.get(f"petalo_{i}_otros_new", [])
 
-                # Header
+                # ── Encabezado del pétalo ──────────────────────────
+                subtitulo = petal_info.get("subtitulo", "") if petal_info else ""
+                resumen   = petal_info.get("resumen", "")   if petal_info else ""
                 st.markdown(f"""
-                <div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:12px;padding:0.8rem;margin:0.8rem 0 0.4rem;">
-                    <div style="font-size:1.1rem;font-weight:800;color:#1B4332;">{icon} {p_name}</div>
-                    <div style="display:flex;gap:0.8rem;margin-top:0.4rem;flex-wrap:wrap;">
-                        <div style="background:white;border-radius:8px;padding:0.3rem 0.6rem;border:1px solid #D8F3DC;font-size:0.82rem;">
-                            🌍 ERP: <strong>{e_score:.0f}/10</strong> — {lv_e}</div>
-                        <div style="background:white;border-radius:8px;padding:0.3rem 0.6rem;border:1px dashed #52B788;font-size:0.82rem;">
-                            🌱 HRP: <strong>{h_score:.0f}/10</strong> — {lv_h}</div>
-                        <div style="background:white;border-radius:8px;padding:0.3rem 0.6rem;border:1px solid #FFA726;font-size:0.82rem;">
-                            🌀 Brecha: <strong>+{gap:.0f}</strong> pts</div>
-                    </div>
+                <div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;
+                            border-radius:14px;padding:1rem 1.2rem;margin:1.2rem 0 0;
+                            box-shadow:0 2px 6px rgba(40,120,80,0.07);">
+                  <div style="font-size:1rem;font-weight:800;color:#1B4332;margin-bottom:0.3rem;">
+                    {icon} {p_name}
+                  </div>
+                  {f'<div style="font-size:0.82rem;color:#40916C;margin-bottom:0.5rem;font-style:italic;">{subtitulo}</div>' if subtitulo else ''}
+                  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:{'0.6rem' if resumen else '0'};">
+                    <span style="background:white;border-radius:20px;padding:0.25rem 0.7rem;
+                                 border:1px solid #D8F3DC;font-size:0.8rem;color:#1B4332;">
+                      🌍 ERP <strong>{e_score:.0f}/10</strong> — {lv_e}</span>
+                    <span style="background:white;border-radius:20px;padding:0.25rem 0.7rem;
+                                 border:1px dashed #52B788;font-size:0.8rem;color:#2D6A4F;">
+                      🌱 HRP <strong>{h_score:.0f}/10</strong> — {lv_h}</span>
+                    <span style="background:#FFF8E1;border-radius:20px;padding:0.25rem 0.7rem;
+                                 border:1px solid #FFD54F;font-size:0.8rem;color:#E65100;">
+                      🌀 Brecha <strong>+{gap:.0f} pts</strong></span>
+                  </div>
+                  {f'<div style="font-size:0.84rem;color:#2D6A4F;line-height:1.65;border-top:1px solid #D8F3DC;padding-top:0.5rem;">{resumen}</div>' if resumen else ''}
                 </div>""", unsafe_allow_html=True)
 
-                # Petal explanation
-                petal_info = PETAL_DESC.get(p_name, {})
-                if petal_info:
-                    with st.expander(f"📖 ¿Qué es «{p_name}»? — Definición y referencias", expanded=False):
-                        if petal_info.get("subtitulo"):
-                            st.markdown(f"*{petal_info['subtitulo']}*")
+                # ── Interpretación del estado + potencial ──────────
+                if interp_e or interp_h:
+                    interp_html = ""
+                    if interp_e:
+                        interp_html += (
+                            f'<div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem 0.7rem;'                            f'border-bottom:1px solid #E8F5E9;">'                            f'<span style="color:#1B4332;font-size:0.85rem;white-space:nowrap;">🌍 <strong>Hoy:</strong></span>'                            f'<span style="font-size:0.84rem;color:#1B4332;">{interp_e}</span></div>'
+                        )
+                    if interp_h:
+                        interp_html += (
+                            f'<div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem 0.7rem;">'                            f'<span style="color:#E65100;font-size:0.85rem;white-space:nowrap;">🌱 <strong>Potencial:</strong></span>'                            f'<span style="font-size:0.84rem;color:#5D4037;">{interp_h}</span></div>'
+                        )
+                    st.markdown(
+                        f'<div style="background:white;border:1px solid #E8F5E9;border-radius:0 0 10px 10px;'                        f'margin-top:-2px;border-top:none;">{interp_html}</div>',
+                        unsafe_allow_html=True)
+
+                # ── Prácticas activas + potencial en columnas ──────
+                obs_items = [(k.replace("_"," ").title(), v) for k, v in obs_data.items() if v]
+                if otros_obs: obs_items.append(("Otras prácticas", otros_obs))
+                new_items = [(k.replace("_"," ").title(), v) for k, v in new_data.items() if v]
+                if otros_new: new_items.append(("Otras oportunidades", otros_new))
+
+                if obs_items or new_items:
+                    st.markdown(
+                        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin:0.8rem 0;">',
+                        unsafe_allow_html=True)
+                    pc1, pc2 = st.columns(2)
+                    with pc1:
+                        st.markdown(
+                            '<div style="font-size:0.78rem;font-weight:700;color:#1B4332;'                            'text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;'                            'padding-bottom:0.2rem;border-bottom:2px solid #52B788;">✅ Lo que ya está activo</div>',
+                            unsafe_allow_html=True)
+                        if obs_items:
+                            for cat, items in obs_items:
+                                items_str = " · ".join(items) if isinstance(items, list) else str(items)
+                                st.markdown(
+                                    f'<div style="background:#F0FFF4;border-radius:8px;padding:0.45rem 0.7rem;'                                    f'margin-bottom:0.35rem;border-left:3px solid #52B788;">'                                    f'<div style="font-size:0.72rem;color:#40916C;text-transform:uppercase;'                                    f'font-weight:700;margin-bottom:0.15rem;">{cat}</div>'                                    f'<div style="font-size:0.84rem;color:#1B4332;">{items_str}</div></div>',
+                                    unsafe_allow_html=True)
+                        else:
+                            st.markdown(
+                                '<div style="font-size:0.82rem;color:#888;padding:0.5rem 0;font-style:italic;">'                                'Aún no hay prácticas activas registradas.</div>', unsafe_allow_html=True)
+                    with pc2:
+                        st.markdown(
+                            '<div style="font-size:0.78rem;font-weight:700;color:#E65100;'                            'text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;'                            'padding-bottom:0.2rem;border-bottom:2px solid #FFA726;">🌱 Potencial identificado</div>',
+                            unsafe_allow_html=True)
+                        if new_items:
+                            for cat, items in new_items:
+                                items_str = " · ".join(items) if isinstance(items, list) else str(items)
+                                st.markdown(
+                                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.45rem 0.7rem;'                                    f'margin-bottom:0.35rem;border-left:3px solid #FFA726;">'                                    f'<div style="font-size:0.72rem;color:#E65100;text-transform:uppercase;'                                    f'font-weight:700;margin-bottom:0.15rem;">{cat}</div>'                                    f'<div style="font-size:0.84rem;color:#5D4037;">{items_str}</div></div>',
+                                    unsafe_allow_html=True)
+                        else:
+                            st.markdown(
+                                '<div style="font-size:0.82rem;color:#888;padding:0.5rem 0;font-style:italic;">'                                'Sin acciones potenciales identificadas.</div>', unsafe_allow_html=True)
+
+                # ── Detalle ampliado (expander compacto al pie) ────
+                if petal_info and (petal_info.get("detalle") or petal_info.get("holmgren_name")):
+                    with st.expander(f"📖 Profundizar en «{p_name}»", expanded=False):
                         if petal_info.get("holmgren_name"):
                             st.markdown(f"**Nombre original (Holmgren, 2002):** *{petal_info['holmgren_name']}*")
-                        if petal_info.get("resumen"):
-                            st.markdown(f"**Resumen:** {petal_info['resumen']}")
                         if petal_info.get("detalle"):
                             st.markdown(petal_info["detalle"])
                         petal_refs = petal_info.get("referencias", [])
                         if petal_refs:
                             _ref_box(petal_refs)
 
-                # Interpretations
-                interp_e = get_petal_interp(p_name, e_score, "erp")
-                interp_h = get_petal_interp(p_name, h_score, "hrp")
-                if interp_e:
-                    st.markdown(f'<div style="background:#E8F5E9;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0;font-size:0.82rem;color:#1B4332;border-left:3px solid #1B4332;">🌍 <strong>Estado actual:</strong> {interp_e}</div>', unsafe_allow_html=True)
-                if interp_h:
-                    st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">🌱 <strong>Horizonte potencial:</strong> {interp_h}</div>', unsafe_allow_html=True)
-
-                # Practices (observed + potential)
-                petalo_data_item = _petalos_data[i] if i < len(_petalos_data) else {}
-                obs_data = data.get(f"petalo_{i}_obs", {})
-                new_data = data.get(f"petalo_{i}_pot_new", {})
-                otros_obs = data.get(f"petalo_{i}_otros_obs", [])
-                otros_new = data.get(f"petalo_{i}_otros_new", [])
-                has_practices = any(obs_data.values()) or otros_obs or any(new_data.values()) or otros_new
-                if has_practices:
-                    st.markdown(
-                        '<div style="background:#FAFAFA;border-radius:8px;padding:0.5rem 0.7rem;margin:0.5rem 0;'
-                        'font-size:0.82rem;color:#333;border-left:3px solid #52B788;">'
-                        '<strong>Acciones en este pétalo:</strong> '
-                        'Por un lado, prácticas ya activas. '
-                        'Por otro, acciones con potencial de implementación que LivLin puede acompañar </div>',
-                        unsafe_allow_html=True)
-                    pc1, pc2 = st.columns(2)
-                    with pc1:
-                        st.markdown("**Lo que ya esta activo:**")
-                        for k, v in obs_data.items():
-                            if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#E8F5E9", border="#1B4332")
-                        if otros_obs: _card("Otras practicas", " · ".join(otros_obs), bg="#E8F5E9", border="#1B4332")
-                        if not any(obs_data.values()) and not otros_obs:
-                            st.caption("Aun no se registran practicas activas en este petalo.")
-                    with pc2:
-                        st.markdown("**Potencial identificado:**")
-                        for k, v in new_data.items():
-                            if v: _card(k.replace("_"," ").title(), " · ".join(v), bg="#FFFDE7", border="#FFA726")
-                        if otros_new: _card("Otras oportunidades", " · ".join(otros_new), bg="#FFFDE7", border="#FFA726")
-                        if not any(new_data.values()) and not otros_new:
-                            st.caption("Sin acciones potenciales adicionales identificadas.")
+                st.markdown("<hr style='border:none;border-top:1px solid #E8F5E9;margin:0.3rem 0 0;'>",
+                            unsafe_allow_html=True)
 
             # ── Sub-indicadores M2-6 ──
             if cross:
-                st.markdown("---")
+                
                 with st.expander("📈 Sub-indicadores ecológicos M2-6 (aportan 20% al ERP)", expanded=False):
                     st.markdown(
                         '<div style="font-size:0.84rem;color:#2D6A4F;margin-bottom:0.5rem;">'
@@ -656,57 +699,8 @@ def render():
                         for vn, vs in detail["variables"]:
                             st.caption(f"  • {vn}: {vs}")
 
-            # ── 10 Dimensiones ──
-            st.markdown("---")
-            st.markdown("##### 🌿 10 Dimensiones de Análisis")
-            st.markdown(
-                '<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.5rem;font-size:0.84rem;color:#2D6A4F;line-height:1.6;">'
-                'Las 10 dimensiones permiten una lectura integral del potencial regenerativo. '
-                'Cada dimensión evalúa un aspecto de la vida en el lugar — desde la producción de alimentos '
-                'hasta la participación comunitaria (Mason, 2025; Holmgren, 2002).</div>', unsafe_allow_html=True)
-            dims = list(potenciales_erp.keys())
-            erp_vals = [potenciales_erp[d] for d in dims]
-            hrp_vals = [potenciales_hrp[d] for d in dims]
-            gap_vals = [max(0, round(h-e,1)) for e,h in zip(erp_vals, hrp_vals)]
-            st.plotly_chart(_stacked_bar(dims, erp_vals, gap_vals, title="10 Dimensiones — ERP + Brecha → HRP", height=420), use_container_width=True, key="bar_comp_dim")
-
-            for dim in dims:
-                e = potenciales_erp[dim]; h = potenciales_hrp.get(dim,0)
-                interp_e = get_interp_text(dim, e, "erp")
-                interp_h = get_interp_text(dim, h, "hrp")
-                dim_info = DIM_WHAT_MEASURES.get(dim, {})
-                if isinstance(dim_info, str):
-                    dim_info = {"que_mide": dim_info, "fuentes": "", "icono": "📊"}
-                icono = dim_info.get("icono", "📊")
-                que_mide = dim_info.get("que_mide", "")
-                lv_e, _ = _score_to_level(e)
-                lv_h, _ = _score_to_level(h)
-                with st.expander(f"{icono} {dim}: ERP {e}/10 ({lv_e}) → HRP {h}/10 ({lv_h})", expanded=False):
-                    if que_mide:
-                        st.markdown(f"**¿Qué mide?** {que_mide}")
-                    if interp_e: st.markdown(f"🌍 **Estado actual:** {interp_e}")
-                    if interp_h: st.markdown(f"🌱 **Horizonte potencial:** {interp_h}")
-
-            st.markdown(
-                '<div style="background:#FAFAFA;border-radius:8px;padding:0.5rem 0.8rem;font-size:0.82rem;color:#555;margin-top:0.5rem;">'
-                '📐 <strong>¿Cómo se calculan estos indicadores?</strong> Consulta la sección de Metodología más abajo '
-                'para el detalle completo de fórmulas, variables y escalas de puntuación.</div>', unsafe_allow_html=True)
-
-            # ── Motivacional ──
-            st.markdown(
-                f'<div style="background:linear-gradient(135deg,#E8F5E9,#D8F3DC);border-radius:12px;padding:1rem;margin-top:1rem;text-align:center;">'
-                f'<div style="font-size:1rem;font-weight:800;color:#1B4332;">🌿 Tu espacio tiene un camino claro hacia la regeneración</div>'
-                f'<div style="font-size:0.88rem;color:#2D6A4F;margin-top:0.4rem;line-height:1.6;">'
-                f'Con un ERP de <strong>{erp_score}/10</strong> y un HRP de <strong>{hrp_score}/10</strong>, '
-                f'hay <strong>{brecha} puntos de potencial por activar</strong>. '
-                f'Cada práctica nueva que incorpores acerca tu espacio a su máximo potencial regenerativo. '
-                f'LivLin te acompaña en este camino. 🌱</div>'
-                f'</div>', unsafe_allow_html=True)
-
-            _ref_box([
-                ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
-                ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-            ])
+           
+          
 
         # ── TAB: ERP ──────────────────────────────────────────────────
         with tab_erp:
@@ -743,98 +737,13 @@ def render():
                     st.markdown(f'<div style="background:#FFFDE7;border-radius:6px;padding:0.4rem 0.6rem;margin:0.2rem 0 0.5rem;font-size:0.82rem;color:#5D4037;border-left:3px solid #FFA726;">{interp_h}</div>', unsafe_allow_html=True)
             _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
 
-        # ── SECCIÓN: METODOLOGÍA (dentro de Visión) ──────────────────
-        st.markdown("---")
-        st.markdown("#### 📐 Metodología — Cómo se construyen los indicadores")
-        st.markdown(
-            '<div style="background:#F0FFF4;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#2D6A4F;line-height:1.7;">'
-            'Transparencia es un principio central de LivLin. A continuación se detalla cómo se construyen '
-            'los indicadores ERP y HRP, qué variables los componen, y cómo se traducen a la escala de niveles. '
-            'Toda la metodología está basada en Mason (2025) y en el modelo de la Flor de la Permacultura (Holmgren, 2002).'
-            '</div>', unsafe_allow_html=True)
-
-        with st.expander("🌍 ¿Cómo se calcula el ERP (Estado Regenerativo Presente)?", expanded=False):
-            st.markdown(
-                '**ERP = 80% MFP observado + 20% Sub-indicadores M2-6**\n\n'
-                '- **MFP observado (80%):** Se cuentan las prácticas regenerativas **actualmente observadas** en cada uno de los '
-                '7 pétalos de la Flor de la Permacultura (Holmgren, 2002). El total de prácticas se traduce a una escala 0-10 '
-                'según la siguiente tabla de puntuación:\n\n'
-                '| Prácticas observadas | Puntuación |\n|---|---|\n'
-                '| 0 | 0/10 |\n| 1-2 | 2/10 |\n| 3-5 | 4/10 |\n| 6-9 | 6/10 |\n| 10-14 | 8/10 |\n| 15+ | 10/10 |\n\n'
-                '- **Sub-indicadores M2-6 (20%):** Datos ecológicos y sistémicos recogidos en los módulos de observación:\n')
-
-            if cross:
-                for name, info in cross.items():
-                    st.markdown(f"  - **{info.get('icono','')} {name}:** {info['score']}/10 — _{info['fuente']}_")
-                st.markdown("")
-                st.markdown("**Detalle de variables y escalas de cada sub-indicador:**")
-                for name, detail in CROSS_MODULE_DETAIL.items():
-                    st.markdown(f"**{detail.get('icono','')} {name}** — Fórmula: `{detail['formula']}`")
-                    for vn, vs in detail["variables"]:
-                        st.caption(f"  • {vn}: {vs}")
-
-        with st.expander("🌱 ¿Cómo se calcula el HRP (Horizonte Regenerativo Potencial)?", expanded=False):
-            st.markdown(
-                '**HRP = 100% MFP proyectado (observado + potencial)**\n\n'
-                'El HRP toma **todas las prácticas** de la Flor de la Permacultura: tanto las ya observadas como las '
-                'identificadas como potenciales durante el diagnóstico. Se aplica la misma tabla de puntuación que el MFP. '
-                'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida en las prácticas potenciales.\n\n'
-                'El HRP representa el techo alcanzable si se activan todas las prácticas potenciales identificadas.')
-
-        with st.expander("🌀 ¿Qué es la Brecha?", expanded=False):
-            st.markdown(
-                '**Brecha = HRP − ERP**\n\n'
-                'La brecha indica cuánto potencial hay por activar. No es un indicador negativo — una brecha grande '
-                'significa que hay mucho espacio para crecer. Una brecha pequeña indica que el espacio ya está cerca '
-                'de su máximo potencial identificado.\n\n'
-                f'En este diagnóstico, la brecha es de **{brecha} puntos**: {brecha_txt}')
-
-        with st.expander("📊 Escala de niveles (0-10)", expanded=False):
-            st.markdown(
-                'Todos los indicadores se expresan en una escala de 0 a 10 con 5 niveles narrativos:\n\n'
-                '| Rango | Nivel | Significado |\n|---|---|---|\n'
-                '| 0-2 | 🔴 Sin inicio | El camino regenerativo está por comenzar |\n'
-                '| 2-4 | 🟠 Semilla | Primeras prácticas activas, la semilla germina |\n'
-                '| 4-6 | 🟡 Brote | Prácticas en marcha, el espacio crece |\n'
-                '| 6-8 | 🟢 Crecimiento | Prácticas consolidadas, regenera con fuerza |\n'
-                '| 8-10 | 🌿 Abundancia | Referente vivo de regeneración |\n')
-
-        with st.expander("🌸 ¿Qué es la Flor de la Permacultura?", expanded=False):
-            st.markdown(
-                'La **Flor de la Permacultura** es el modelo central de David Holmgren (2002) que organiza la vida cotidiana '
-                'en **7 dominios de acción regenerativa** (pétalos). Cada pétalo representa un ámbito donde las prácticas '
-                'pueden transformar sistemas extractivos en regenerativos. Los 7 pétalos son:\n')
-            for i, p in enumerate(PETAL_ORDER):
-                icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else "🌱"
-                pinfo = PETAL_DESC.get(p, {})
-                sub = pinfo.get("subtitulo","")
-                st.markdown(f"- **{icon} {p}** — {sub}")
-            st.markdown('\nEl centro de la flor son los principios éticos: cuidado de la tierra, cuidado de las personas '
-                        'y distribución justa de los excedentes.')
-
-        with st.expander("🌿 ¿Qué son las 10 Dimensiones de análisis?", expanded=False):
-            st.markdown(
-                'Las 10 dimensiones ofrecen una lectura más granular del potencial regenerativo. '
-                'Se derivan combinando los pétalos de la Flor con los sub-indicadores ecológicos:\n')
-            for dim_name, dim_info in DIM_WHAT_MEASURES.items():
-                if isinstance(dim_info, str):
-                    dim_info = {"que_mide": dim_info, "icono": "📊", "fuentes": ""}
-                st.markdown(f"- **{dim_info.get('icono','📊')} {dim_name}:** {dim_info.get('que_mide','')} *(Fuentes: {dim_info.get('fuentes','')})*")
-
-        _ref_box([
-            ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
-            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-            ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework", "https://doi.org/10.1080/09613218.2012.62134"),
-        ])
-
-        st.markdown("---")
 
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 2 — DATOS DEL PROYECTO
     # ══════════════════════════════════════════════════════════════════
     if _show("datos"):
-        st.markdown(f"### 📋 Datos del Proyecto &nbsp; {_status_badge('mod_cliente')}", unsafe_allow_html=True)
+        st.markdown(f"#### 📋 Información General del Espacio &nbsp; {_status_badge('mod_cliente')}", unsafe_allow_html=True)
         for lbl, key in [("Nombre del espacio","proyecto_nombre"),("Contacto","proyecto_cliente"),
                          ("Ciudad","proyecto_ciudad"),("Dirección","proyecto_direccion"),
                          ("Fecha","proyecto_fecha"),("Tipo de espacio","proyecto_tipo_espacio"),
@@ -853,7 +762,17 @@ def render():
         # Cuenca hidrografica - Caracteristicas de la ubicacion
         cuenca_nombre = data.get("cuenca_nombre", "")
         if cuenca_nombre:
-            st.markdown("#### Caracteristicas de la ubicacion — Cuenca hidrografica")
+            st.markdown("#### 📍Caracteristicas de su ubicación y su cuenca")
+            # Coordenadas y elevación
+            _lat_d = _safe_float(data.get("geo_lat"))
+            _lon_d = _safe_float(data.get("geo_lon"))
+            _elev_d = _safe_float(data.get("geo_elevation"))
+            if _lat_d and _lon_d:
+                _gc1, _gc2, _gc3 = st.columns(3)
+                with _gc1: st.metric("📍 Latitud", f"{_lat_d:.4f}")
+                with _gc2: st.metric("📍 Longitud", f"{_lon_d:.4f}")
+                with _gc3:
+                    if _elev_d > 0: st.metric("⛰️ Elevación", f"{_elev_d:.0f} m.s.n.m.")
             st.markdown(
                 '<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;'
                 'font-size:0.82rem;color:#1A237E;line-height:1.6;">'
@@ -886,6 +805,133 @@ def render():
                     f'<strong>Sobre {wiki_source} (Wikipedia):</strong><br>{wiki_summary}</div>',
                     unsafe_allow_html=True)
 
+        # ── Clima histórico del lugar ─────────────────────────────
+        geo_clima = data.get("geo_clima_anual")
+        if geo_clima:
+            try:
+                import ast as _ast_c
+                climate_d = _ast_c.literal_eval(geo_clima) if isinstance(geo_clima, str) else geo_clima
+                if isinstance(climate_d, dict) and climate_d.get("months"):
+                    st.markdown("---")
+                    st.markdown("#### 🌦️ Clima e Hidrografía del Lugar")
+                    
+                    st.markdown(
+                        '<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.8rem;'
+                        'margin-bottom:0.6rem;font-size:0.82rem;color:#1A237E;line-height:1.6;">'
+                        'Datos climáticos históricos (promedio 5 años) provistos por '
+                        '<strong>Open-Meteo Historical Weather API</strong> para las coordenadas exactas '
+                        'del espacio. Las líneas muestran temperaturas máximas (rojo) y mínimas (azul); '
+                        'las barras muestran precipitación mensual promedio.</div>',
+                        unsafe_allow_html=True)
+
+                    # Gráfico temperatura + precipitación
+                    fig_clima = go.Figure()
+                    fig_clima.add_trace(go.Bar(
+                        name="Precipitación (mm)", x=climate_d["months"],
+                        y=climate_d.get("prec", []), yaxis="y2",
+                        marker_color="rgba(30,136,229,0.45)", offsetgroup=1))
+                    fig_clima.add_trace(go.Scatter(
+                        name="T° Máx", x=climate_d["months"],
+                        y=climate_d.get("t_max", []),
+                        line=dict(color="#E53935", width=2.5), mode="lines+markers",
+                        marker=dict(size=6)))
+                    fig_clima.add_trace(go.Scatter(
+                        name="T° Mín", x=climate_d["months"],
+                        y=climate_d.get("t_min", []),
+                        line=dict(color="#1565C0", width=2.5), mode="lines+markers",
+                        marker=dict(size=6)))
+                    fig_clima.update_layout(
+                        yaxis=dict(title="Temperatura (°C)", side="left"),
+                        yaxis2=dict(title="Precipitación (mm)", side="right", overlaying="y"),
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, font=dict(size=10)),
+                        height=320, margin=dict(l=40, r=40, t=30, b=30),
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.5)")
+                    st.plotly_chart(fig_clima, use_container_width=True, key="clima_datos_proyecto")
+
+                    # Métricas clave en 5 columnas
+                    st.markdown("**📊 Indicadores climáticos clave**")
+                    km1, km2, km3, km4, km5 = st.columns(5)
+                    anio_ref = climate_d.get("anio_referencia", "")
+                    with km1:
+                        mes_cal = data.get("clima_mes_caluroso") or climate_d.get("mes_mas_caluroso", "—")
+                        st.metric("🌡️ Mes más cálido", mes_cal,
+                                  f"Máx prom: {climate_d.get('t_max_media', '?')}°C")
+                    with km2:
+                        mes_frio = data.get("clima_mes_frio") or climate_d.get("mes_mas_frio", "—")
+                        st.metric("🥶 Mes más frío", mes_frio,
+                                  f"Mín prom: {climate_d.get('t_min_media', '?')}°C")
+                    with km3:
+                        t_max_abs = data.get("clima_t_max_abs") or climate_d.get("abs_max_ultimo_anio")
+                        st.metric("🔴 T° máxima registrada",
+                                  f"{t_max_abs}°C" if t_max_abs is not None else "—",
+                                  f"Año {anio_ref}" if anio_ref else "")
+                    with km4:
+                        t_min_abs = data.get("clima_t_min_abs") or climate_d.get("abs_min_ultimo_anio")
+                        st.metric("🔵 T° mínima registrada",
+                                  f"{t_min_abs}°C" if t_min_abs is not None else "—",
+                                  f"Año {anio_ref}" if anio_ref else "")
+                    with km5:
+                        prec_total = _safe_float(data.get("agua_prec_anual")) or round(
+                            sum(p for p in climate_d.get("prec", []) if p))
+                        st.metric("💧 Precipitación anual", f"{prec_total:.0f} mm", "promedio histórico")
+
+                    # Mes más lluvioso y meses secos
+                    prec_vals = [(i, v) for i, v in enumerate(climate_d.get("prec", [])) if v]
+                    if prec_vals:
+                        idx_lluv = max(prec_vals, key=lambda x: x[1])
+                        months_list = climate_d.get("months", [])
+                        mes_lluv = months_list[idx_lluv[0]] if idx_lluv[0] < len(months_list) else "—"
+                        meses_secos = sum(1 for v in climate_d.get("prec", []) if v is not None and v < 5)
+                        st.markdown(
+                            f'<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.8rem;'
+                            f'margin-top:0.3rem;font-size:0.82rem;color:#1A237E;line-height:1.7;">'
+                            f'🌧️ <strong>Mes más lluvioso:</strong> {mes_lluv} '
+                            f'({idx_lluv[1]:.1f} mm prom.) &nbsp;·&nbsp; '
+                            f'☀️ <strong>Meses secos (&lt;5 mm):</strong> {meses_secos} al año'
+                            f'</div>', unsafe_allow_html=True)
+
+                    st.caption("📡 Fuente: Open-Meteo Historical Weather API (open-meteo.com) · "
+                               "Nominatim OpenStreetMap para geocodificación.")
+            except Exception:
+                pass
+
+        # ── Potencial de captación de agua de lluvia ───────────────
+        prec_v  = _safe_float(data.get("agua_prec_anual"))
+        techo_v = _safe_float(data.get("agua_techo_m2"))
+        efic_v  = _safe_float(data.get("agua_efic_captacion", 80))
+        litros_cap = _safe_float(data.get("agua_litros_captacion_anual"))
+        if litros_cap == 0 and prec_v > 0 and techo_v > 0:
+            litros_cap = round(prec_v * techo_v * efic_v / 100)
+
+        if prec_v > 0 and techo_v > 0:
+            st.markdown("---")
+            st.markdown("#### ☔ Potencial de Captación de Agua de Lluvia")
+            st.markdown(
+                '<div style="background:#E3F2FD;border-radius:8px;padding:0.6rem 0.9rem;'
+                'margin-bottom:0.6rem;font-size:0.82rem;color:#1A237E;line-height:1.6;">'
+                'La captación de agua de lluvia es una de las estrategias más accesibles y '
+                'regenerativas para reducir el consumo de agua potable y mejorar la autonomía '
+                'hídrica del espacio. La fórmula es simple: '
+                '<strong>Litros = Precipitación anual × Área de techo × Eficiencia de captación</strong>.'
+                '</div>', unsafe_allow_html=True)
+
+            wc1, wc2, wc3, wc4 = st.columns(4)
+            with wc1: st.metric("🌧️ Precipitación anual", f"{prec_v:.0f} mm")
+            with wc2: st.metric("🏠 Área de techo", f"{techo_v:.0f} m²")
+            with wc3: st.metric("⚙️ Eficiencia", f"{efic_v:.0f}%")
+            with wc4: st.metric("💧 Captación estimada", f"{litros_cap:,.0f} L/año")
+
+            # Contexto en equivalencias útiles
+            litros_dia = round(litros_cap / 365)
+            meses_agua = round(litros_cap / 4000) if litros_cap > 0 else 0
+            st.markdown(
+                f'<div style="background:#E8F5E9;border-radius:8px;padding:0.7rem 1rem;'
+                f'margin-top:0.4rem;font-size:0.85rem;color:#1B4332;line-height:1.8;">'
+                f'📌 <strong>¿Qué significa esto?</strong><br>'
+                f'• <strong>{litros_dia} litros por día</strong> en promedio anual disponibles para riego u otros usos no potables.<br>'
+                f'• Equivale aproximadamente a <strong>{meses_agua} meses</strong> de agua para un hogar de 4 personas (consumo riego ~350 L/día).<br>'
+                f'</div>', unsafe_allow_html=True)
+
         _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
         st.markdown("---")
 
@@ -894,46 +940,162 @@ def render():
     # SECCION 3 -- TAO DE LA REGENERACION (v2 -- 5 dimensiones)
     # ==================================================================
     if _show("tao"):
-        st.markdown(f"### Tao de la Regeneracion &nbsp; {_status_badge('mod_tao')}", unsafe_allow_html=True)
+        st.markdown(f"#### ☯️ Tao para una vida regenerativa &nbsp; {_status_badge('mod_tao')}", unsafe_allow_html=True)
         st.markdown(f'<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">{TAO_REFLEXION_SHORT}</div>', unsafe_allow_html=True)
 
         # Import Tao module functions
         try:
             from modules.tao import (
-                TAO_DIMENSIONES, TAO_DISCLAIMER, _render_tao_radar,
+                TAO_DIMENSIONES, TAO_DISCLAIMER, TAO_INTRO, TAO_EPIGRAFE,
+                _render_tao_radar,
                 get_tao_scores, get_tao_total, get_tao_label
             )
+
+            # ── Introduccion: que es el Tao de la Regeneracion ──────────
+            with st.expander("¿Cómo ayuda el Tao para la regeneración? (clic para leer)", expanded=False):
+                st.markdown(
+                    f'<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;'
+                    f'margin-bottom:0.5rem;border-left:3px solid #2D6A4F;">'
+                    f'<em style="color:#555;font-size:0.85rem;">'
+                    f'&laquo;{TAO_EPIGRAFE}&raquo;</em><br>'
+                    f'<span style="font-size:0.75rem;color:#888;">-- Reflexiones frente a Lao Tse, Hua Dao (2025)</span>'
+                    f'</div>', unsafe_allow_html=True)
+                st.markdown(TAO_INTRO)
+                st.info(TAO_DISCLAIMER)
+                st.markdown(
+                    '<div style="font-size:0.8rem;color:#555;margin-top:0.5rem;line-height:1.6;">'
+                    '<strong>Referencias:</strong><br>'
+                    '📖 <a href="https://drive.google.com/file/d/1JAWwhCOyvZKrACoAk5bv5Jh2thxppLZh/view" target="_blank">Tao Te Ching — Texto completo en español (PDF)</a><br>'
+                    '📖 <a href="https://drive.google.com/file/d/1MLOLcIso_inxbpIaoJfcdrZimVl9xHgj/view?usp=sharing" target="_blank">Mason, F. (2026) El Tao para una vida regenerativa — LivLin</a><br>'
+                    '📖 <a href="https://drive.google.com/file/d/1nkjTOoW-4HUCbazcqPH-5G2ZsV2IosBB/view?usp=sharing" target="_blank">Mason, F. (2025) Introducción al enfoque de la regeneración — LivLin</a>'
+                    '</div>', unsafe_allow_html=True)
+
             scores = get_tao_scores(data)
             valores = [scores[d["id"]] for d in TAO_DIMENSIONES]
             total = get_tao_total(data)
 
             if any(v > 0 for v in valores):
-                st.markdown("#### Radar de las 5 Dimensiones Taoistas")
+                # Radar
+                st.markdown("##### 5 dimensiones de sabiduría taoísta para la regeneración")
                 _render_tao_radar(valores, compact=True)
 
-                # Show each dimension detail
+                # Score total
+                if total > 0:
+                    lv_tao = "Semilla" if total < 10 else "Brote" if total < 15 else "Crecimiento" if total < 20 else "Abundancia"
+                    st.markdown(
+                        f'<div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);'
+                        f'border-radius:10px;padding:0.6rem 1rem;margin:0.5rem 0 1rem;'
+                        # f'border-left:4px solid #2D6A4F;font-size:0.88rem;color:#1B4332;">'
+                        # f'<strong>Puntaje total Tao:</strong> {total}/25 — {lv_tao}'
+                        f'</div>', unsafe_allow_html=True)
+
+                # st.markdown("---")
+
+                # Una tarjeta unificada por dimensión
                 for dim in TAO_DIMENSIONES:
                     v = scores.get(dim["id"], 0)
-                    if v > 0:
-                        opt_text = dim["opciones"][v-1] if 1 <= v <= 5 else "Sin responder"
-                        _card(
-                            f"Dimension {dim['icono']}: {dim['titulo']}",
-                            f"Nivel {v}/5 -- {opt_text}",
-                            bg="#E8F5E9", border="#2D6A4F"
-                        )
+                    opt_text = dim["opciones"][v-1] if 1 <= v <= 5 else "Sin responder"
+                    nivel_color = ["#E53935","#FB8C00","#FDD835","#43A047","#1B5E20"][v-1] if 1 <= v <= 5 else "#999"
+                    nivel_bg    = ["#FFEBEE","#FFF3E0","#FFFDE7","#E8F5E9","#E8F5E9"][v-1] if 1 <= v <= 5 else "#F5F5F5"
+                    estrellas   = "●" * v + "○" * (5 - v) if v > 0 else "○○○○○"
 
-                # Disclaimer
+                    # Cita principal inline
+                    cita_html = (
+                        f'<div style="border-left:3px solid #A8D5B5;padding:0.4rem 0.7rem;'
+                        f'margin:0.6rem 0;background:#F9FFFC;border-radius:0 6px 6px 0;">'
+                        f'<em style="color:#2D6A4F;font-size:0.83rem;">&laquo;{dim["cita_tao"]}&raquo;</em>'
+                        f'<span style="font-size:0.72rem;color:#888;display:block;margin-top:0.15rem;">— {dim["cita_cap"]}</span>'
+                        f'</div>'
+                    )
+
+                    # Descripción (primer párrafo visible, resto en expander)
+                    parrafos = [p.strip() for p in dim["descripcion"].split("\n\n") if p.strip()]
+                    desc_visible = parrafos[0] if parrafos else ""
+                    desc_resto   = "\n\n".join(parrafos[1:]) if len(parrafos) > 1 else ""
+
+                    # Tarjeta principal
+                    st.markdown(
+                        f'<div style="border:1.5px solid #B7E4C7;border-radius:12px;'
+                        f'margin:0.8rem 0 0;overflow:hidden;">'
+
+                        # Header: número + título + subtítulo + badge nivel
+                        f'<div style="background:linear-gradient(135deg,#D8F3DC,#E8F5E9);'
+                        f'padding:0.7rem 1rem;display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">'
+                        f'<span style="font-size:1.3rem;font-weight:900;color:#1B4332;'
+                        f'min-width:1.8rem;text-align:center;">{dim["icono"]}</span>'
+                        f'<div style="flex:1;">'
+                        f'<div style="font-size:0.95rem;font-weight:800;color:#1B4332;">{dim["titulo"]}</div>'
+                        f'<div style="font-size:0.78rem;color:#40916C;font-style:italic;">{dim["subtitulo"]}</div>'
+                        f'</div>'
+                        f'<div style="background:{nivel_bg};border:1px solid {nivel_color};'
+                        f'border-radius:20px;padding:0.2rem 0.8rem;text-align:center;">'
+                        f'<div style="font-size:0.95rem;color:{nivel_color};letter-spacing:2px;">{estrellas}</div>'
+                        f'<div style="font-size:0.72rem;color:{nivel_color};font-weight:700;">{v}/5</div>'
+                        f'</div>'
+                        f'</div>'
+
+                        # Nivel seleccionado
+                        f'<div style="background:{nivel_bg};border-bottom:1px solid #D8F3DC;'
+                        f'padding:0.45rem 1rem;font-size:0.83rem;color:#333;">'
+                        f'<strong style="color:{nivel_color};">Nivel {v}:</strong> {opt_text}'
+                        f'</div>'
+
+                        # Cita + primer párrafo descripción
+                        f'<div style="padding:0.7rem 1rem 0.2rem;">{cita_html}'
+                        f'<p style="font-size:0.85rem;color:#333;line-height:1.7;margin:0.4rem 0 0.6rem;">{desc_visible}</p>'
+                        f'</div>'
+
+                        # Pregunta de reflexión al pie
+                        f'<div style="background:#F0FFF4;border-top:1px solid #D8F3DC;'
+                        f'padding:0.55rem 1rem;font-size:0.83rem;color:#2D6A4F;">'
+                        f'<strong>💭 Pregunta de reflexión:</strong> <em>{dim["pregunta"]}</em>'
+                        f'</div>'
+
+                        f'</div>',
+                        unsafe_allow_html=True)
+
+                    # Expander solo si hay párrafos adicionales o cita extra
+                    has_more = desc_resto or dim.get("cita_extra")
+                    if has_more:
+                        with st.expander("Leer más sobre esta dimensión", expanded=False):
+                            if desc_resto:
+                                for p in desc_resto.split("\n\n"):
+                                    if p.strip():
+                                        st.markdown(
+                                            f'<p style="font-size:0.86rem;color:#333;line-height:1.7;margin:0.3rem 0;">{p.strip()}</p>',
+                                            unsafe_allow_html=True)
+                            if dim.get("cita_extra"):
+                                st.markdown(
+                                    f'<div style="background:#FAFAFA;border-radius:6px;padding:0.4rem 0.8rem;'
+                                    f'margin-top:0.5rem;border-left:2px solid #A8D5B5;">'
+                                    f'<em style="color:#555;font-size:0.82rem;">&laquo;{dim["cita_extra"]}&raquo;</em>'
+                                    f'<span style="font-size:0.72rem;color:#888;display:block;margin-top:0.1rem;">'
+                                    f'— {dim.get("cita_extra_cap","")}</span>'
+                                    f'</div>', unsafe_allow_html=True)
+
+                # Disclaimer al pie
                 st.markdown(
-                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem;'
-                    f'margin-top:0.5rem;font-size:0.8rem;color:#5D4037;border-left:3px solid #F9A825;">'
-                    f'{TAO_DISCLAIMER}</div>', unsafe_allow_html=True)
+                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.6rem 0.9rem;'
+                    f'margin-top:1rem;font-size:0.8rem;color:#5D4037;border-left:3px solid #F9A825;">'
+                    f'📌 <strong>Nota interpretativa:</strong> {TAO_DISCLAIMER}</div>',
+                    unsafe_allow_html=True)
             else:
-                st.caption("Las dimensiones del Tao no han sido evaluadas en este diagnostico.")
+                st.markdown(
+                    '<div style="background:#F5F5F5;border-radius:8px;padding:0.8rem 1rem;'
+                    'font-size:0.85rem;color:#777;font-style:italic;">'
+                    'Las dimensiones del Tao no han sido evaluadas en este diagnóstico.</div>',
+                    unsafe_allow_html=True)
 
-            # Notas
+            # Notas del facilitador
             notas = data.get("tao_notas", "")
             if notas:
-                _card("Notas del Tao", notas, bg="#E8F5E9", border="#2D6A4F")
+                st.markdown(
+                    f'<div style="background:#E8F5E9;border-radius:8px;padding:0.6rem 0.9rem;'
+                    f'margin-top:0.8rem;border-left:3px solid #2D6A4F;">'
+                    f'<div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;'
+                    f'font-weight:700;margin-bottom:0.2rem;">Notas del facilitador/a</div>'
+                    f'<div style="font-size:0.85rem;color:#1B4332;">{notas}</div></div>',
+                    unsafe_allow_html=True)
 
         except Exception as e:
             st.caption(f"Tao de la Regeneracion: {e}")
@@ -950,16 +1112,14 @@ def render():
         ]
         sal_has_data = any(data.get(k) and data.get(k) != "No registrado" for _, k in salud_fields)
         if sal_has_data:
-            st.markdown("#### Salud y Bienestar")
+            st.markdown("#### 🍎 Salud y Bienestar")
             for lbl, key in salud_fields:
                 v = data.get(key)
                 if v and v != "No registrado":
                     _card(lbl, str(v), bg="#FFF8E1", border="#A67C00")
 
         _ref_box([("Mason, F. (2026)", "El Tao para una vida regenerativa — LivLin", "https://drive.google.com/file/d/1MLOLcIso_inxbpIaoJfcdrZimVl9xHgj/view?usp=sharing"),
-                  ("Lao Tse (s. VI a.C.)", "Tao Te Ching — Texto completo en espanol (PDF)", "https://drive.google.com/file/d/1JAWwhCOyvZKrACoAk5bv5Jh2thxppLZh/view"),
-                  ("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
-                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/")])
+                  ("Lao Tse (s. VI a.C.)", "Tao Te Ching — Texto completo en espanol (PDF)", "https://drive.google.com/file/d/1JAWwhCOyvZKrACoAk5bv5Jh2thxppLZh/view"),])
         st.markdown("---")
 
     # ==================================================================
@@ -968,7 +1128,7 @@ def render():
     if _show("eco_conciencia"):
         eco_has_data = any(data.get(k) for k in ["eco_cc_conciencia", "eco_bio_conciencia", "eco_cont_conciencia"])
         if eco_has_data:
-            st.markdown(f"### Conciencia Ecologica &nbsp; {_status_badge('mod_eco')}", unsafe_allow_html=True)
+            st.markdown(f"#### ♻️ Conciencia Ecologica &nbsp; {_status_badge('mod_eco')}", unsafe_allow_html=True)
             st.markdown(
                 '<div style="background:#FFF3E0;border-radius:8px;padding:0.6rem;margin-bottom:0.8rem;'
                 'font-size:0.85rem;color:#4E342E;">'
@@ -996,7 +1156,7 @@ def render():
     # SECCION 4 -- ANALISIS DE SECTORES (Ecologia + Contexto + Sistemas)
     # ==================================================================
     if _show("analisis_sectores"):
-        st.markdown("### Analisis de Sectores")
+        st.markdown("#### 🔎 Analisis de Sectores")
         st.markdown(
             '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
             'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
@@ -1006,7 +1166,7 @@ def render():
             'es necesario comprender las condiciones reales del lugar.</div>', unsafe_allow_html=True)
 
         # ── 4a. Observacion Ecologica ──
-        st.markdown(f"#### Observacion Ecologica &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
+        st.markdown(f"### Observacion Ecologica &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
         st.markdown(
             '<div style="background:#E8F5E9;border-radius:6px;padding:0.5rem;margin-bottom:0.8rem;font-size:0.82rem;color:#2D6A4F;">'
             'Lectura del sitio: suelo, agua, sol, viento y biodiversidad. '
@@ -1048,57 +1208,6 @@ def render():
                         ("agua_flujo_lluvia","Flujo agua lluvia"),("agua_acumulacion","Acumulación agua"),("flujos_notas","Notas flujos")]:
                 _card(l, str(data.get(k,"")) if data.get(k) else "", bg="#E3F2FD", border="#1565C0")
 
-        # ── Datos geográficos y climáticos (API) ──────────────────────
-        lat = _safe_float(data.get("geo_lat")); lon = _safe_float(data.get("geo_lon"))
-        elev = _safe_float(data.get("geo_elevation"))
-        if lat and lon:
-            st.markdown("---")
-            st.markdown("**🌍 Datos geográficos y climáticos (Open-Meteo API)**")
-            gc1, gc2, gc3 = st.columns(3)
-            with gc1: st.metric("📍 Latitud", f"{lat:.4f}")
-            with gc2: st.metric("📍 Longitud", f"{lon:.4f}")
-            with gc3:
-                if elev > 0: st.metric("⛰️ Elevación", f"{elev:.0f} m.s.n.m.")
-
-        geo_clima = data.get("geo_clima_anual")
-        if geo_clima:
-            try:
-                import ast as _ast
-                climate = _ast.literal_eval(geo_clima) if isinstance(geo_clima, str) else geo_clima
-                if isinstance(climate, dict) and climate.get("months"):
-                    st.markdown("**📅 Perfil climático anual (Open-Meteo — promedio histórico 5 años)**")
-                    fig_c = go.Figure()
-                    fig_c.add_trace(go.Bar(name="Precipitación (mm)", x=climate["months"], y=climate.get("prec",[]), yaxis="y2", marker_color="rgba(30,136,229,0.4)", offsetgroup=1))
-                    fig_c.add_trace(go.Scatter(name="T° Máx", x=climate["months"], y=climate.get("t_max",[]), line=dict(color="#E53935",width=2), mode="lines+markers"))
-                    fig_c.add_trace(go.Scatter(name="T° Mín", x=climate["months"], y=climate.get("t_min",[]), line=dict(color="#1565C0",width=2), mode="lines+markers"))
-                    fig_c.update_layout(yaxis=dict(title="T° (°C)", side="left"), yaxis2=dict(title="Precipitación (mm)", side="right", overlaying="y"),
-                        legend=dict(orientation="h", yanchor="bottom", y=1.02, font=dict(size=9)), height=280, margin=dict(l=30,r=30,t=20,b=20),
-                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(248,255,248,0.4)")
-                    st.plotly_chart(fig_c, use_container_width=True, key="clima_report")
-
-                    # Métricas climáticas clave
-                    st.markdown("**📊 Registros climáticos clave**")
-                    km1, km2, km3, km4, km5 = st.columns(5)
-                    with km1:
-                        mes_cal = data.get("clima_mes_caluroso") or climate.get("mes_mas_caluroso","—")
-                        st.metric("🌡️ Mes más cálido", mes_cal)
-                    with km2:
-                        mes_frio = data.get("clima_mes_frio") or climate.get("mes_mas_frio","—")
-                        st.metric("🥶 Mes más frío", mes_frio)
-                    with km3:
-                        t_max_abs = data.get("clima_t_max_abs") or climate.get("abs_max_ultimo_anio")
-                        st.metric("🔴 T° máx registrada", f"{t_max_abs}°C" if t_max_abs else "—")
-                    with km4:
-                        t_min_abs = data.get("clima_t_min_abs") or climate.get("abs_min_ultimo_anio")
-                        st.metric("🔵 T° mín registrada", f"{t_min_abs}°C" if t_min_abs else "—")
-                    with km5:
-                        prec_total = _safe_float(data.get("agua_prec_anual")) or round(sum(p for p in climate.get("prec",[]) if p))
-                        st.metric("💧 Precipitación anual", f"{prec_total:.0f} mm")
-
-                    st.caption("📡 Fuente: Open-Meteo Historical Weather API · Nominatim OpenStreetMap para geocodificación.")
-            except Exception:
-                pass
-
         st.markdown("**Cultivo**")
         st.caption("Superficie cultivable actual y futura, produccion existente y potencial de expansion.")
         for k,l in [("cultivo_produce_hoy","Produce hoy"),("cultivo_interes","Interés en producir"),
@@ -1134,7 +1243,7 @@ def render():
         st.markdown("---")
 
         # ── 4b. Contexto, Agua, Energia y Materiales ──
-        st.markdown(f"#### Contexto, Agua, Energia y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
+        st.markdown(f"##### Entorno Urbano, Agua, Energia y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
         st.markdown(
             '<div style="background:#E8F5E9;border-radius:6px;padding:0.5rem;margin-bottom:0.8rem;font-size:0.82rem;color:#2D6A4F;">'
             'Analisis de los flujos vitales del espacio: entorno urbano, gestion del agua, consumo energetico '
@@ -1189,80 +1298,197 @@ def render():
                       f"{litros_cap:,.0f} L/año · Techo: {techo:.0f} m² · Precip: {prec:.0f} mm · Efic: {efic:.0f}%",
                       bg="#E3F2FD", border="#1565C0")
 
-            st.markdown("**Energia**")
-            st.caption("Fuente, consumo, eficiencia y potencial de transicion a renovables.")
-            for k,l in [("ene_ind_general","Percepción energía"),("ene_fuente","Fuente principal"),
-                        ("ene_led","Iluminación LED"),("ene_solar_interes","Interés solar"),
-                        ("ene_regleta","Uso de regletas con interruptor"),("ene_circuitos","Circuitos separados"),
-                        ("ene_monitoreo","Monitoreo de consumo"),("ene_apagar_luces","Apagar luces"),
-                        ("ene_eficiencia_electrodom","Electrodomésticos eficientes")]:
-                v = data.get(k)
-                if v and str(v) not in ["No registrado",""]: _card(l, str(v), bg="#FFF8E1", border="#F57C00")
+            # =========================================================
+            # 🔌 BLOQUE ENERGÍA — DIAGNÓSTICO + SIMULACIÓN
+            # =========================================================
 
-            # Consumo de cuenta eléctrica
-            cuenta_kwh = _safe_float(data.get("ene_consumo_cuenta_kwh"))
-            if cuenta_kwh > 0:
-                _card("📊 Consumo real (cuenta eléctrica)",
-                      f"{cuenta_kwh:.0f} kWh/mes · {round(cuenta_kwh/30,1)} kWh/día",
-                      bg="#FFF8E1", border="#F57C00")
+        
 
-            # Consumo calculado por equipos
-            kwh = _safe_float(data.get("ene_kwh_dia_calc"))
-            if kwh > 0:
-                _card("🔌 Consumo calculado (equipos)",
-                      f"{kwh:.1f} kWh/día · {round(kwh*30):,} kWh/mes · {round(kwh*365):,} kWh/año",
-                      bg="#FFF8E1", border="#F57C00")
+        # =========================================================
+        # 🔌 BLOQUE ENERGÍA — MODELO REGENERATIVO + ECONÓMICO
+        # =========================================================
 
-            # Equipos eléctricos
-            equipos = data.get("equipos_electricos", [])
-            if isinstance(equipos, list) and equipos:
-                equip_text = "; ".join(f"{e.get('nombre','')} ({e.get('kwh_dia',e.get('kwh',0))} kWh/dia)" for e in equipos)
-                _card("Equipos electricos registrados", equip_text, bg="#FFF8E1", border="#F57C00")
+        st.markdown("**Energia**")
+        st.caption("Fuente, consumo, eficiencia y potencial de transición a renovables.")
 
-            # Solar potential info + links
-            sol_horas = _safe_float(data.get("sol_horas", 0))
-            if sol_horas > 0:
-                kwh_pot = round(sol_horas * 0.15, 2)  # kWh per m2 per day approx
-                st.markdown(
-                    f'<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem;margin-top:0.5rem;border-left:3px solid #F57C00;">'
-                    f'<div style="font-weight:700;color:#E65100;font-size:0.85rem;">Potencial de luz solar</div>'
-                    f'<div style="font-size:0.82rem;color:#5D4037;line-height:1.7;">'
-                    f'Este espacio recibe aproximadamente <strong>{sol_horas:.0f} horas de sol directo al dia</strong>. '
-                    f'Esto equivale a un recurso solar de aproximadamente <strong>{kwh_pot} kWh por m² al dia</strong>. '
-                    f'La energia solar es un recurso renovable clave para la transicion energetica y la autonomia del espacio.'
-                    f'</div>'
-                    f'<div style="font-size:0.78rem;color:#666;margin-top:0.5rem;line-height:1.6;">'
-                    f'<strong>Herramientas para evaluar tu potencial solar:</strong><br>'
-                    f'☀️ <a href="https://solar.minenergia.cl/inicio" target="_blank" style="color:#1565C0;">Calculadora Solar Minenergia</a> '
-                    f'— Calcula el ahorro al instalar un sistema fotovoltaico conectado a la red (Ley de Generacion Distribuida)<br>'
-                    f'💡 <a href="https://cuentadelaluz.cl/" target="_blank" style="color:#1565C0;">Cuenta de la Luz</a> '
-                    f'— Conoce el precio de la energia electrica en tu comuna'
-                    f'</div></div>', unsafe_allow_html=True)
+        # ---------------------------------------------------------
+        # 🧾 1. CONSUMO
+        # ---------------------------------------------------------
 
-            st.markdown("**Materiales y Residuos**")
-            st.caption("Compostaje, tipos de residuos, volumen de organicos y oportunidades de cierre de ciclos.")
-            for k,l in [("res_compostan","Compostan residuos organicos"),("res_compost_tipo","Tipo de compostaje"),
-                        ("res_organico_kg","Residuos organicos (kg/semana)"),("res_tipos_generados","Tipos de residuos"),
-                        ("res_intentos_fallidos","Intentos fallidos de compostaje"),
-                        ("res_jardin_kg","Residuos de jardin (kg/semana)"),
-                        ("mat_notas","Notas sobre materiales")]:
-                v = data.get(k)
-                if v and str(v) not in ["No registrado",""]:
-                    if isinstance(v, list):
-                        v = ", ".join(str(x) for x in v)
-                    _card(l, str(v), bg="#F3E5F5", border="#7B1FA2")
+        cuenta_kwh = _safe_float(data.get("ene_consumo_cuenta_kwh"))
+        kwh = _safe_float(data.get("ene_kwh_dia_calc"))
 
-        _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-                  ("Mollison, B. (1988)", "Permaculture: A Designers' Manual", "https://tagari.com"),
-                  ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
-        st.markdown("---")
+        consumo_dia = None
+        if kwh > 0:
+            consumo_dia = kwh
+        elif cuenta_kwh > 0:
+            consumo_dia = cuenta_kwh / 30
+
+        if consumo_dia:
+            _card(
+                "🔌 Consumo del espacio",
+                f"{round(consumo_dia,1)} kWh/día · {round(consumo_dia*30):,} kWh/mes",
+                bg="#FFF8E1", border="#F57C00"
+            )
+
+        # ---------------------------------------------------------
+        # 💰 2. PRECIO ELECTRICIDAD (EDITABLE)
+        # ---------------------------------------------------------
+
+        precio_kwh = st.slider(
+            "💰 Precio electricidad ($/kWh)",
+            100, 400, 230,
+            help="Puedes ajustarlo según tu tarifa real (ver enlace abajo)"
+        )
+
+        # ---------------------------------------------------------
+        # ☀️ 3. RECURSO SOLAR
+        # ---------------------------------------------------------
+
+        sol_horas = _safe_float(data.get("sol_horas", 0))
+
+        if sol_horas > 0:
+
+            recurso_solar = round(sol_horas, 2)  # kWh/m²/día
+
+            st.markdown("**☀️ Energía Solar del Lugar**")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.metric("Recurso solar", f"{recurso_solar} kWh/m²/día")
+
+            with col2:
+                st.metric("Horas sol pico", f"{sol_horas:.1f} h/día")
+
+            # -----------------------------------------------------
+            # 🔧 4. CONFIGURACIÓN DEL SISTEMA
+            # -----------------------------------------------------
+
+            potencia_panel_w = st.selectbox(
+                "🔧 Tamaño de panel solar",
+                [200, 300, 400, 500],
+                index=2,
+                help="Selecciona el tipo de panel que usarías en un sistema real"
+            )
+
+            potencia_panel_kw = potencia_panel_w / 1000
+
+            eficiencia = 0.8  # pérdidas del sistema
+
+            # -----------------------------------------------------
+            # ⚡ 5. CÁLCULOS ENERGÉTICOS
+            # -----------------------------------------------------
+
+            sistema_kw = None
+            energia_panel_dia = None
+            paneles_necesarios = None
+            cobertura = None
+
+            if consumo_dia:
+                sistema_kw = consumo_dia / (sol_horas * eficiencia)
+
+            energia_panel_dia = potencia_panel_kw * sol_horas * eficiencia
+
+            if sistema_kw:
+                paneles_necesarios = sistema_kw / potencia_panel_kw
+
+            if consumo_dia:
+                cobertura = (energia_panel_dia / consumo_dia) * 100
+
+            # -----------------------------------------------------
+            # 💸 6. CÁLCULOS ECONÓMICOS
+            # -----------------------------------------------------
+
+            ahorro_panel_mes = None
+            ahorro_total_mes = None
+
+            if energia_panel_dia:
+                ahorro_panel_mes = energia_panel_dia * precio_kwh * 30
+
+            if consumo_dia:
+                ahorro_total_mes = consumo_dia * precio_kwh * 30
+
+            # -----------------------------------------------------
+            # 🧠 7. VISUALIZACIÓN CLAVE (TARJETAS)
+            # -----------------------------------------------------
+
+            cols = st.columns(3)
+
+            with cols[0]:
+                st.metric("Sistema requerido", f"{round(sistema_kw,2)} kW" if sistema_kw else "—")
+
+            with cols[1]:
+                st.metric("Paneles necesarios", f"{round(paneles_necesarios)}" if paneles_necesarios else "—")
+
+            with cols[2]:
+                st.metric("Cobertura por panel", f"{round(cobertura,1)}%" if cobertura else "—")
+
+            # -----------------------------------------------------
+            # 🧾 8. TEXTO EXPLICATIVO CLARO
+            # -----------------------------------------------------
+
+            # Build explanation text safely — only include lines where values exist
+            _lineas = [
+                f'Este espacio recibe aproximadamente <strong>{sol_horas:.1f} horas de sol pico al día</strong>, '
+                f'equivalente a <strong>{recurso_solar} kWh/m²/día</strong> de energía disponible.',
+            ]
+            if energia_panel_dia is not None:
+                _lineas.append(
+                    f'Cada panel de <strong>{potencia_panel_w} W</strong> genera cerca de '
+                    f'<strong>{round(energia_panel_dia, 2)} kWh/día</strong>.'
+                )
+            if consumo_dia is not None and sistema_kw is not None:
+                _lineas.append(
+                    f'Para cubrir el consumo actual (~<strong>{round(consumo_dia, 1)} kWh/día</strong>) '
+                    f'se requeriría un sistema de aproximadamente <strong>{round(sistema_kw, 2)} kW</strong> '
+                    f'({round(paneles_necesarios) if paneles_necesarios else "?"} paneles de {potencia_panel_w} W).'
+                )
+            if ahorro_panel_mes is not None:
+                _lineas.append(
+                    f'El ahorro estimado por panel es de <strong>${round(ahorro_panel_mes):,}/mes</strong>.'
+                )
+            if ahorro_total_mes is not None:
+                _lineas.append(
+                    f'Cubrir el 100% del consumo podría significar un ahorro de '
+                    f'<strong>${round(ahorro_total_mes):,}/mes</strong>.'
+                )
+            _lineas.append(
+                'La radiación varía durante el año — considera el mes más crítico para dimensionar el sistema.'
+            )
+            _texto_solar = ' '.join(_lineas)
+
+            st.markdown(
+                f'<div style="background:#FFFDE7;border-radius:8px;padding:0.8rem;border-left:4px solid #F57C00;">'                f'<div style="font-weight:700;color:#E65100;margin-bottom:0.4rem;">☀️ Potencial de energía solar</div>'                f'<div style="font-size:0.85rem;color:#5D4037;line-height:1.75;">{_texto_solar}</div>'                f'<div style="font-size:0.78rem;color:#666;margin-top:0.6rem;">'                f'🔧 <strong>Herramientas útiles:</strong><br>'                f'☀️ <a href="https://solar.minenergia.cl/inicio" target="_blank">Explorador Solar Minenergía</a> — Generación real según ubicación<br>'                f'💡 <a href="https://cuentadelaluz.cl/" target="_blank">Cuenta de la Luz</a> — Tarifas eléctricas por comuna'                f'</div></div>',
+                unsafe_allow_html=True
+            )
+
+
+
+        st.markdown("**Materiales y Residuos**")
+        st.caption("Compostaje, tipos de residuos, volumen de organicos y oportunidades de cierre de ciclos.")
+        for k,l in [("res_compostan","Compostan residuos organicos"),("res_compost_tipo","Tipo de compostaje"),
+                    ("res_organico_kg","Residuos organicos (kg/semana)"),("res_tipos_generados","Tipos de residuos"),
+                    ("res_intentos_fallidos","Intentos fallidos de compostaje"),
+                    ("res_jardin_kg","Residuos de jardin (kg/semana)"),
+                    ("mat_notas","Notas sobre materiales")]:
+            v = data.get(k)
+            if v and str(v) not in ["No registrado",""]:
+                if isinstance(v, list):
+                    v = ", ".join(str(x) for x in v)
+                _card(l, str(v), bg="#F3E5F5", border="#7B1FA2")
+
+    _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+                ("Mollison, B. (1988)", "Permaculture: A Designers' Manual", "https://tagari.com"),
+                ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
+    st.markdown("---")
 
 
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 6 — REGISTRO FOTOGRÁFICO (restored from v6)
     # ══════════════════════════════════════════════════════════════════
     if _show("fotos"):
-        st.markdown("### 📷 Registro Fotografico")
+        st.markdown("#### 📷 Registro Fotografico")
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
             'Fotografias registradas durante el diagnostico del espacio. '
             'Documentan el estado actual, las condiciones ecologicas y las oportunidades identificadas.</div>', unsafe_allow_html=True)
@@ -1331,7 +1557,7 @@ def render():
     # SECCIÓN 7 — SÍNTESIS Y PLAN
     # ══════════════════════════════════════════════════════════════════
     if _show("sintesis"):
-        st.markdown("### 🗺️ Síntesis y Plan de Acción")
+        st.markdown("#### 🗺️ Síntesis y Plan de Acción")
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
             'Integración de los hallazgos del diagnóstico en fortalezas, oportunidades, desafíos y '
             'un plan de acción en 3 horizontes temporales (Mason, 2025).</div>', unsafe_allow_html=True)
@@ -1345,8 +1571,9 @@ def render():
         fases = [("plan_inmediatas","⚡ Fase 1 (0-3 meses)","Acciones inmediatas de bajo costo.","#52B788"),
                  ("plan_estacionales","🌱 Fase 2 (3-12 meses)","Intervenciones estacionales.","#2D6A4F"),
                  ("plan_estructurales","🌳 Fase 3 (1-5 años)","Transformaciones estructurales.","#1B4332")]
+        st.markdown("")
         for pk, fase, desc, color in fases:
-            st.markdown(f"#### {fase}")
+            st.markdown(f"##### {fase}")
             st.caption(desc)
             v = data.get(pk, "")
             if v:
@@ -1357,67 +1584,120 @@ def render():
                 else:
                     st.markdown(str(v))
 
-        _ref_box([("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL),
-                  ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/")])
         st.markdown("---")
 
 
-    # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 10 — BIBLIOGRAFÍA
+  
     # ══════════════════════════════════════════════════════════════════
     # SECCION 9 -- METODOLOGIA
     if _show("metodologia"):
-        st.markdown("### Metodologia de la Indagación Regenerativa")
+        st.markdown("#### 📐 Metodología — Cómo funciona este diagnóstico")
         st.markdown(
-            '<div style="background:#F0FFF4;border-radius:8px;padding:0.8rem;margin-bottom:1rem;'
-            'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
-            'La <strong>Herramienta de Indagación Regenerativa</strong> de LivLin evalua el potencial '
-            'regenerativo de un espacio a traves de multiples dimensiones interconectadas. '
-            'El diagnostico se realiza mediante una visita presencial de una persona facilitadora '
-            'certificada, que observa, conversa y registra las condiciones del espacio y las '
-            'practicas de quienes lo habitan.</div>', unsafe_allow_html=True)
+            '<div style="background:#F0FFF4;border-radius:10px;padding:0.9rem 1.1rem;margin-bottom:1rem;'
+            'font-size:0.88rem;color:#2D6A4F;line-height:1.75;">'
+            'La <strong>Herramienta de Indagación Regenerativa</strong> de LivLin evalúa el potencial '
+            'regenerativo de un espacio a través de múltiples dimensiones interconectadas. '
+            'El diagnóstico se realiza mediante una visita presencial de una persona facilitadora '
+            'certificada que observa, conversa y registra. '
+            'A continuación se explica cómo se construyen los indicadores, qué mide cada uno '
+            'y cómo se traducen a la escala de niveles. '
+            'Toda la metodología se basa en Mason (2025) y en el modelo de la Flor de la Permacultura (Holmgren, 2002).'
+            '</div>', unsafe_allow_html=True)
 
-        st.markdown("#### Flor de la Permacultura y el IPR")
-        st.markdown(
-            'El instrumento central se basa en los **7 petalos de la Flor de la Permacultura** '
-            '(Holmgren, 2002), que representan los ambitos fundamentales de la vida '
-            'cotidiana que deben transformarse para una cultura regenerativa:\n\n'
-            '1. **Administracion de la Tierra y la Naturaleza** — agricultura urbana, suelo, biodiversidad, agua\n'
-            '2. **Entorno Construido** — bioconstruccion, diseno bioclimatico\n'
-            '3. **Herramientas y Tecnologia** — energia renovable, tecnologia simple\n'
-            '4. **Educacion y Cultura** — saberes locales, arte comunitario, redes\n'
-            '5. **Salud y Bienestar Espiritual** — alimentacion, plantas medicinales\n'
-            '6. **Finanzas y Economia** — mercados locales, economias solidarias\n'
-            '7. **Tenencia de la Tierra y Gobernanza** — participacion, organizacion territorial\n\n'
-            'Para cada petalo, la persona facilitadora registra las **practicas ya activas** (observadas) '
-            'y las **practicas con potencial concreto de realizacion**. Solo se registra como potencial '
-            'aquello que la persona facilitadora evalua como razonablemente factible para ese espacio.')
+        with st.expander("🌸 ¿Qué es la Flor de la Permacultura?", expanded=False):
+            st.markdown(
+                'La **Flor de la Permacultura** (Holmgren, 2002) organiza la vida cotidiana '
+                'en **7 dominios de acción regenerativa** (pétalos). Cada pétalo representa un ámbito '
+                'donde las prácticas pueden transformar sistemas extractivos en regenerativos:\n')
+            for i, p in enumerate(PETAL_ORDER):
+                icon = PETAL_ICONS[i] if i < len(PETAL_ICONS) else "🌱"
+                pinfo = PETAL_DESC.get(p, {})
+                sub = pinfo.get("subtitulo", "")
+                st.markdown(f"- **{icon} {p}** — {sub}")
+            st.markdown(
+                '\nPara cada pétalo se registran las **prácticas ya activas** (observadas) '
+                'y las **prácticas con potencial concreto de realización** (potenciales). '
+                'Solo se registra como potencial aquello que la facilitadora evalúa como '
+                'razonablemente factible para ese espacio.\n\n'
+                'El centro de la flor son los principios éticos: cuidado de la tierra, '
+                'cuidado de las personas y distribución justa de los excedentes.')
 
-        st.markdown("#### ERP y HRP")
-        st.markdown(
-            '**ERP (Estado Regenerativo Presente)** — Fotografia del momento actual. '
-            '80% Flor de la Permacultura (practicas observadas) + 20% sub-indicadores ecologicos. '
-            'Escala 0-10.\n\n'
-            '**HRP (Horizonte Regenerativo Potencial)** — Lo que el espacio puede alcanzar. '
-            '100% Flor proyectada (observadas + potenciales). Escala 0-10.\n\n'
-            'La **brecha** entre ERP y HRP es el campo de accion concreto.')
+        with st.expander("🌍 ¿Cómo se calcula el ERP (Estado Regenerativo Presente)?", expanded=False):
+            st.markdown(
+                '**ERP = 80% Flor de la Permacultura observada + 20% Sub-indicadores M2-6**\n\n'
+                '**MFP observado (80%):** Se cuentan las prácticas actualmente activas en cada uno de los '
+                '7 pétalos. El total se traduce a una escala 0–10 según esta tabla:\n\n'
+                '| Prácticas observadas | Puntuación |\n|---|---|\n'
+                '| 0 | 0/10 |\n| 1–2 | 2/10 |\n| 3–5 | 4/10 |\n'
+                '| 6–9 | 6/10 |\n| 10–14 | 8/10 |\n| 15+ | 10/10 |\n\n'
+                '**Sub-indicadores M2-6 (20%):** Datos ecológicos y sistémicos de los módulos de observación:')
+            if cross:
+                for name, info in cross.items():
+                    st.markdown(f"  - **{info.get('icono','')} {name}:** {info['score']}/10 — _{info['fuente']}_")
+                st.markdown("\n**Detalle de fórmulas y variables:**")
+                for name, detail in CROSS_MODULE_DETAIL.items():
+                    st.markdown(f"**{detail.get('icono','')} {name}** — `{detail['formula']}`")
+                    for vn, vs in detail["variables"]:
+                        st.caption(f"  • {vn}: {vs}")
 
-        st.markdown("#### Tao de la Regeneracion")
-        st.markdown(
-            '5 dimensiones de sabiduria taoista (accion espontanea, humildad, compasion, '
-            'fortalecer lo esencial, retorno a la raiz). Escala 1-5 por dimension, '
-            'puntaje total 5-25. Radar de 5 ejes.')
+        with st.expander("🌱 ¿Cómo se calcula el HRP (Horizonte Regenerativo Potencial)?", expanded=False):
+            st.markdown(
+                '**HRP = 100% Flor proyectada (observadas + potenciales)**\n\n'
+                'El HRP suma todas las prácticas de la Flor: las ya activas más las identificadas '
+                'como potenciales. Se aplica la misma tabla de puntuación que el ERP. '
+                'No incluye sub-indicadores M2-6 porque la visión futura ya está contenida '
+                'en las prácticas potenciales de cada pétalo.\n\n'
+                'El HRP representa el techo alcanzable si se activan todas las prácticas '
+                'potenciales identificadas en el diagnóstico.')
 
-        _ref_box([
-            ("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-            ("Mason, F. (2025)", "Introduccion al enfoque de la regeneracion", MASON_URL),
-            ("Mang, P. & Reed, B. (2012)", "Designing from place: A regenerative framework", "https://doi.org/10.1080/09613218.2012.62134"),
-        ])
-        st.markdown("---")
+        with st.expander("🌀 ¿Qué es la Brecha?", expanded=False):
+            st.markdown(
+                '**Brecha = HRP − ERP**\n\n'
+                'La brecha indica cuánto potencial hay por activar. No es negativa — una brecha '
+                'grande significa mucho espacio para crecer. Una brecha pequeña indica que el '
+                'espacio ya está cerca de su máximo potencial identificado.\n\n'
+                f'En este diagnóstico, la brecha es de **{brecha} puntos**: {brecha_txt}')
+
+        with st.expander("📊 Escala de niveles (0–10)", expanded=False):
+            st.markdown(
+                'Todos los indicadores se expresan en una escala 0–10 con 5 niveles narrativos:\n\n'
+                '| Rango | Nivel | Significado |\n|---|---|---|\n'
+                '| 0–2 | 🔴 Sin inicio | El camino regenerativo está por comenzar |\n'
+                '| 2–4 | 🟠 Semilla | Primeras prácticas activas, la semilla germina |\n'
+                '| 4–6 | 🟡 Brote | Prácticas en marcha, el espacio crece |\n'
+                '| 6–8 | 🟢 Crecimiento | Prácticas consolidadas, regenera con fuerza |\n'
+                '| 8–10 | 🌿 Abundancia | Referente vivo de regeneración |\n')
+
+        with st.expander("🌿 ¿Qué son las 10 Dimensiones de análisis?", expanded=False):
+            st.markdown(
+                'Las 10 dimensiones ofrecen una lectura más granular del potencial regenerativo, '
+                'combinando los 7 pétalos con los sub-indicadores ecológicos (M2-6):\n')
+            for dim_name, dim_info in DIM_WHAT_MEASURES.items():
+                if isinstance(dim_info, str):
+                    dim_info = {"que_mide": dim_info, "icono": "📊", "fuentes": ""}
+                st.markdown(
+                    f"- **{dim_info.get('icono','📊')} {dim_name}:** "
+                    f"{dim_info.get('que_mide','')} "
+                    f"*(Fuentes: {dim_info.get('fuentes','')})*")
+
+        with st.expander("🔵 Tao de la Regeneración — 5 dimensiones de sabiduría taoísta", expanded=False):
+            st.markdown(
+                'El **Tao de la Regeneración** complementa la Flor con una dimensión interior: '
+                'la disposición interna del grupo para el cambio transformativo. '
+                'Se evalúan 5 dimensiones desde la filosofía taoísta (escala 1–5 c/u):\n\n'
+                '1. **Wu Wei** — Acción espontánea y oportuna; no-imposición de ritmos externos\n'
+                '2. **Humildad y suficiencia** — Estar al servicio, detenerse a tiempo, sencillez\n'
+                '3. **Compasión y no-juicio** — Inclusividad, verdad sobria, cuidado de todos\n'
+                '4. **Fortalecer lo esencial** — Raíz, substancia, enfoque en lo que nutre vida\n'
+                '5. **Retorno a la raíz** — Ciclos, memoria del lugar, regeneración natural\n\n'
+                'El resultado se visualiza en un radar de 5 ejes. Total: 5–25 puntos.')
+
+    st.markdown("---")
+       
 
     # SECCION 9b -- GLOSARIO DE ACCIONES
     if _show("glosario"):
-        st.markdown("### Glosario de Acciones Regenerativas")
+        st.markdown("#### 📘 Glosario de Acciones Regenerativas")
         st.markdown(
             '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
             'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
@@ -1451,7 +1731,7 @@ def render():
         st.markdown("---")
 
     if _show("biblio"):
-        st.markdown("### 📚 Bibliografía y Recursos")
+        st.markdown("#### 📚 Bibliografía y Recursos")
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
             'Referencias utilizadas en la construcción del marco teórico y metodológico de LivLin.</div>', unsafe_allow_html=True)
         for auth, title, url in GLOBAL_REFS:
