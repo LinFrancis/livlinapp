@@ -556,8 +556,7 @@ def render():
             # st.plotly_chart(_stacked_bar(petal_names, p_erp, p_gap, title="7 Pétalos — ERP + Brecha → HRP", height=350), use_container_width=True, key="bar_comp_pet")
 
             # ── Detalle pétalo a pétalo con definición + prácticas ──
-            st.markdown("---")
-            st.markdown("##### 🌸 Detalle por Pétalo — Definición, Estado y Potencial")
+           
             st.markdown(
                 '<div style="background:#F0FFF4;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.8rem;font-size:0.84rem;color:#2D6A4F;line-height:1.6;">'
                 'Cada pétalo representa un ámbito de la vida cotidiana donde las prácticas regenerativas '
