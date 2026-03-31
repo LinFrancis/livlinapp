@@ -879,7 +879,7 @@ def list_demo_profiles():
         result.append((
             p["id"],
             p["proyecto_nombre"],
-            p["proyecto_cliente"],
+            # p["proyecto_cliente"],
             p.get("proyecto_tipo_espacio", ""),
             desc,
         ))
