@@ -41,7 +41,7 @@ PAGES_CLIENT = {
 
 def _login_page():
     logo_path = Path(__file__).parent / "assets" / "logolivlin.png"
-    _, cc, _ = st.columns([1.5, 1, 1.5])
+    _, cc, _ = st.columns([2.5, 1, 2.5])
     with cc:
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
@@ -51,6 +51,17 @@ def _login_page():
         st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagación Regenerativa</h2>', unsafe_allow_html=True)
         st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Bases para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
 
+    video_path = Path(__file__).parent / "data" / "video_intro_3_min.mp4"
+    if video_path.exists():
+        st.markdown('<div style="margin-top:1.5rem;"></div>', unsafe_allow_html=True)
+        _, vc, _ = st.columns([5, 1.5, 5])
+        with vc:
+            with st.container(border=True):
+                st.markdown('<p style="text-align:center;font-weight:600;margin-bottom:0.5rem;color:#1B4332;font-size:0.7rem;">Video Introductorio</p>', unsafe_allow_html=True)
+                st.video(str(video_path))
+                # st.markdown('<p style="text-align:center;font-weight:600;margin-bottom:0.5rem;color:#1B4332;font-size:0.7rem;">(2:48 minutos)</p>', unsafe_allow_html=True)
+
+
     # ── DEMO MODE ──────────────────────────────────────────────────────
     st.markdown("---")
     _, cc, _ = st.columns([0.5, 2, 0.5])
@@ -59,7 +70,7 @@ def _login_page():
             '<div style="text-align:center;padding:0.3rem 0;">'
             '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostración</span><br>'
             '<span style="font-size:0.82rem;color:#555;">'
-            'Explora informes profesionales aplicables a tu espacio:'
+            'Explora informes aplicables a tu espacio:'
             ' conoce potenciales regenerativos y planes de acción.</span></div>',
             unsafe_allow_html=True)
     
@@ -67,7 +78,7 @@ def _login_page():
             from utils.demo_profiles import list_demo_profiles, get_demo_profile
             profiles = list_demo_profiles()
             opciones = ["Selecciona un perfil de ejemplo..."] + [
-                f"{nombre} — {desc_corta}" for _, nombre, _, _, desc_corta in profiles
+                nombre for _, nombre, _, _, _ in profiles
             ]
             sel = st.selectbox("Perfil demo", opciones, index=0, key="demo_select", label_visibility="collapsed")
             if sel != opciones[0]:
