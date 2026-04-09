@@ -112,6 +112,20 @@ def render():
         st.warning("⚠️ Primero crea o carga un diagnóstico desde el panel de administración.")
         return
 
+    from utils.module_status import render_module_status, is_module_active
+    from utils.module_status import is_readonly as _is_ro, render_readonly_notice
+    _readonly = _is_ro()
+    if _readonly:
+        render_readonly_notice()
+
+    st.markdown("**Estado de este modulo:**")
+    _mod_status = render_module_status(data, "mod_fotos")
+    if not is_module_active(_mod_status):
+        from utils.module_status import render_not_addressed_notice
+        render_not_addressed_notice(data, "mod_fotos", _readonly)
+        return
+
+
     use_supabase = is_configured()
 
     # ── Tab layout ────────────────────────────────────────────────────────

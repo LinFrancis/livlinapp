@@ -98,17 +98,13 @@ def render():
     # ── Estado del módulo ─────────────────────────────────────────────────
     from utils.module_status import render_module_status, is_module_active
     from utils.tab_nav import show_drive_save_status
-    st.markdown("**Estado de este módulo:**")
+    st.markdown("**Estado de este modulo:**")
     _mod_status = render_module_status(data, "mod_cliente")
     if not is_module_active(_mod_status):
-        if not _readonly:
-            if st.button("💾 Guardar como No Abordado", key="save_na_mod_cliente",
-                         use_container_width=True):
-                st.session_state.visit_data = data
-                save_visit(data)
-                st.success("✅ Módulo marcado como No Abordado.")
-                show_drive_save_status()
+        from utils.module_status import render_not_addressed_notice
+        render_not_addressed_notice(data, "mod_cliente", _readonly)
         return
+
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas son interpretaciones del facilitador.")
     st.markdown("---")
@@ -165,21 +161,26 @@ def render():
             data.update({"geo_lat": float(geo["lat"]), "geo_lon": float(geo["lon"]),
                          "geo_display": geo["display_name"],
                          "geo_city": geo["city"], "geo_country": geo["country"]})
-            # Auto-identify cuenca
-            try:
-                from utils.cuencas import get_cuenca_info
-                get_cuenca_info(data)
-            except Exception:
-                pass  # cuencas may not be available (geopandas)
             st.session_state.visit_data = data
             save_visit(data)
             st.success(f"Ubicacion encontrada: {geo['display_name']}")
             st.rerun()
         else:
-            st.warning("No se encontro la direccion. Intenta con ciudad y pais: 'Los Aromos 234, Nunoa, Santiago, Chile'")
+            st.warning("No se encontró la dirección. Intenta un formato más general (ej. ciudad y país) o directamente las coordenadas Latitud, Longitud si 'Nominatim' (OpenStreetMap) no reconoce la calle.")
 
     if data.get("geo_lat"):
         lat, lon = float(data["geo_lat"]), float(data["geo_lon"])
+
+        # Auto-identify cuenca if coordinates exist but cuenca not yet saved
+        if not data.get("cuenca_nombre"):
+            try:
+                from utils.cuencas import get_cuenca_info
+                _cuenca_result = get_cuenca_info(data)
+                if _cuenca_result and _cuenca_result.get("cuenca_nombre"):
+                    st.session_state.visit_data = data
+                    save_visit(data)
+            except Exception:
+                pass  # geopandas may not be available
 
         # Coordinates info box
         st.markdown(
@@ -194,21 +195,38 @@ def render():
             f'<a href="https://shademap.app/@{lat},{lon},15z" target="_blank">ShadowMap</a>'
             f'</div>', unsafe_allow_html=True)
 
-        # -- Cuenca identification --
+        # -- Cuenca identification display --
         cuenca_nombre = data.get("cuenca_nombre", "")
         if cuenca_nombre:
-            sc = data.get("subcuenca_nombre", "")
+            sc  = data.get("subcuenca_nombre", "")
             ssc = data.get("subsubcuenca_nombre", "")
-            parts = [f"Cuenca: **{cuenca_nombre}**"]
-            if sc: parts.append(f"Subcuenca: **{sc}**")
-            if ssc: parts.append(f"Subsubcuenca: **{ssc}**")
+            def _c_badge(nivel, nombre, cod, link, border, icon):
+                if not nombre: return ""
+                link_part = (f'<a href="{link}" target="_blank" style="color:{border};'
+                             f'font-weight:700;text-decoration:none;">{nombre} 🔗</a>'
+                             ) if link else f'<strong>{nombre}</strong>'
+                cod_part = f' <span style="color:#888;font-size:0.75rem;">({cod})</span>' if cod else ""
+                return (f'<span style="display:inline-block;background:#F0F4FF;border:1px solid {border};'
+                        f'border-radius:6px;padding:0.2rem 0.6rem;margin-right:0.4rem;margin-bottom:0.3rem;'
+                        f'font-size:0.82rem;">{icon} {nivel}: {link_part}{cod_part}</span>')
+            badges = (
+                _c_badge("Cuenca",      cuenca_nombre, data.get("cuenca_cod",""),
+                         data.get("cuenca_wiki_link",""), "#1565C0", "🌊") +
+                _c_badge("Subcuenca",   sc, data.get("subcuenca_cod",""),
+                         data.get("subcuenca_wiki_link",""), "#2E7D32", "🏞️") +
+                _c_badge("Subsubcuenca",ssc, data.get("subsubcuenca_cod",""),
+                         data.get("subsubcuenca_wiki_link",""), "#F57F17", "🏔️")
+            )
             st.markdown(
                 f'<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.8rem;'
                 f'margin-bottom:0.5rem;font-size:0.82rem;border-left:3px solid #1565C0;">'
-                f'{" | ".join(parts)}</div>', unsafe_allow_html=True)
+                f'🌊 <strong>Cuenca hidrográfica:</strong><br>{badges}</div>',
+                unsafe_allow_html=True)
+
         else:
+            st.info("🌊 No se pudo identificar la cuenca hidrográfica para estas coordenadas. Verifica que los shapefiles BNA estén disponibles en data/cuencas/.")
             if not _readonly:
-                if st.button("Identificar cuenca hidrografica", key="btn_cuenca"):
+                if st.button("🔄 Reintentar identificación de cuenca", key="btn_cuenca"):
                     with st.spinner("Identificando cuenca..."):
                         try:
                             from utils.cuencas import get_cuenca_info
@@ -216,12 +234,13 @@ def render():
                             if result and result.get("cuenca_nombre"):
                                 st.session_state.visit_data = data
                                 save_visit(data)
-                                st.success(f"Cuenca: {result['cuenca_nombre']}")
+                                st.success(f"Cuenca identificada: {result['cuenca_nombre']}")
                                 st.rerun()
                             else:
-                                st.info("No se encontro cuenca para estas coordenadas.")
+                                st.warning("No se encontró cuenca para estas coordenadas en los shapefiles BNA.")
                         except Exception as e:
                             st.caption(f"Cuencas no disponible: {e}")
+
 
         # Interactive Folium map
         _render_folium_map(lat, lon, data, sat_mode)

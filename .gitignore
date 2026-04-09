@@ -30,3 +30,4 @@ dist/
 
 # Streamlit
 .streamlit/secrets.toml
+.streamlit_backup/

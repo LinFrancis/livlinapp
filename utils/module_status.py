@@ -126,3 +126,28 @@ def render_readonly_notice():
             unsafe_allow_html=True)
     except Exception:
         pass
+
+
+def render_not_addressed_notice(data: dict, module_key: str, readonly: bool):
+    """Shows a message informing that the module is not addressed and allows reactivation."""
+    st.markdown(
+        f'<div style="background:#F5F5F5;border:1px solid #E0E0E0;border-radius:10px;'
+        f'padding:1.5rem;margin:1rem 0;text-align:center;color:#757575;">'
+        f'<div style="font-size:3rem;margin-bottom:0.5rem;">⭕</div>'
+        f'<div style="font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;">'
+        f'Módulo marcado como "No abordado"</div>'
+        f'<div style="font-size:0.9rem;line-height:1.6;">'
+        f'Este módulo no forma parte del diagnóstico actual o no ha sido trabajado aún.<br>'
+        f'Si deseas activarlo y comenzar el registro de datos, presiona el botón de abajo.'
+        f'</div></div>', unsafe_allow_html=True)
+    
+    if not readonly:
+        if st.button(f"🚀 Reactivar módulo", key=f"reactivate_{module_key}", use_container_width=True, type="primary"):
+            data[module_key] = "respondido"
+            from utils.data_manager import save_visit
+            save_visit(data)
+            st.success("Módulo reactivado.")
+            from utils.tab_nav import show_drive_save_status
+            show_drive_save_status()
+            st.rerun()
+

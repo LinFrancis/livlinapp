@@ -26,17 +26,10 @@ def render():
     st.markdown("**Estado de este módulo:**")
     _mod_status = render_module_status(data, "mod_sitio")
     if not is_module_active(_mod_status):
-        # Limpiar valores por defecto si el módulo no fue abordado
-        save_col1, save_col2 = st.columns([1,1])
-        with save_col1:
-            if not _readonly:
-                if st.button("💾 Guardar como No Abordado", key="save_na_mod_sitio",
-                             use_container_width=True):
-                    st.session_state.visit_data = data
-                    save_visit(data)
-                    st.success("✅ Módulo marcado como No Abordado.")
-                    show_drive_save_status()
+        from utils.module_status import render_not_addressed_notice
+        render_not_addressed_notice(data, "mod_sitio", _readonly)
         return
+
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
     st.markdown("---")
@@ -246,12 +239,21 @@ def _render_cultivo(data, only_containers):
     st.markdown("</div>", unsafe_allow_html=True)
 
     # ── Calculadora de áreas de cultivo ─────────────────────────────────
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown("#### 📐 Calculadora de Áreas de Cultivo")
+    
+    # Bag size selector (moved even higher for maximum visibility)
+    s_litros_saved = data.get("cultivo_saco_litros", 40)
+    saco_litros = st.slider("Tamaño de saco de sustrato (Litros) — Usado para todos los cálculos", 5, 120, 
+                            value=int(s_litros_saved), step=5,
+                            key="sel_saco_litros")
+    data["cultivo_saco_litros"] = saco_litros
+    
     st.caption("Agrega cada zona, maceta o bancal para calcular el área total y el sustrato necesario.")
 
     if "bancales" not in data or not isinstance(data.get("bancales"), list):
         data["bancales"] = []
+
+
 
     with st.expander("➕ Agregar zona / bancal / maceta", expanded=False):
         b_nombre = st.text_input("Nombre de la zona", placeholder="Ej: Bancal 1, Terraza sur…", key="b_nombre")
@@ -265,20 +267,23 @@ def _render_cultivo(data, only_containers):
             b_ancho = bc2.number_input("Ancho (m)", min_value=0.1, value=0.5, step=0.1, key="b_ancho")
             b_alto  = bc3.number_input("Profundidad (m)", min_value=0.05, value=0.3, step=0.05, key="b_alto")
             b_area = round(b_largo * b_ancho, 2); b_vol = round(b_area * b_alto, 3)
+            b_dim = f"{b_largo}m(L) x {b_ancho}m(A) x {b_alto}m(P)"
         elif b_tipo == "Circular":
             bc1, bc2 = st.columns(2)
             b_radio = bc1.number_input("Radio (m)", min_value=0.1, value=0.3, step=0.05, key="b_radio")
             b_alto  = bc2.number_input("Profundidad (m)", min_value=0.05, value=0.3, step=0.05, key="b_alto_c")
             b_area = round(math.pi * b_radio**2, 2); b_vol = round(b_area * b_alto, 3)
+            b_dim = f"Radio: {b_radio}m, Profundidad: {b_alto}m"
         else:
             b_area = st.number_input("Área (m²)", min_value=0.01, value=0.5, step=0.1, key="b_area_libre")
             b_alto = st.number_input("Profundidad (m)", min_value=0.05, value=0.3, step=0.05, key="b_alto_l")
             b_vol  = round(b_area * b_alto, 3)
-        st.caption(f"Área: **{b_area} m²** · Volumen: **{b_vol} m³** · Litros: **{round(b_vol*1000)} L** · Sacos 50L: **~{round(b_vol*1000/50,1)}**")
+            b_dim = f"Profundidad: {b_alto}m"
+        st.caption(f"Área: **{b_area} m²** · Volumen: **{b_vol} m³** · Litros: **{round(b_vol*1000)} L** · Sacos {saco_litros}L: **~{round(b_vol*1000/saco_litros, 1)}**")
         if st.button("✅ Agregar zona", key="btn_add_bancal"):
             if b_nombre.strip():
                 data["bancales"].append({"nombre": b_nombre, "tipo": b_tipo,
-                    "area": b_area, "vol": b_vol, "litros": round(b_vol*1000),
+                    "area": b_area, "vol": b_vol, "litros": round(b_vol*1000), "dim": b_dim,
                     "estado": "observado" if b_estado.startswith("Observado") else "potencial"})
                 st.session_state.visit_data = data  # sync before rerun
                 st.rerun()
@@ -291,25 +296,36 @@ def _render_cultivo(data, only_containers):
         total_area = round(area_obs + area_pot, 2)
         total_vol  = round(sum(b["vol"]    for b in data["bancales"]), 3)
         total_lit  = round(sum(b["litros"] for b in data["bancales"]))
+        total_sacos = round(total_lit / saco_litros, 1)
+
         st.markdown(
             f'<div style="background:rgba(82,183,136,0.15);border:1px solid #52B788;'
             f'border-radius:10px;padding:0.8rem 1rem;margin:0.5rem 0;">'
-            f'<strong>Totales:</strong>'
+            f'<strong>Totales de Cultivo:</strong>'
             f'<br>Área observada (ya existe): <strong>{area_obs} m²</strong>'
             f'<br>Área potencial (se podría habilitar): <strong>{area_pot} m²</strong>'
-            f'<br>Total: <strong>{total_area} m²</strong> · Sustrato aprox.: <strong>{total_lit:,} L</strong>'
+            f'<br>Total: <strong>{total_area} m²</strong>'
+            f'<br>Sustrato aprox. total: <strong>{total_lit:,} L</strong> (aprox. <strong>{total_sacos} sacos</strong> de {saco_litros}L)'
             f'</div>', unsafe_allow_html=True)
         data["cultivo_m2"]        = area_obs
         data["cultivo_m2_futuro"] = area_pot
         for i, b in enumerate(data["bancales"]):
-            estado_label = "Potencial" if b.get("estado") == "potencial" else "Observado"
+            estado_label = "Posible de construir" if b.get("estado") == "potencial" else "Observado"
             estado_color = "#52B788" if b.get("estado") == "potencial" else "#1B4332"
             cb, cd = st.columns([4, 1])
             with cb:
+                dim_texto = b.get("dim", "Sin medidas")
+                s_size = data.get("cultivo_saco_litros", 40)
+                z_sacos = round(b.get("litros", 0) / s_size, 1) if s_size > 0 else 0
                 st.markdown(
+                    f'<div style="border-left:4px solid {estado_color}; padding-left:10px; margin-bottom:10px;">'
                     f'<span style="background:{estado_color};color:white;border-radius:3px;padding:1px 6px;'
                     f'font-size:0.72rem;margin-right:6px;">{estado_label}</span>'
-                    f'<strong>{b["nombre"]}</strong> — {b["area"]} m² · {b["vol"]} m³ · {b["litros"]} L',
+                    f'<strong>{b["nombre"]}</strong> ({b["tipo"]})<br>'
+                    f'<span style="font-size:0.85rem;color:#555;">📏 {dim_texto}</span><br>'
+                    f'<span style="font-size:0.85rem;font-weight:600;">{b["area"]} m² · {b["vol"]} m³ · {b["litros"]} L</span><br>'
+                    f'<span style="font-size:0.85rem;color:#40916C;font-weight:700;">➔ {z_sacos} sacos ({s_size}L)</span>'
+                    f'</div>',
                     unsafe_allow_html=True)
             with cd:
                 if st.button("🗑️", key=f"del_bancal_{i}"):

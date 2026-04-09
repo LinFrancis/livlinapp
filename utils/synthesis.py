@@ -183,48 +183,9 @@ def generate_limitaciones(data: dict) -> str:
     return "\n".join(items)
 
 
-def generate_quick_wins(data: dict) -> str:
-    """Genera intervenciones de alto impacto y bajo costo basadas en el contexto."""
-    items = []
-
-    if not _has(data, "res_compostan", ["Sí", "Parcialmente"]):
-        items.append("⚡ Instalar un compostero básico — bajo costo, alto impacto en suelo y residuos")
-
-    if not _has(data, "ene_led", ["Sí"]):
-        items.append("💡 Cambiar toda la iluminación a LED — amortización en menos de 6 meses")
-
-    if _has(data, "agua_pot_captacion", ["Medio", "Alto"]):
-        items.append("💧 Instalar primera cisterna o barril para captar agua de lluvia")
-
-    if not _has(data, "res_separan", ["Siempre"]):
-        items.append("♻️ Implementar sistema de separación de residuos en el hogar")
-
-    if _score_val(data, "cultivo_m2") < 2:
-        items.append("🌱 Crear primer bancal elevado o maceta productiva en zona más soleada")
-
-    if not _has(data, "fauna_polinizadores", ["Frecuentemente"]):
-        items.append("🌸 Plantar 3–5 especies nectaríferas nativas para atraer polinizadores")
-
-    if _has(data, "suelo_compactacion", ["Alta"]):
-        items.append("⛏️ Airear el suelo con horqueta y aplicar compost maduro — primer paso de regeneración")
-
-    if _has(data, "mat_pot_infra", ["Alto"]) and not _has(data, "mat_infraestructura_verde", ["Sí"]):
-        items.append("🌿 Instalar primer muro verde o estructura trepadora — impacto visual inmediato")
-
-    if _has(data, "ctx_huertas_com", ["Sí"]) and not _has(data, "ctx_participacion", ["Regularmente"]):
-        items.append("🤝 Visitar la huerta comunitaria más cercana y conectar con la red local")
-
-    if not items:
-        items.append("🌱 Comenzar con observación sistemática del espacio durante 4 semanas antes de intervenir")
-        items.append("📓 Llevar un diario del espacio: sol, viento, agua, biodiversidad observada")
-
-    return "\n".join(items[:6])  # máx 6 quick wins
-
-
 def generate_all(data: dict) -> dict:
     return {
         "sint_fortalezas":    generate_fortalezas(data),
         "sint_oportunidades": generate_oportunidades(data),
         "sint_limitaciones":  generate_limitaciones(data),
-        "sint_quick_wins":    generate_quick_wins(data),
     }
