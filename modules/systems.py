@@ -27,17 +27,10 @@ def render():
     st.markdown("**Estado de este módulo:**")
     _mod_status = render_module_status(data, "mod_sistemas")
     if not is_module_active(_mod_status):
-        # Limpiar valores por defecto si el módulo no fue abordado
-        save_col1, save_col2 = st.columns([1,1])
-        with save_col1:
-            if not _readonly:
-                if st.button("💾 Guardar como No Abordado", key="save_na_mod_sistemas",
-                             use_container_width=True):
-                    st.session_state.visit_data = data
-                    save_visit(data)
-                    st.success("✅ Módulo marcado como No Abordado.")
-                    show_drive_save_status()
+        from utils.module_status import render_not_addressed_notice
+        render_not_addressed_notice(data, "mod_sistemas", _readonly)
         return
+
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
     st.markdown("---")

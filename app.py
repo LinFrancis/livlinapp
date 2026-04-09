@@ -11,7 +11,6 @@ st.set_page_config(
     page_icon=str(_FAVICON) if _FAVICON.exists() else "🌱",
     layout="wide",
     initial_sidebar_state="expanded",
-    
 )
 
 CSS_FILE = Path(__file__).parent / "style.css"
@@ -40,107 +39,131 @@ PAGES_CLIENT = {
 
 
 def _login_page():
-    logo_path = Path(__file__).parent / "assets" / "logolivlin.png"
-    _, cc, _ = st.columns([2.5, 1, 2.5])
-    with cc:
-        if logo_path.exists():
-            st.image(str(logo_path), use_container_width=True)
+    # ── 1. HERO IMAGE (Foto Asociada) ──
+    # Significantly narrower columns to reduce size by half
+    _, hcc, _ = st.columns([2.5, 2, 2.5])
+    with hcc:
+        foto_path  = Path(__file__).parent / "data" / "foto_intro.png"
+        if foto_path.exists():
+            st.image(str(foto_path), use_container_width=True)
+        else:
+            st.markdown('<div style="margin-top:2rem;"></div>', unsafe_allow_html=True)
 
-    _, cc, _ = st.columns([0.5, 2, 0.5])
-    with cc:
-        st.markdown('<h2 style="text-align:center;color:#1B4332;font-family:Georgia;">Herramienta de Indagación Regenerativa</h2>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align:center;color:#666;font-size:0.9rem;">Bases para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
+    # ── 2. MAIN TITLE & SUBTITLE ───────────────────────────────────────
+    st.markdown(
+        """
+        <div style="text-align:center; margin-top:1rem; margin-bottom:1rem;">
+            <h1 style="color:#1B4332; font-family:'Georgia', serif; font-size:2rem; font-weight:800; line-height:1.1;">
+                Herramienta de <span style="color:#52B788;">Indagación</span> Regenerativa
+            </h1>
+            <p style="color:#6B705C; font-size:0.95rem; font-weight:400; margin-top:0.4rem; letter-spacing:0.02em;">
+                Bases para el diseño de ecosistemas regenerativos · LivLin
+            </p>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
 
+    # ── 3. INTRODUCTORY VIDEO (Inside Expander) ───────────────────────
     video_path = Path(__file__).parent / "data" / "video_intro_3_min.mp4"
     if video_path.exists():
-        st.markdown('<div style="margin-top:1.5rem;"></div>', unsafe_allow_html=True)
-        _, vc, _ = st.columns([5, 1.5, 5])
-        with vc:
-            with st.container(border=True):
-                st.markdown('<p style="text-align:center;font-weight:600;margin-bottom:0.5rem;color:#1B4332;font-size:0.7rem;">Video Introductorio</p>', unsafe_allow_html=True)
+        _, vcc, _ = st.columns([2.5, 3, 2.5])
+        with vcc:
+            with st.expander("🎞️ Ver Video Introductorio", expanded=False):
                 st.video(str(video_path))
-                # st.markdown('<p style="text-align:center;font-weight:600;margin-bottom:0.5rem;color:#1B4332;font-size:0.7rem;">(2:48 minutos)</p>', unsafe_allow_html=True)
+                st.markdown('<p style="text-align:center;font-size:0.7rem;color:#999;margin-top:0.3rem;">El Enfoque de LivLin · 3 min</p>', unsafe_allow_html=True)
 
+    st.markdown('<div style="margin-top:2rem;"></div>', unsafe_allow_html=True)
 
-    # ── DEMO MODE ──────────────────────────────────────────────────────
-    st.markdown("---")
-    _, cc, _ = st.columns([0.5, 2, 0.5])
-    with cc:
-        st.markdown(
-            '<div style="text-align:center;padding:0.3rem 0;">'
-            '<span style="font-size:1rem;color:#1B4332;font-weight:700;">Modo Demostración</span><br>'
-            '<span style="font-size:0.82rem;color:#555;">'
-            'Explora informes aplicables a tu espacio:'
-            ' conoce potenciales regenerativos y planes de acción.</span></div>',
-            unsafe_allow_html=True)
-    
-        try:
-            from utils.demo_profiles import list_demo_profiles, get_demo_profile
-            profiles = list_demo_profiles()
-            opciones = ["Selecciona un perfil de ejemplo..."] + [
-                nombre for _, nombre, _, _, _ in profiles
-            ]
-            sel = st.selectbox("Perfil demo", opciones, index=0, key="demo_select", label_visibility="collapsed")
-            if sel != opciones[0]:
-                idx = opciones.index(sel) - 1
-                pid = profiles[idx][0]
-                if st.button("Ver informe de ejemplo", use_container_width=True, type="primary", key="btn_demo_go"):
-                    profile = get_demo_profile(pid)
-                    if profile:
-                        st.session_state.authenticated = True
-                        st.session_state.current_user = {
-                            "username": "demo", "role": "user",
-                            "display_name": profile.get("proyecto_cliente", "Demo"),
-                            "space_name": profile.get("proyecto_nombre", "Demo"),
-                        }
-                        st.session_state.visit_data = profile
-                        st.session_state.demo_mode = True
-                        st.session_state.page = "report"
-                        st.rerun()
-        except Exception as e:
-            st.caption(f"Demo: {e}")
-    
-        st.markdown(
-            '<div style="text-align:center;padding:0.5rem;margin-top:0.3rem;">'
-            '<span style="font-size:0.8rem;color:#40916C;">'
-            'Resultados para tu espacio   '
-            '<a href="https://www.livlin.cl/?lang=es#contact" target="_blank" style="color:#1B4332;font-weight:700;">'
-            'Contacta a LivLin</a></span></div>',
-            unsafe_allow_html=True)
+    # ── 4. ACCESS SECTIONS (DEMO & LOGIN) ──────────────────────────────
+    # Centered and slightly more compact cards
+    _, m_col, _ = st.columns([1, 4, 1])
+    with m_col:
+        col_demo, col_login = st.columns([1, 1], gap="medium")
 
-    # ── LOGIN FORM ─────────────────────────────────────────────────────
-    st.markdown("---")
-    _, lc, _ = st.columns([1.5, 1, 1.5])
-    with lc:
-        st.markdown('<p style="text-align:center;font-size:0.85rem;color:#888;margin-bottom:0.3rem;">Acceso Miembros</p>', unsafe_allow_html=True)
-        uname = st.text_input("Usuario", placeholder="Ej: francis", key="login_user")
-        pwd   = st.text_input("Contraseña", type="password", key="login_pwd")
-        if st.button("Ingresar", use_container_width=True, type="primary", key="btn_login"):
-            from utils.users import authenticate, refresh_from_supabase
+        with col_demo:
+            st.markdown(
+                '<div style="background:#F8F9FA; border-radius:12px; padding:1.5rem; border:1px solid #E9ECEF; height:100%;">'
+                '<h3 style="color:#1B4332; font-size:1.1rem; font-weight:700; margin-bottom:0.6rem;">Modo Demostración</h3>'
+                '<p style="color:#666; font-size:0.82rem; margin-bottom:1.2rem;">'
+                'Explora informes aplicables y conoce potenciales regenerativos.'
+                '</p>',
+                unsafe_allow_html=True
+            )
+            
             try:
-                refresh_from_supabase()
+                from utils.demo_profiles import list_demo_profiles, get_demo_profile
+                profiles = list_demo_profiles()
+                opciones = ["Selecciona un perfil..."] + [
+                    nombre for _, nombre, _, _, _ in profiles
+                ]
+                sel = st.selectbox("Perfil", opciones, index=0, key="demo_select", label_visibility="collapsed")
+                if sel != opciones[0]:
+                    idx = opciones.index(sel) - 1
+                    pid = profiles[idx][0]
+                    if st.button("Explorar Perfil", use_container_width=True, type="primary", key="btn_demo_go"):
+                        profile = get_demo_profile(pid)
+                        if profile:
+                            st.session_state.authenticated = True
+                            st.session_state.current_user = {
+                                "username": "demo", "role": "user",
+                                "display_name": profile.get("proyecto_cliente", "Demo"),
+                                "space_name": profile.get("proyecto_nombre", "Demo"),
+                            }
+                            st.session_state.visit_data = profile
+                            st.session_state.demo_mode = True
+                            st.session_state.page = "report"
+                            st.rerun()
             except Exception:
                 pass
-            user = authenticate(uname.strip(), pwd.strip())
-            if user:
-                st.session_state.authenticated = True
-                st.session_state.current_user  = user
-                st.session_state.username      = user["username"]
-                st.session_state.pop("_visits_cache", None)
-                st.session_state.pop("_sb_status_cache", None)
-                if user.get("visit_id"):
-                    v = get_visit(user["visit_id"])
-                    st.session_state.visit_data = v if v else {}
+            
+            st.markdown(
+                '<div style="margin-top:1rem; border-top:1px solid #E9ECEF; padding-top:0.8rem;">'
+                '<a href="https://www.livlin.cl" target="_blank" style="font-size:0.78rem; color:#1B4332; font-weight:700; text-decoration:none;">'
+                'Contacta a LivLin →</a></div></div>',
+                unsafe_allow_html=True
+            )
+
+        with col_login:
+            st.markdown(
+                '<div style="background:#FFFFFF; border-radius:12px; padding:1.5rem; border:1px solid #E9ECEF; height:100%;">'
+                '<h3 style="color:#1B4332; font-size:1.1rem; font-weight:700; margin-bottom:0.6rem;">Acceso Miembros</h3>'
+                '<p style="color:#666; font-size:0.82rem; margin-bottom:1rem;">Inicia sesión para tus diagnósticos.</p>',
+                unsafe_allow_html=True
+            )
+            uname = st.text_input("Usuario", placeholder="Tu usuario", key="login_user")
+            pwd   = st.text_input("Contraseña", type="password", placeholder="••••••••", key="login_pwd")
+            
+            if st.button("Iniciar Sesión", use_container_width=True, type="secondary", key="btn_login"):
+                from utils.users import authenticate, refresh_from_supabase
+                try:
+                    refresh_from_supabase()
+                except Exception:
+                    pass
+                user = authenticate(uname.strip(), pwd.strip())
+                if user:
+                    st.session_state.authenticated = True
+                    st.session_state.current_user  = user
+                    st.session_state.username      = user["username"]
+                    st.session_state.pop("_cache", None)
+                    if user.get("visit_id"):
+                        v = get_visit(user["visit_id"])
+                        st.session_state.visit_data = v if v else {}
+                    else:
+                        st.session_state.visit_data = {}
+                    role = user.get("role", "user")
+                    st.session_state.page = "home" if role == "admin" else "report"
+                    st.rerun()
                 else:
-                    st.session_state.visit_data = {}
-                st.session_state.pop("_visits_cache", None)
-                st.session_state.pop("_db_last_errors", None)
-                role = user.get("role", "user")
-                st.session_state.page = "home" if role == "admin" else "report"
-                st.rerun()
-            else:
-                st.error("Usuario o Contraseña incorrectos.")
-        st.markdown('<p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:1rem;">LivLin · Servicios para una vida regenerativa</p>', unsafe_allow_html=True)
+                    st.error("Credenciales incorrectas.")
+            
+            st.markdown(
+                '<div style="margin-top:0.8rem; text-align:center;">'
+                '<p style="font-size:0.68rem; color:#AAA;">LivLin · Vida Regenerativa</p></div></div>',
+                unsafe_allow_html=True
+            )
+
+
 
 
 def _sidebar():

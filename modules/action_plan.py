@@ -127,33 +127,17 @@ def _render_potencial(data):
     st.markdown("**Estado de este módulo:**")
     _mod_status = render_module_status(data, "mod_plan")
     if not is_module_active(_mod_status):
-        # Limpiar valores por defecto si el módulo no fue abordado
-        save_col1, save_col2 = st.columns([1,1])
-        with save_col1:
-            if not _readonly:
-                if st.button("💾 Guardar como No Abordado", key="save_na_mod_plan",
-                             use_container_width=True):
-                    st.session_state.visit_data = data
-                    save_visit(data)
-                    st.success("✅ Módulo marcado como No Abordado.")
-                    show_drive_save_status()
+        from utils.module_status import render_not_addressed_notice
+        render_not_addressed_notice(data, "mod_plan", _readonly)
         return
+
     if _mod_status == "inferido":
         st.info("🔍 **Modo inferido** — Las respuestas abajo son interpretaciones del facilitador, no de las personas del espacio.")
     st.markdown("---")
     st.markdown("### 🌱 Dimensiones Regenerativas — Interpretación y Análisis")
 
-    # View mode toggle
-    view_mode = st.radio("Modo de vista:",
-                         ["🤖 Interpretación automática", "✏️ Editar interpretaciones"],
-                         horizontal=True, key="pot_view_mode")
-
     for dim, val in potenciales.items():
         desc      = DIM_DESC.get(dim, "")
-        interp_a  = _interp_auto(dim, val)
-        climate   = CLIMATE_REF.get(dim, "")
-        edit_key  = f"interp_edit_{dim.replace(' ','_')}"
-        saved_key = f"interp_saved_{dim.replace(' ','_')}"
         pct = int((val/10)*100) if val else 0
 
         if val >= 4: bar_col, bg_col = "#1B4332", "rgba(27,67,50,0.08)"
@@ -162,7 +146,6 @@ def _render_potencial(data):
         elif val >= 1: bar_col, bg_col = "#52B788", "rgba(82,183,136,0.08)"
         else: bar_col, bg_col = "#74C69D", "rgba(116,198,157,0.08)"
 
-        lbl, _ = score_label(val)
         st.markdown(
             f'<div style="background:{bg_col};border:1px solid {bar_col}40;'
             f'border-left:4px solid {bar_col};border-radius:10px;padding:0.7rem 1rem;margin:6px 0;">'
@@ -173,44 +156,9 @@ def _render_potencial(data):
             f'<div style="font-size:0.78rem;color:#666;font-style:italic;margin-bottom:4px;">{desc}</div>'
             f'<div style="background:rgba(255,255,255,0.6);border-radius:4px;height:7px;margin-bottom:6px;overflow:hidden;">'
             f'<div style="background:{bar_col};width:{pct}%;height:100%;border-radius:4px;"></div>'
-            f'</div>',
+            f'</div>'
+            '</div>',
             unsafe_allow_html=True)
-
-        if view_mode == "🤖 Interpretación automática":
-            # Show auto text + climate ref
-            current_text = data.get(saved_key, interp_a)
-            st.markdown(
-                f'<div style="font-size:0.82rem;color:#2D5A3D;line-height:1.5;">{current_text}</div>'
-                + (f'<div style="font-size:0.77rem;color:#666;margin-top:4px;font-style:italic;">{climate}</div>' if climate else '')
-                + '</div>', unsafe_allow_html=True)
-        else:
-            st.markdown("</div>", unsafe_allow_html=True)  # close the outer div first
-            # Edit mode: pre-filled text area
-            current_text = data.get(saved_key, interp_a)
-            with st.container():
-                edited = st.text_area(
-                    f"✏️ Interpretación de {dim}",
-                    value=current_text,
-                    height=120,
-                    key=edit_key,
-                    help=f"Texto automático: {interp_a[:100]}…")
-                c1, c2 = st.columns(2)
-                with c1:
-                    if st.button(f"✅ Aceptar", key=f"accept_{dim.replace(' ','_')}", use_container_width=True):
-                        data[saved_key]    = edited
-                        data[f"interp_auto_{dim.replace(' ','_')}"] = interp_a
-                        save_visit(data)
-                        st.session_state.visit_data = data
-                        st.success("Guardado.")
-                with c2:
-                    if st.button(f"🔄 Restaurar automático", key=f"restore_{dim.replace(' ','_')}", use_container_width=True):
-                        data[saved_key] = interp_a
-                        save_visit(data)
-                        st.session_state.visit_data = data
-                        st.rerun()
-            continue  # skip closing div (already closed above)
-
-        # (closed inside the if block for auto mode)
 
 
 # ── Tab 2: Síntesis Narrativa ─────────────────────────────────────────────────
@@ -238,7 +186,6 @@ def _render_sintesis(data):
         ("sint_fortalezas",    "💪 Fortalezas y prácticas activas",        "Lo que ya funciona bien…"),
         ("sint_oportunidades", "🚀 Potencial de transformación regenerativa","Áreas donde la regeneración puede florecer…"),
         ("sint_limitaciones",  "🌱 Desafíos a transformar en oportunidad",  "Condiciones que requieren atención…"),
-        ("sint_quick_wins",    "⚡ Primeros pasos — acciones de alto impacto","Acciones de bajo costo y gran impacto…"),
         ("sint_observaciones", "🌿 Reflexión del/la facilitador/a",          "Observaciones sobre el potencial del espacio…"),
     ]:
         data[key] = st.text_area(label, value=data.get(key, ""), height=120,

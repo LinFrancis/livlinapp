@@ -30,7 +30,7 @@ def _load_gdf(path):
 
 
 def identificar_cuenca(lat, lon):
-    """Given lat/lon, return dict with cuenca/subcuenca/subsubcuenca info.
+    """Given lat/lon (WGS84 degrees), return dict with cuenca/subcuenca/subsubcuenca info.
 
     Returns dict with keys:
       cuenca_cod, cuenca_nombre,
@@ -46,49 +46,72 @@ def identificar_cuenca(lat, lon):
 
     try:
         from shapely.geometry import Point
+        import geopandas as gpd
     except ImportError:
         return result
 
-    point = Point(lon, lat)  # shapely uses (x=lon, y=lat)
+    # Create point in WGS84 (EPSG:4326)
+    point_wgs84 = gpd.GeoDataFrame(
+        geometry=[Point(lon, lat)], crs="EPSG:4326"
+    )
+
+    def _reproject_point(gdf_target):
+        """Reproject the WGS84 point to match the target GeoDataFrame's CRS."""
+        if gdf_target.crs and gdf_target.crs != point_wgs84.crs:
+            return point_wgs84.to_crs(gdf_target.crs).geometry.iloc[0]
+        return point_wgs84.geometry.iloc[0]
+
+    def _find_containing(gdf, tolerance=500):
+        """Find the polygon that contains the point, or the nearest within tolerance (meters)."""
+        if gdf is None:
+            return None
+        pt = _reproject_point(gdf)
+        # First: exact containment
+        mask = gdf.geometry.contains(pt)
+        if mask.any():
+            return gdf[mask].iloc[0]
+        # Fallback: nearest polygon within tolerance meters
+        distances = gdf.geometry.distance(pt)
+        min_dist = distances.min()
+        if min_dist <= tolerance:
+            return gdf.iloc[distances.idxmin()]
+        return None
 
     # Search subsubcuencas first (most specific)
-    gdf = _load_gdf(_SUBSUBCUENCAS_SHP)
-    if gdf is not None:
-        for _, row in gdf.iterrows():
-            if row.geometry and row.geometry.contains(point):
-                result["cuenca_cod"] = str(row.get("COD_CUEN", "")).strip()
-                result["subcuenca_cod"] = str(row.get("COD_SUBC", "")).strip()
-                result["subsubcuenca_cod"] = str(row.get("COD_SSUBC", "")).strip()
-                result["subsubcuenca_nombre"] = str(row.get("NOM_SSUBC", "")).strip()
-                break
+    gdf_ssc = _load_gdf(_SUBSUBCUENCAS_SHP)
+    match = _find_containing(gdf_ssc)
+    if match is not None:
+        result["cuenca_cod"]        = str(match.get("COD_CUEN", "")).strip()
+        result["subcuenca_cod"]     = str(match.get("COD_SUBC", "")).strip()
+        result["subsubcuenca_cod"]  = str(match.get("COD_SSUBC", "")).strip()
+        result["subsubcuenca_nombre"] = str(match.get("NOM_SSUBC", "")).strip()
 
     # Get cuenca name
     if result["cuenca_cod"]:
         gdf_c = _load_gdf(_CUENCAS_SHP)
         if gdf_c is not None:
-            match = gdf_c[gdf_c["COD_CUEN"].str.strip() == result["cuenca_cod"]]
-            if len(match) > 0:
-                result["cuenca_nombre"] = str(match.iloc[0].get("NOM_CUEN", "")).strip()
+            m = gdf_c[gdf_c["COD_CUEN"].str.strip() == result["cuenca_cod"]]
+            if len(m) > 0:
+                result["cuenca_nombre"] = str(m.iloc[0].get("NOM_CUEN", "")).strip()
 
     # Get subcuenca name
     if result["subcuenca_cod"]:
         gdf_s = _load_gdf(_SUBCUENCAS_SHP)
         if gdf_s is not None:
-            match = gdf_s[gdf_s["COD_SUBC"].str.strip() == result["subcuenca_cod"]]
-            if len(match) > 0:
-                result["subcuenca_nombre"] = str(match.iloc[0].get("NOM_SUBC", "")).strip()
+            m = gdf_s[gdf_s["COD_SUBC"].str.strip() == result["subcuenca_cod"]]
+            if len(m) > 0:
+                result["subcuenca_nombre"] = str(m.iloc[0].get("NOM_SUBC", "")).strip()
 
-    # If subsubcuenca search failed, try cuenca level
+    # Fallback: try at cuenca level if subsubcuenca search returned nothing
     if not result["cuenca_cod"]:
         gdf_c = _load_gdf(_CUENCAS_SHP)
-        if gdf_c is not None:
-            for _, row in gdf_c.iterrows():
-                if row.geometry and row.geometry.contains(point):
-                    result["cuenca_cod"] = str(row.get("COD_CUEN", "")).strip()
-                    result["cuenca_nombre"] = str(row.get("NOM_CUEN", "")).strip()
-                    break
+        match = _find_containing(gdf_c)
+        if match is not None:
+            result["cuenca_cod"]    = str(match.get("COD_CUEN", "")).strip()
+            result["cuenca_nombre"] = str(match.get("NOM_CUEN", "")).strip()
 
     return result
+
 
 
 def wikipedia_link(nombre):
@@ -147,28 +170,36 @@ def get_cuenca_info(data):
 
     result = identificar_cuenca(lat, lon)
 
-    # Store in data
-    data["cuenca_cod"] = result.get("cuenca_cod", "")
-    data["cuenca_nombre"] = result.get("cuenca_nombre", "")
-    data["subcuenca_cod"] = result.get("subcuenca_cod", "")
-    data["subcuenca_nombre"] = result.get("subcuenca_nombre", "")
-    data["subsubcuenca_cod"] = result.get("subsubcuenca_cod", "")
+    # Store identifiers
+    data["cuenca_cod"]          = result.get("cuenca_cod", "")
+    data["cuenca_nombre"]       = result.get("cuenca_nombre", "")
+    data["subcuenca_cod"]       = result.get("subcuenca_cod", "")
+    data["subcuenca_nombre"]    = result.get("subcuenca_nombre", "")
+    data["subsubcuenca_cod"]    = result.get("subsubcuenca_cod", "")
     data["subsubcuenca_nombre"] = result.get("subsubcuenca_nombre", "")
 
-    # Try to get Wikipedia summary for the most specific level
-    for key in ["subsubcuenca_nombre", "subcuenca_nombre", "cuenca_nombre"]:
-        nombre = result.get(key)
-        if nombre:
-            wiki = wikipedia_summary(nombre)
-            if wiki:
-                data["cuenca_wiki_summary"] = wiki
-                data["cuenca_wiki_source"] = nombre
-                break
-
-    # Generate Wikipedia links
+    # Wikipedia links for all levels
     for level in ["cuenca", "subcuenca", "subsubcuenca"]:
         nombre = result.get(f"{level}_nombre")
         if nombre:
             data[f"{level}_wiki_link"] = wikipedia_link(nombre)
 
+    # Wikipedia summary: fetch main cuenca first (most relevant for report)
+    cuenca_nombre = result.get("cuenca_nombre")
+    if cuenca_nombre and not data.get("cuenca_wiki_summary"):
+        wiki = wikipedia_summary(cuenca_nombre)
+        if wiki:
+            data["cuenca_wiki_summary"] = wiki
+            data["cuenca_wiki_source"]  = cuenca_nombre
+
+    # Also fetch subcuenca and subsubcuenca summaries independently
+    for level in ["subcuenca", "subsubcuenca"]:
+        nombre = result.get(f"{level}_nombre")
+        key    = f"{level}_wiki_summary"
+        if nombre and not data.get(key):
+            wiki = wikipedia_summary(nombre)
+            if wiki:
+                data[key] = wiki
+
     return result
+

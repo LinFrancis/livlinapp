@@ -440,7 +440,7 @@ def generate_excel(data: dict) -> bytes:
     r=_sp(ws6,r)
 
     for key,lbl in [("sint_fortalezas","💚 Fortalezas"),("sint_oportunidades","🌱 Oportunidades"),
-                    ("sint_limitaciones","⚡ Desafíos"),("sint_quick_wins","🎯 Primeros pasos")]:
+                    ("sint_limitaciones","⚡ Desafíos")]:
         v=data.get(key,"")
         if v: r=_row(ws6,r,lbl,str(v),h=28)
     r=_sp(ws6,r)

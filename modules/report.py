@@ -44,8 +44,8 @@ def _val(data, key, default="No registrado"):
     if v in [None, "", [], 0, 0.0]: return default
     return v
 
-def _show_field(label, value, empty_msg="No registrado"):
-    if value in [None, "", [], 0, 0.0]: return
+def _show_field(label, value, empty_msg=""):
+    if not value or value in [None, "", [], 0, 0.0, "No registrado"]: return
     st.markdown(
         f'<div style="padding:0.3rem 0;border-bottom:1px solid #E8F5E9;">'
         f'<span style="font-size:0.75rem;color:#52B788;text-transform:uppercase;">{label}</span><br>'
@@ -53,7 +53,7 @@ def _show_field(label, value, empty_msg="No registrado"):
         unsafe_allow_html=True)
 
 def _card(label, value, bg="#F0FFF4", fg="#1B4332", border="#52B788"):
-    if not value or value == "No registrado": return
+    if not value or value in [None, "", [], 0, 0.0, "No registrado"]: return
     st.markdown(
         f'<div style="background:{bg};border-radius:8px;padding:0.6rem 0.8rem;'
         f'margin-bottom:0.5rem;border-left:3px solid {border};">'
@@ -144,28 +144,88 @@ def _dual_radar(domain_obs, domain_tot, height=400, title=""):
     return fig
 
 
-def _render_report_map(lat, lon, data):
+def _render_report_map(lat, lon, data, map_key="rpt_map"):
+    """Mapa del espacio con selector de vistas y zoom satelital alto."""
+    # Tile options
+    _tile_options = {
+        "🛰️ Satélite (Google)": {
+            "tiles": "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+            "attr": "© Google",
+        },
+        "🗺️ Híbrido (Satélite + calles)": {
+            "tiles": "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+            "attr": "© Google",
+        },
+        "📍 OpenStreetMap": {
+            "tiles": "OpenStreetMap",
+            "attr": "© OpenStreetMap",
+        },
+        "🌑 CartoDB Dark": {
+            "tiles": "CartoDB dark_matter",
+            "attr": "© CartoDB",
+        },
+    }
+    sel_tile = st.radio(
+        "Vista del mapa",
+        list(_tile_options.keys()),
+        index=0,  # Satélite por defecto
+        horizontal=True,
+        key=f"{map_key}_tile",
+    )
+    tile_cfg = _tile_options[sel_tile]
+
     try:
         import folium
         from streamlit_folium import st_folium
-        m = folium.Map(location=[lat,lon], zoom_start=16, tiles="CartoDB positron")
-        folium.Marker([lat,lon],
-            popup=folium.Popup(f"<b>{data.get('proyecto_nombre','Espacio')}</b><br>Lat: {lat:.6f}  Lon: {lon:.6f}", max_width=250),
-            tooltip=data.get("proyecto_nombre","Espacio"), icon=folium.Icon(color="green",icon="leaf",prefix="fa")).add_to(m)
+
+        if tile_cfg["tiles"] in ("OpenStreetMap", "CartoDB dark_matter", "CartoDB positron"):
+            m = folium.Map(location=[lat, lon], zoom_start=19,
+                           tiles=tile_cfg["tiles"])
+        else:
+            m = folium.Map(location=[lat, lon], zoom_start=19,
+                           tiles=tile_cfg["tiles"],
+                           attr=tile_cfg["attr"])
+
+        # Marker del espacio
+        folium.Marker(
+            [lat, lon],
+            popup=folium.Popup(
+                f"<b>{data.get('proyecto_nombre','Espacio')}</b><br>"
+                f"Lat: {lat:.6f}  Lon: {lon:.6f}<br>"
+                f"{data.get('proyecto_direccion','')}",
+                max_width=260),
+            tooltip=data.get("proyecto_nombre", "Espacio"),
+            icon=folium.Icon(color="green", icon="leaf", prefix="fa")
+        ).add_to(m)
+
+        # Lugares cercanos
         nearby_raw = data.get("entorno_lugares_cercanos")
         if nearby_raw:
             try:
                 import ast as _a
-                places = _a.literal_eval(nearby_raw) if isinstance(nearby_raw,str) else nearby_raw
+                places = _a.literal_eval(nearby_raw) if isinstance(nearby_raw, str) else nearby_raw
+                color_map = {"parques": "green", "ferias": "orange", "mercados": "blue",
+                             "bibliotecas": "purple", "escuelas": "red", "huertas": "darkgreen"}
                 for p in (places or [])[:12]:
-                    folium.CircleMarker([p["lat"],p["lon"]], radius=7, color="#1565C0",
-                        fill=True, fill_color="#1565C0", fill_opacity=0.6,
-                        popup=f"{p['name']} ({p.get('dist_m',0)} m)", tooltip=p["name"]).add_to(m)
-            except: pass
-        st_folium(m, width="100%", height=380, returned_objects=[])
+                    c = "gray"
+                    for k, v in color_map.items():
+                        if k in p.get("categoria", "").lower():
+                            c = v; break
+                    folium.CircleMarker(
+                        [p["lat"], p["lon"]], radius=8,
+                        color=c, fill=True, fill_color=c, fill_opacity=0.7,
+                        popup=folium.Popup(f"<b>{p['name']}</b><br>{p.get('categoria','')}<br>{p.get('dist_m',0)} m", max_width=180),
+                        tooltip=f"{p['name']} ({p.get('dist_m',0)}m)"
+                    ).add_to(m)
+            except:
+                pass
+
+        st_folium(m, width="100%", height=480, returned_objects=[], key=map_key)
+
     except ImportError:
         import pandas as pd
-        st.map(pd.DataFrame({"lat":[lat],"lon":[lon]}), zoom=15)
+        st.map(pd.DataFrame({"lat": [lat], "lon": [lon]}), zoom=18)
+        st.caption("Para mapa interactivo completo instala: pip install folium streamlit-folium")
 
 
 # ── Stacked bar chart helper ─────────────────────────────────────────
@@ -185,18 +245,24 @@ def _stacked_bar(names, erp_vals, gap_vals, title="", height=420):
 
 
 # ── Section registry ────────────────────────────────────────────────
+# Orden: Resultados generales → Síntesis/Plan → Descriptivos → Referencias
 REPORT_SECTIONS = {
-    "vision":           "Potencial Regenerativo",
-    "datos":            "Datos del Proyecto",
-    "tao":              "Tao Vida Regenerativa",
-    "eco_conciencia":   "Conciencia Ecológica",
-    "analisis_sectores":"Análisis de Sectores",
-    "fotos":            "Registro Fotográfico",
-    "sintesis":         "Síntesis y Plan",
-    "metodologia":      "Metodología",
-    "glosario":         "Glosario de Acciones",
-    "biblio":           "Recursos",
+    # ── RESULTADOS ─────────────────────────────────────────────────
+    "vision":           ("🌸 Potencial Regenerativo",      "mod_potencial"),
+    "sintesis":         ("🗺️ Síntesis y Plan de Acción",   "mod_plan"),
+    # ── DESCRIPTIVOS DEL ESPACIO ───────────────────────────────────
+    "datos":            ("📋 Datos del Proyecto",           "mod_cliente"),
+    "registro":         ("📍 Lectura del Lugar",            "mod_sitio"),
+    "tao":              ("🌀 Tao Vida Regenerativa",        "mod_tao"),
+    "eco_conciencia":   ("🌍 Conciencia Ecológica",         "mod_eco"),
+    "analisis_sectores":("🗂️ Análisis de Sectores",         "mod_sistemas"),
+    "fotos":            ("📷 Registro Fotográfico",         "mod_fotos"),
+    # ── REFERENCIAS ────────────────────────────────────────────────
+    "metodologia":      ("📐 Metodología",                  None),
+    "glosario":         ("📚 Glosario de Acciones",         None),
+    "biblio":           ("🔗 Recursos",                     None),
 }
+
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -215,6 +281,13 @@ def render():
     if not data.get("id"):
         st.warning("Carga o crea un diagnóstico primero.")
         return
+
+    # Check if a module is addressed
+    def _is_addressed(mod_key):
+        if not mod_key: return True
+        if isinstance(mod_key, list):
+            return any(data.get(k, "respondido") != "no_abordado" for k in mod_key)
+        return data.get(mod_key, "respondido") != "no_abordado"
 
     # ── Compute scores ────────────────────────────────────────────────
     domain_obs = compute_domain_scores(data)
@@ -278,11 +351,28 @@ def render():
             if st.button("📖 Ver informe completo", use_container_width=True, key="rpt_nav_all",
                          type="primary" if st.session_state.report_section == "all" else "secondary"):
                 st.session_state.report_section = "all"; st.rerun()
-            for sec_key, sec_label in REPORT_SECTIONS.items():
+
+            # Group labels for visual separation
+            _group_headers = {
+                "vision":           ("🎯 RESULTADOS",              "#1B4332"),
+                "datos":            ("📂 DESCRIPTIVOS DEL ESPACIO","#0D47A1"),
+                "metodologia":      ("📌 REFERENCIAS",             "#4A148C"),
+            }
+            for sec_key, (sec_label, mod_key) in REPORT_SECTIONS.items():
+                if not _is_addressed(mod_key):
+                    continue
+                # Print group header if this key starts a group
+                if sec_key in _group_headers:
+                    gh_label, gh_color = _group_headers[sec_key]
+                    st.markdown(
+                        f'<div style="font-size:0.66rem;color:{gh_color};font-weight:700;'
+                        f'margin:0.5rem 0 0.2rem;letter-spacing:0.05em;">{gh_label}</div>',
+                        unsafe_allow_html=True)
                 active = st.session_state.report_section == sec_key
                 if st.button(sec_label, use_container_width=True, key=f"rpt_nav_{sec_key}",
                              type="primary" if active else "secondary"):
                     st.session_state.report_section = sec_key; st.rerun()
+
             st.markdown("---")
 
             # ═══ C) DESCARGAR INFORME ═══
@@ -363,105 +453,81 @@ def render():
 
     active_sec = st.session_state.get("report_section", "all")
     def _show(sec_key):
-        return active_sec == "all" or active_sec == sec_key
-
-
-    # ── Welcome message (client view) ─────────────────────────────
-    _is_demo_main = st.session_state.get("demo_mode", False)
-    if readonly:
-        if _is_demo_main:
-            st.markdown(
-                '<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:14px;'
-                'padding:0.8rem 1.2rem;margin-bottom:0.8rem;border:1px solid #FFB74D;">'
-                '<div style="font-size:0.85rem;font-weight:700;color:#E65100;margin-bottom:0.3rem;">'
-                'Modo Demostracion</div>'
-                '<div style="font-size:0.82rem;color:#BF360C;line-height:1.6;">'
-                f'Este es un informe de ejemplo para <strong>{nombre}</strong>. '
-                'Los datos son ficticios. '
-                'Esta es la vista de resultados para quienes contratan el servicio de indagación regenerativa para el diseño de ecosistemas regenerativos en Livlin.'
-                '</div></div>', unsafe_allow_html=True)
-
-        st.markdown(
-            '<div style="background:linear-gradient(135deg,#D8F3DC,#E8F5E9);border-radius:14px;'
-            'padding:1.2rem 1.5rem;margin-bottom:1.2rem;border:1px solid #A8D5B5;">'
-            '<div style="font-size:1.2rem;font-weight:800;color:#1B4332;margin-bottom:0.4rem;">'
-            f'Informe de {nombre} 🌿</div>'
-            '<div style="font-size:0.92rem;color:#2D6A4F;line-height:1.8;">'
-            'Este es el resultado de una <strong>Indagación Regenerativa</strong>.  '
-            'Todo tiene potencial regenerativo. Aprender a reconocer este potencial y activarlo es clave para nuevos futuros posibles. '
-            'Aquí encontrarás un informe detallado del Estado Regenerativo Presente (ERP) '
-            'y el Horizonte Regenerativo Potencial (HRP) de este espacio.'
-            '<br><br>'
-            'Navega las secciones usando el menu lateral. Cada sección profundiza en un aspecto diferente. '
-            'Al final encontrarás una síntesis con un plan de accion concreto.'
-            '</div></div>', unsafe_allow_html=True)
+        # Must be either "all" or the selected section
+        if not (active_sec == "all" or active_sec == sec_key):
+            return False
+        # MUST also be addressed
+        mod_key = REPORT_SECTIONS.get(sec_key, (None, None))[1]
+        return _is_addressed(mod_key)
 
     # ── Header ────────────────────────────────────────────────────────
     st.markdown("## Informe de la Indagación Regenerativa")
     st.markdown('<p class="module-subtitle">Resultados claves para el diseño de ecosistemas regenerativos</p>', unsafe_allow_html=True)
 
+
     # ══════════════════════════════════════════════════════════════════
     # SECCIÓN 1 — VISIÓN Y ESTADO REGENERATIVO (3 TABS)
     # ══════════════════════════════════════════════════════════════════
     if _show("vision"):
-        st.markdown("#### Potencial regenerativo")
+        st.markdown(f"#### Potencial regenerativo &nbsp; {_status_badge('mod_potencial')}", unsafe_allow_html=True)
 
-        # ── Intro narrativo: ¿Qué es la regeneración? ──
-        st.markdown(
-            '<div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">'
-            '<div style="font-size:0.72rem;color:#52B788;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Antes de leer este informe</div>'
-            '<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar un espacio?</div>'
-            '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
-            'En LivLin, regenerar es volver a lo esencial de lo esencial. Así, <em>cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida</em>.  '
-            'Regenerar no es simplemente «mejorar» o «hacer sostenible» un lugar. Es activar los procesos vivos '
-            'que permiten a un espacio evolucionar hacia mayor vitalidad, biodiversidad y conexión. '
-            'Un espacio regenerativo favorece las condiciones para la continuidad de la vida. Produce alimentos, favorece los ciclos del agua, hace uso sabio de la energía, construye comunidad '
-            'y fortalece la relación entre las personas y su territorio.'
-            '</div>'
-            '<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:0.8rem;">'
-            'Este informe utiliza dos indicadores complementarios para describir '
-            'el estado y el potencial regenerativo de tu espacio:</div>'
-            '<div style="display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:0.8rem;">'
-            '  <div style="flex:1;min-width:200px;background:white;border-radius:10px;padding:0.8rem;border-left:4px solid #1B4332;">'
-            '    <div style="font-weight:800;color:#1B4332;font-size:0.88rem;">🌍 ERP — Estado Regenerativo Presente</div>'
-            '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
-            '      Es la <em>fotografía</em> del momento actual. Captura las prácticas, ciclos y relaciones '
-            '      que ya están activas en tu espacio. Se calcula siguiendo el modelo de la <strong>Flor de la Permacultura</strong> '
-            '      (prácticas observadas en sus 7 pétalos) + otros  indicadores de un <strong>análisis de sectores</strong> '
-            '      (suelo, agua, sol, biodiversidad, energía y materiales). '
-            '      Un ERP alto indica que el espacio ya tiene prácticas regenerativas y sustentables consolidadas.</div>'
-            '  </div>'
-            '  <div style="flex:1;min-width:200px;background:white;border-radius:10px;padding:0.8rem;border-left:4px solid #52B788;">'
-            '    <div style="font-weight:800;color:#2D6A4F;font-size:0.88rem;">🌱 HRP — Horizonte Regenerativo Potencial</div>'
-            '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.3rem;">'
-            '      Es la <em>proyección</em> de lo que tu espacio puede llegar a ser si se activan las prácticas '
-            '      potenciales identificadas durante el diagnóstico. Se calcula como <strong>100% de las acciones proyectadas siguiendo el modelo de la Flor de la Permacultura</strong> '
-            '      (observadas + potenciales). Un HRP alto indica un gran margen para seguir creciendo.</div>'
-            '</div>'
-            '<div style="background:rgba(255,167,38,0.08);border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.8rem;">'
-            '  <div style="font-weight:800;color:#E65100;font-size:0.88rem;">🌀 Brecha = HRP − ERP → Campo de acción</div>'
-            '  <div style="font-size:0.82rem;color:#5D4037;line-height:1.6;margin-top:0.3rem;">'
-            '    La diferencia entre el HRP y el ERP señala exactamente <em>cuánto potencial hay por activar</em>. '
-            '    Una brecha grande no es negativa — significa que hay mucho espacio para crecer. '
-            '    Una brecha pequeña indica que el espacio ya está cerca de su máximo potencial identificado. Sin embargo, interpretar con cautela. El potencial regenerativo es inconmesurable. Siempre se puede desarrollar más.</div>'
-            '</div>'
-            
+        # ── Guidance Expander (solo en sección Potencial Regenerativo) ────────
+        with st.expander("📖 ¿Cómo leer estos resultados? (clic para aprender más)", expanded=False):
+            if readonly and st.session_state.get("demo_mode", False):
+                st.markdown(
+                    '<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:12px;'
+                    'padding:0.8rem 1.2rem;margin-bottom:0.8rem;border:1px solid #FFB74D;">'
+                    '<div style="font-size:0.85rem;font-weight:700;color:#E65100;margin-bottom:0.3rem;">'
+                    'Modo Demostración</div>'
+                    '<div style="font-size:0.82rem;color:#BF360C;line-height:1.6;">'
+                    f'Este es un informe de ejemplo para <strong>{nombre}</strong>. '
+                    'Los datos son ficticios. '
+                    'Esta es la vista de resultados para quienes contratan el servicio de indagación regenerativa para el diseño de ecosistemas regenerativos en Livlin.'
+                    '</div></div>', unsafe_allow_html=True)
+
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,#F0FFF4,#E8F5E9);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">'
+                f'<div style="font-size:1.1rem;font-weight:800;color:#1B4332;margin-bottom:0.5rem;">¿Qué significa regenerar un espacio?</div>'
+                f'<div style="font-size:0.9rem;color:#2D6A4F;line-height:1.8;margin-bottom:1.2rem;">'
+                f'Este informe es el resultado de una <strong>Indagación Regenerativa</strong> de LivLin para <strong>{nombre}</strong>. '
+                f'En LivLin, regenerar es volver a lo esencial de lo esencial. <em>Cuando el planeta enferma, regenerar es mejorar la salud y celebrar la vida</em>.<br><br>'
+                'Regenerar es activar los procesos vivos que permiten a un espacio evolucionar hacia mayor vitalidad, biodiversidad y conexión.'
+                'Aquí encontrarás un análisis detallado basado en dos indicadores complementarios:'
+                '</div>'
+                '<div style="display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:0.8rem;">'
+                '  <div style="flex:1;min-width:260px;background:white;border-radius:10px;padding:1rem;border-left:4px solid #1B4332;">'
+                '    <div style="font-weight:800;color:#1B4332;font-size:0.9rem;">🌍 ERP — Estado Regenerativo Presente</div>'
+                '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.4rem;">'
+                '      Es la <strong>fotografía actual</strong>: las prácticas y ciclos que ya están activos. '
+                '      Se calcula sumando la <strong>Flor de la Permacultura</strong> (observada) + indicadores de <strong>análisis de sectores</strong>.'
+                '    </div>'
+                '  </div>'
+                '  <div style="flex:1;min-width:260px;background:white;border-radius:10px;padding:1rem;border-left:4px solid #52B788;">'
+                '    <div style="font-weight:800;color:#2D6A4F;font-size:0.9rem;">🌱 HRP — Horizonte Regenerativo Potencial</div>'
+                '    <div style="font-size:0.82rem;color:#333;line-height:1.6;margin-top:0.4rem;">'
+                '      Es la <strong>proyección a futuro</strong>: lo que tu espacio puede llegar a ser si se activan todas las prácticas '
+                '      potenciales identificadas. Es el techo máximo de regeneración del lugar.'
+                '    </div>'
+                '  </div>'
+                '</div>'
+                '<div style="background:rgba(255,167,38,0.08);border-radius:10px;padding:0.8rem 1rem;border:1px dashed #FFA726;">'
+                '  <div style="font-weight:800;color:#E65100;font-size:0.9rem;">🌀 Brecha = HRP − ERP → Tu Campo de Acción</div>'
+                '  <div style="font-size:0.82rem;color:#5D4037;line-height:1.6;margin-top:0.4rem;">'
+                '    Indica exactamente <em>cuánto potencial hay por activar</em>. Una brecha grande significa que hay mucho espacio para crecer. '
+                '    Una brecha pequeña indica que estás cerca de tu máximo potencial identificado.'
+                '  </div>'
+                '</div>'
+                '<div style="margin-top:1rem;font-size:0.82rem;color:#555;text-align:center;">'
+                'Navega las secciones usando el menú lateral para profundizar en cada aspecto.'
+                '</div>'
+                '</div>', unsafe_allow_html=True)
+
+            st.markdown(
+                f'<div style="text-align:center;margin-top:0.5rem;">'
+                f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;">📄 Leer Introducción al Enfoque de la Regeneración · Mason (2025)</a>'
+                f'</div>', unsafe_allow_html=True)
 
 
-
-            # '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:0.5rem;">'
-            # '📖 <strong>Escala de niveles (0-10):</strong> '
-            # '<span style="color:#B71C1C;">0-2 Sin inicio</span> · '
-            # '<span style="color:#E65100;">2-4 Semilla</span> · '
-            # '<span style="color:#F9A825;">4-6 Brote</span> · '
-            # '<span style="color:#2E7D32;">6-8 Crecimiento</span> · '
-            # '<span style="color:#1B4332;">8-10 Abundancia</span>'
-            # '</div>'
-            f'<a href="{MASON_URL}" target="_blank" style="display:inline-block;background:#1B4332;color:white;border-radius:8px;padding:0.5rem 1rem;font-weight:700;font-size:0.85rem;text-decoration:none;margin-top:0.3rem;">📄 Leer Introducción al Enfoque de la Regeneración · Mason (2025)</a>'
-            '</div>', unsafe_allow_html=True)
-
-
-      
         # # ── Tarjetas de resultado ──
         st.markdown(f"""
         <div style="background:linear-gradient(135deg,#F0FFF4,#D8F3DC);border:2px solid #52B788;border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;">
@@ -510,27 +576,6 @@ def render():
         #     f'</div>', unsafe_allow_html=True)
 
         
-
-        # ── Interpretación narrativa del resultado ──
-        st.markdown(
-            '<div style="background:#FAFAFA;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;border-left:4px solid #52B788;">'
-            '<div style="font-weight:700;color:#1B4332;font-size:0.92rem;margin-bottom:0.4rem;">📖 ¿Cómo leer estos resultados?</div>'
-            '<div style="font-size:0.85rem;color:#333;line-height:1.7;">'
-            f'El espacio <strong>{nombre}</strong> presenta un <strong>ERP de {erp_score}/10 ({label_erp})</strong>, '
-            f'lo que indica el nivel de prácticas regenerativas que ya están activas. '
-            f'Al mismo tiempo, el <strong>HRP de {hrp_score}/10 ({label_hrp})</strong> muestra '
-            f'el horizonte al que puede llegar si se implementan las prácticas potenciales identificadas. '
-            f'La brecha de <strong>{brecha} puntos</strong> representa el campo de acción disponible. Livlin te acompaña en este camino.'
-            '</div>'
-            '<div style="font-size:0.82rem;color:#555;line-height:1.6;margin-top:0.5rem;">'
-            '👉 <strong>Explora las secciones del informe</strong> usando el menú lateral: '
-            '<em>Datos del Proyecto</em>, '
-            '<em>Tao Vida Regenerativa</em> (intención y visión), '
-            '<em>Análisis de Sectores</em> (suelo, agua, sol, clima, biodiversidad, contexto, energía y materiales), '
-            
-            '<em>Registro Fotográfico</em> y '
-            '<em>Síntesis y Plan</em> (hoja de ruta en 3 horizontes).'
-            '</div></div>', unsafe_allow_html=True)
 
         # ── 3 TABS ────────────────────────────────────────────────────
         tab_comp, tab_erp, tab_hrp = st.tabs(["📊 Perspectiva Comparada", "🌍 ERP — Estado Presente", "🌱 HRP — Horizonte Potencial"])
@@ -615,21 +660,7 @@ def render():
                   {f'<div style="font-size:0.84rem;color:#2D6A4F;line-height:1.65;border-top:1px solid #D8F3DC;padding-top:0.5rem;">{resumen}</div>' if resumen else ''}
                 </div>""", unsafe_allow_html=True)
 
-                # ── Interpretación del estado + potencial ──────────
-                if interp_e or interp_h:
-                    interp_html = ""
-                    if interp_e:
-                        interp_html += (
-                            f'<div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem 0.7rem;'                            f'border-bottom:1px solid #E8F5E9;">'                            f'<span style="color:#1B4332;font-size:0.85rem;white-space:nowrap;">🌍 <strong>Hoy:</strong></span>'                            f'<span style="font-size:0.84rem;color:#1B4332;">{interp_e}</span></div>'
-                        )
-                    if interp_h:
-                        interp_html += (
-                            f'<div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem 0.7rem;">'                            f'<span style="color:#E65100;font-size:0.85rem;white-space:nowrap;">🌱 <strong>Potencial:</strong></span>'                            f'<span style="font-size:0.84rem;color:#5D4037;">{interp_h}</span></div>'
-                        )
-                    st.markdown(
-                        f'<div style="background:white;border:1px solid #E8F5E9;border-radius:0 0 10px 10px;'                        f'margin-top:-2px;border-top:none;">{interp_html}</div>',
-                        unsafe_allow_html=True)
-
+             
                 # ── Prácticas activas + potencial en columnas ──────
                 obs_items = [(k.replace("_"," ").title(), v) for k, v in obs_data.items() if v]
                 if otros_obs: obs_items.append(("Otras prácticas", otros_obs))
@@ -740,7 +771,47 @@ def render():
 
 
     # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 2 — DATOS DEL PROYECTO
+    # SECCIÓN 2 — SÍNTESIS Y PLAN (va justo después de Potencial Regenerativo)
+    # ══════════════════════════════════════════════════════════════════
+    if _show("sintesis"):
+        st.markdown(f"### 🗺️ Síntesis y Planificación &nbsp; {_status_badge('mod_plan')}", unsafe_allow_html=True)
+        st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
+            'Integración de los hallazgos del diagnóstico en fortalezas, oportunidades, desafíos y '
+            'un plan de acción en 3 horizontes temporales (Mason, 2025).</div>', unsafe_allow_html=True)
+
+        st.markdown("#### 🔍 Síntesis del Diagnóstico")
+        st.caption("Resumen integrado de hallazgos del diagnóstico regenerativo.")
+
+        for key, lbl, bg, fg in [("sint_fortalezas","💚 Fortalezas","#E8F5E9","#2E7D32"),
+                                  ("sint_oportunidades","🌱 Oportunidades","#F0FFF4","#40916C"),
+                                  ("sint_limitaciones","⚡ Desafíos","#FFF3E0","#E65100")]:
+            _render_sintesis_list(data.get(key,""), lbl, bg, fg)
+
+        st.markdown("---")
+        st.markdown("#### 🗺️ Plan de Acción — Hoja de Ruta en 3 Horizontes")
+        st.caption("Intervenciones ordenadas por horizonte temporal, del corto al largo plazo (Mason, 2025).")
+
+        fases = [("plan_inmediatas","⚡ Fase 1 (0-3 meses)","Acciones inmediatas de bajo costo.","#52B788"),
+                 ("plan_estacionales","🌱 Fase 2 (3-12 meses)","Intervenciones estacionales.","#2D6A4F"),
+                 ("plan_estructurales","🌳 Fase 3 (1-5 años)","Transformaciones estructurales.","#1B4332")]
+        st.markdown("")
+        for pk, fase, desc, color in fases:
+            st.markdown(f"##### {fase}")
+            st.caption(desc)
+            v = data.get(pk, "")
+            if v:
+                if isinstance(v, list):
+                    for item in v:
+                        txt = item.get("titulo","") if isinstance(item, dict) else str(item)
+                        if txt: st.markdown(f"→ {txt}")
+                else:
+                    st.markdown(str(v))
+
+        st.markdown("---")
+
+
+    # ══════════════════════════════════════════════════════════════════
+    # SECCIÓN 3 — DATOS DEL PROYECTO (descriptivos)
     # ══════════════════════════════════════════════════════════════════
     if _show("datos"):
         st.markdown(f"#### 📋 Información General del Espacio &nbsp; {_status_badge('mod_cliente')}", unsafe_allow_html=True)
@@ -755,57 +826,329 @@ def render():
                        ("intencion_suenos","Sueños regenerativos")]:
             v = data.get(k)
             if v: _card(lbl, str(v), bg="#E8F5E9", border="#2D6A4F")
-        # Map
-        lat = _safe_float(data.get("geo_lat")); lon = _safe_float(data.get("geo_lon"))
-        if lat and lon: _render_report_map(lat, lon, data)
+        # (El mapa se muestra en Lectura del Lugar)
 
-        # Cuenca hidrografica - Caracteristicas de la ubicacion
-        cuenca_nombre = data.get("cuenca_nombre", "")
-        if cuenca_nombre:
-            st.markdown("#### 📍Caracteristicas de su ubicación y su cuenca")
-            # Coordenadas y elevación
-            _lat_d = _safe_float(data.get("geo_lat"))
-            _lon_d = _safe_float(data.get("geo_lon"))
-            _elev_d = _safe_float(data.get("geo_elevation"))
-            if _lat_d and _lon_d:
-                _gc1, _gc2, _gc3 = st.columns(3)
-                with _gc1: st.metric("📍 Latitud", f"{_lat_d:.4f}")
-                with _gc2: st.metric("📍 Longitud", f"{_lon_d:.4f}")
-                with _gc3:
-                    if _elev_d > 0: st.metric("⛰️ Elevación", f"{_elev_d:.0f} m.s.n.m.")
-            st.markdown(
-                '<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;'
-                'font-size:0.82rem;color:#1A237E;line-height:1.6;">'
-                'La cuenca hidrografica define el territorio del agua: de donde viene, por donde fluye '
-                'y hacia donde va. Conocer la cuenca del espacio es fundamental para entender el ciclo '
-                'del agua y disenar soluciones regenerativas apropiadas.</div>', unsafe_allow_html=True)
-            subcuenca_nombre = data.get("subcuenca_nombre", "")
-            subsubcuenca_nombre = data.get("subsubcuenca_nombre", "")
-            cols_c = st.columns(3)
-            with cols_c[0]:
-                link = data.get("cuenca_wiki_link", "")
-                label_html = f'<a href="{link}" target="_blank">{cuenca_nombre}</a>' if link else cuenca_nombre
-                _card("Cuenca", label_html, bg="#E3F2FD", border="#1565C0")
-            with cols_c[1]:
-                if subcuenca_nombre:
-                    link = data.get("subcuenca_wiki_link", "")
-                    label_html = f'<a href="{link}" target="_blank">{subcuenca_nombre}</a>' if link else subcuenca_nombre
-                    _card("Subcuenca", label_html, bg="#E3F2FD", border="#1565C0")
-            with cols_c[2]:
-                if subsubcuenca_nombre:
-                    link = data.get("subsubcuenca_wiki_link", "")
-                    label_html = f'<a href="{link}" target="_blank">{subsubcuenca_nombre}</a>' if link else subsubcuenca_nombre
-                    _card("Subsubcuenca", label_html, bg="#E3F2FD", border="#1565C0")
-            wiki_summary = data.get("cuenca_wiki_summary", "")
-            if wiki_summary:
-                wiki_source = data.get("cuenca_wiki_source", "")
+    # ══════════════════════════════════════════════════════════════════
+    # SECCIÓN 2b — LECTURA DEL LUGAR (M2-3)
+    # ══════════════════════════════════════════════════════════════════
+    if _show("registro"):
+        st.markdown(f"#### 🌍 Lectura del Lugar (M2-3) &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
+        st.markdown(
+            '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
+            'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
+            'La lectura del lugar integra la observación del suelo, la vegetación, la fauna y los flujos naturales '
+            'del espacio. Es el punto de partida indispensable para cualquier diseño regenerativo.</div>', unsafe_allow_html=True)
+
+        # ── Mapa del espacio (satélite, alta resolución) ───────────
+        _lat_r = _safe_float(data.get("geo_lat"))
+        _lon_r = _safe_float(data.get("geo_lon"))
+        if _lat_r and _lon_r:
+            st.markdown("##### 🗺️ Ubicación del Espacio")
+            addr_str = data.get("proyecto_direccion", "") or data.get("geo_display", "")
+            if addr_str:
+                st.caption(f"📍 {addr_str}")
+            _render_report_map(_lat_r, _lon_r, data, map_key="rpt_registro_map")
+            _gc1, _gc2 = st.columns(2)
+            with _gc1:
                 st.markdown(
-                    f'<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem;'
-                    f'margin-top:0.3rem;font-size:0.8rem;color:#1A237E;">'
-                    f'<strong>Sobre {wiki_source} (Wikipedia):</strong><br>{wiki_summary}</div>',
+                    f'<a href="https://www.google.com/maps/@{_lat_r},{_lon_r},19z/data=!3m1!1e3" '
+                    f'target="_blank" style="font-size:0.82rem;">🌍 Abrir en Google Maps satélite</a>',
+                    unsafe_allow_html=True)
+            with _gc2:
+                st.markdown(
+                    f'<a href="https://shademap.app/@{_lat_r},{_lon_r},19z" '
+                    f'target="_blank" style="font-size:0.82rem;">☀️ Ver sombras en ShadowMap</a>',
                     unsafe_allow_html=True)
 
+            # ── Cuenca Hidrográfica (dentro de Ubicación del Espacio) ─────
+            cuenca_nombre = data.get("cuenca_nombre", "")
+            if cuenca_nombre:
+                st.markdown("##### 🌊 Cuenca Hidrográfica")
+                _lat_d = _safe_float(data.get("geo_lat"))
+                _lon_d = _safe_float(data.get("geo_lon"))
+                _elev_d = _safe_float(data.get("geo_elevation"))
+                if _lat_d and _lon_d:
+                    _gc1b, _gc2b, _gc3b = st.columns(3)
+                    with _gc1b: st.metric("📍 Latitud",  f"{_lat_d:.4f}")
+                    with _gc2b: st.metric("📍 Longitud", f"{_lon_d:.4f}")
+                    with _gc3b:
+                        if _elev_d > 0: st.metric("⛰️ Elevación", f"{_elev_d:.0f} m.s.n.m.")
+
+                st.markdown(
+                    '<div style="background:#E3F2FD;border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;'
+                    'font-size:0.82rem;color:#1A237E;line-height:1.6;">'
+                    'La cuenca hidrográfica define el territorio del agua: de dónde viene, por dónde fluye '
+                    'y hacia dónde va. Conocer la cuenca del espacio es fundamental para entender el ciclo '
+                    'del agua y diseñar soluciones regenerativas apropiadas.</div>', unsafe_allow_html=True)
+
+                subcuenca_nombre    = data.get("subcuenca_nombre", "")
+                subsubcuenca_nombre = data.get("subsubcuenca_nombre", "")
+
+                def _wiki_badge(nivel, nombre, cod, link, bg, border, icon):
+                    if not nombre: return ""
+                    link_tag = (f'<a href="{link}" target="_blank" '
+                                f'style="color:{border};font-weight:700;text-decoration:none;">'
+                                f'{nombre} 🔗</a>') if link else f'<strong>{nombre}</strong>'
+                    return (
+                        f'<div style="background:{bg};border-left:4px solid {border};'
+                        f'border-radius:8px;padding:0.55rem 0.8rem;margin-bottom:0.4rem;">'
+                        f'<span style="font-size:0.72rem;color:#555;text-transform:uppercase;'
+                        f'letter-spacing:0.05em;">{icon} {nivel}</span><br>'
+                        f'<span style="font-size:0.88rem;">{link_tag}</span>'
+                        + (f'<span style="font-size:0.75rem;color:#888;"> &nbsp;({cod})</span>' if cod else '')
+                        + '</div>'
+                    )
+
+                badges_html = (
+                    _wiki_badge("Cuenca", cuenca_nombre,
+                                data.get("cuenca_cod",""), data.get("cuenca_wiki_link",""),
+                                "#E3F2FD", "#1565C0", "🌊") +
+                    _wiki_badge("Subcuenca", subcuenca_nombre,
+                                data.get("subcuenca_cod",""), data.get("subcuenca_wiki_link",""),
+                                "#E8F5E9", "#2E7D32", "🏖️") +
+                    _wiki_badge("Subsubcuenca", subsubcuenca_nombre,
+                                data.get("subsubcuenca_cod",""), data.get("subsubcuenca_wiki_link",""),
+                                "#FFF8E1", "#F57F17", "🏔️")
+                )
+                st.markdown(badges_html, unsafe_allow_html=True)
+
+                wiki_summary = data.get("cuenca_wiki_summary", "")
+                wiki_source  = data.get("cuenca_wiki_source", cuenca_nombre)
+                wiki_link    = data.get("cuenca_wiki_link", "")
+                if wiki_summary:
+                    st.markdown(
+                        f'<div style="background:#EEF2FF;border-radius:10px;padding:0.75rem 1rem;'
+                        f'margin-top:0.4rem;border-left:4px solid #3949AB;">'
+                        f'<span style="font-size:0.72rem;color:#3949AB;text-transform:uppercase;'
+                        f'letter-spacing:0.06em;">📖 Wikipedia — {wiki_source}</span><br>'
+                        f'<span style="font-size:0.84rem;color:#1A237E;line-height:1.7;">{wiki_summary}</span><br>'
+                        + (f'<a href="{wiki_link}" target="_blank" style="font-size:0.8rem;color:#3949AB;">'
+                           f'Leer más en Wikipedia →</a>' if wiki_link else '')
+                        + '</div>', unsafe_allow_html=True)
+
+                sub_wiki  = data.get("subcuenca_wiki_summary", "")
+                ssub_wiki = data.get("subsubcuenca_wiki_summary", "")
+                if sub_wiki or ssub_wiki:
+                    with st.expander("📚 Más información de subcuenca y subsubcuenca", expanded=False):
+                        if sub_wiki and subcuenca_nombre:
+                            st.markdown(f"**🏖️ {subcuenca_nombre}**")
+                            sc_link = data.get("subcuenca_wiki_link","")
+                            st.markdown(sub_wiki + (f"\n\n[Leer en Wikipedia ↗]({sc_link})" if sc_link else ""))
+                        if ssub_wiki and subsubcuenca_nombre:
+                            st.markdown("---")
+                            st.markdown(f"**🏔️ {subsubcuenca_nombre}**")
+                            ssc_link = data.get("subsubcuenca_wiki_link","")
+                            st.markdown(ssub_wiki + (f"\n\n[Leer en Wikipedia ↗]({ssc_link})" if ssc_link else ""))
+
+            st.markdown("---")
+
+        c1, c2 = st.columns(2)
+        with c1:
+            # Suelo
+            suelo_fields = [("suelo_tipo","Tipo de suelo"),("suelo_compactacion","Compactación"),
+                          ("suelo_materia_organica","Materia orgánica"),("suelo_drenaje","Drenaje"),
+                          ("suelo_color","Color"),("suelo_olor","Olor"),("suelo_notas","Notas")]
+            if any(data.get(k) for k,_ in suelo_fields):
+                st.markdown("**🌱 Suelo y Sustrato**")
+                for k, l in suelo_fields: _card(l, data.get(k))
+
+            # Vegetación
+            veg_types = data.get("veg_tipos", [])
+            if veg_types or data.get("veg_especies") or data.get("veg_invasoras"):
+                st.markdown("**🌿 Vegetación**")
+                if veg_types: _card("Tipos presentes", ", ".join(veg_types))
+                _card("Especies identificadas", data.get("veg_especies"))
+                _card("Invasoras/Problemáticas", data.get("veg_invasoras"))
+
+        with c2:
+            # Flujos
+            st.markdown("**☀️ Sol y Viento**")
+            _card("Horas sol/día (promedio)", data.get("sol_horas"))
+            _card("Sol Invierno", data.get("sol_horas_invierno"))
+            _card("Sol Verano", data.get("sol_horas_verano"))
+            _card("Orientación", data.get("sol_orientacion"))
+            _card("Dirección del viento", data.get("viento_direccion"))
+            _card("Zonas protegidas", data.get("viento_protegidas"))
+            
+            # Biodiversidad
+            st.markdown("**🦋 Biodiversidad y Fauna**")
+            _card("Polinizadores", data.get("fauna_polinizadores"))
+            _card("Aves", data.get("fauna_aves"))
+            _card("Especies de aves", data.get("fauna_aves_especies"))
+            _card("Lombrices/Suelo", data.get("fauna_lombrices"))
+
+        # --- CALCULADORA DE CULTIVO ---
+        st.markdown("---")
+        st.markdown("### 🥦 Zonas de Cultivo y Calculadora de Sustrato")
+        
+        bancales = data.get("bancales", [])
+        if not bancales:
+            st.info("No se han registrado zonas de cultivo específicas aún.")
+        else:
+            # ── Totales base ──────────────────────────────────────────
+            v_tot = sum(b.get("vol", 0) for b in bancales)
+            l_tot = v_tot * 1000
+            b_obs = [b for b in bancales if b.get("estado") == "observado"]
+            b_pot = [b for b in bancales if b.get("estado") == "potencial"]
+            a_obs = sum(b.get("area", 0) for b in b_obs)
+            a_pot = sum(b.get("area", 0) for b in b_pot)
+
+            mc1, mc2, mc3 = st.columns(3)
+            with mc1: st.metric("✅ Área Activa",    f"{a_obs:.2f} m²")
+            with mc2: st.metric("🌱 Área Potencial", f"{a_pot:.2f} m²")
+            with mc3: st.metric("💧 Volumen total",  f"{l_tot:,.0f} L", f"{v_tot:.3f} m³")
+
+            st.markdown(f'<div style="font-size:0.8rem;color:#555;margin-bottom:0.8rem;">'
+                        f'Detalle de las <strong>{len(bancales)}</strong> zonas registradas:</div>',
+                        unsafe_allow_html=True)
+
+            # Grid de bancales (sin saco fijo aún)
+            cols_b = st.columns(min(len(bancales), 3))
+            for i, b in enumerate(bancales):
+                is_pot = b.get("estado") == "potencial"
+                bg = "#FFFDE7" if is_pot else "#F0FFF4"
+                brd = "#FFA726" if is_pot else "#52B788"
+                txt = "#5D4037" if is_pot else "#1B4332"
+                icon = "🌱" if is_pot else "✅"
+                with cols_b[i % 3]:
+                    st.markdown(
+                        f'<div style="background:{bg};border:1.5px solid {brd};border-radius:12px;padding:0.8rem;margin-bottom:0.8rem;">'
+                        f'<div style="font-size:0.75rem;color:{brd};font-weight:700;text-transform:uppercase;">{icon} {b.get("estado","").title()}</div>'
+                        f'<div style="font-size:1rem;font-weight:800;color:{txt};margin:0.2rem 0;">{b.get("nombre","Zona")}</div>'
+                        f'<div style="font-size:0.85rem;color:{txt};line-height:1.4;">'
+                        f'📏 {b.get("dim","")}<br>'
+                        f'📐 Área: <strong>{b.get("area",0):.2f} m²</strong><br>'
+                        f'📦 Vol: <strong>{b.get("vol",0):.3f} m³</strong> ({b.get("litros",0):,} L)'
+                        f'</div></div>', unsafe_allow_html=True)
+
+            st.markdown("---")
+
+            # ── Calculadora de sustrato premium ──────────────────────
+            st.markdown("#### 🧪 Calculadora de Sustrato Premium")
+
+            # Selector de tamaño de saco
+            sacol1, sacol2 = st.columns([2, 3])
+            with sacol1:
+                _saco_opciones = {
+                    "20 L  (saco pequeño)":  20,
+                    "40 L  (saco estándar)": 40,
+                    "50 L  (saco jumbo)":    50,
+                    "80 L  (medio metro³)":  80,
+                    "Ingresar tamaño personalizado →": None,
+                }
+                _saco_sel = st.selectbox(
+                    "🛍️ Tamaño del saco",
+                    list(_saco_opciones.keys()),
+                    index=1,  # default 40L
+                    key="rpt_saco_sel",
+                )
+            _saco_base = _saco_opciones[_saco_sel]
+            with sacol2:
+                saco_l = st.number_input(
+                    "Litros por saco (editable)",
+                    min_value=1, max_value=500,
+                    value=int(_saco_base) if _saco_base else 40,
+                    step=5,
+                    key="rpt_saco_litros",
+                    help="Tamaño de los sacos de sustrato que usarás para rellenar los bancales.",
+                )
+            sacos_tot = l_tot / saco_l if saco_l > 0 else 0
+            st.metric("📦 Sacos necesarios (total)", f"~{sacos_tot:.1f} sacos de {saco_l} L",
+                      f"{l_tot:,.0f} litros en total")
+
+            st.markdown("---")
+
+            # ── Receta de sustrato premium ────────────────────────────
+            with st.expander("📖 Receta de Sustrato Premium — ver ingredientes y proporciones", expanded=False):
+                st.markdown("""
+**🌿 Sustrato Premium para Bancales de Cultivo**
+
+| Ingrediente | % | Función |
+|---|---|---|
+| 🍂 Compost maduro | 30 % | Fuente principal de N, P, K. Aporta microbiología activa y mejora la fertilidad. |
+| 🪱 Humus de lombriz | 10 % | Refuerzo biológico, rico en enzimas. Mejora la retención de nutrientes y agua. |
+| 🍃 Tierra de hoja | 40 % | Estructura ligera, rica en materia orgánica. Favorece retención de humedad y aireación. |
+| 🪨 Perlita / Vermiculita | 15 % | Aporta aireación, evita compactación. Regula humedad y mejora el drenaje. |
+| 🥥 Fibra de coco / Arena | 5 % | Ajusta la textura, mantiene el sustrato suelto. Equilibra humedad y drenaje. |
+
+> 💡 **Tip:** El compost debe estar **completamente maduro** (no fresco) para evitar quemar las raíces.  
+> La perlita puede reemplazarse por vermiculita si buscas mayor retención de humedad (climas secos).
+""")
+
+            # ── Porcentajes editables ─────────────────────────────────
+            st.markdown("**🎛️ Ajustar proporciones del sustrato**")
+            st.caption("Edita los porcentajes según tus materiales disponibles. La suma debe ser 100%.")
+
+            _ingredientes = [
+                ("🍂 Compost maduro",       "pct_compost",    30, "#A5D6A7", "#2E7D32"),
+                ("🪱 Humus de lombriz",      "pct_humus",      10, "#FFF9C4", "#F9A825"),
+                ("🍃 Tierra de hoja",        "pct_tierra",     40, "#C8E6C9", "#1B5E20"),
+                ("🪨 Perlita / Vermiculita", "pct_perlita",    15, "#B3E5FC", "#0277BD"),
+                ("🥥 Fibra de coco / Arena", "pct_fibra",       5, "#FFE0B2", "#E65100"),
+            ]
+
+            pcts = {}
+            ing_cols = st.columns(len(_ingredientes))
+            for col, (label, key, default, bg, color) in zip(ing_cols, _ingredientes):
+                with col:
+                    pcts[key] = st.number_input(
+                        label,
+                        min_value=0, max_value=100,
+                        value=default, step=1,
+                        key=f"rpt_{key}",
+                    )
+
+            total_pct = sum(pcts.values())
+            diff = total_pct - 100
+
+            # Balance indicator
+            if total_pct == 100:
+                st.success("✅ Mezcla perfecta — la suma es exactamente 100%.")
+            elif diff > 0:
+                st.warning(f"⚠️ La mezcla suma **{total_pct}%** — tienes **{diff}% de sobra**. Reduce algún ingrediente.")
+            else:
+                st.error(f"❌ La mezcla suma **{total_pct}%** — te faltan **{abs(diff)}%** para completar. Aumenta algún ingrediente.")
+
+            # ── Desglose por ingrediente ──────────────────────────────
+            st.markdown("**📊 Sustrato necesario por ingrediente**")
+
+            for label, key, default, bg, color in _ingredientes:
+                pct  = pcts[key] / 100
+                litros_ing = l_tot * pct
+                sacos_ing  = litros_ing / saco_l if saco_l > 0 else 0
+                bar_w = int(pcts[key])
+                st.markdown(
+                    f'<div style="background:{bg};border-left:4px solid {color};border-radius:8px;'
+                    f'padding:0.5rem 0.9rem;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.8rem;">'
+                    f'<div style="flex:1;">'
+                    f'<span style="font-weight:700;color:{color};font-size:0.88rem;">{label}</span> '
+                    f'<span style="font-size:0.8rem;color:#555;">— {pcts[key]}%</span><br>'
+                    f'<div style="background:#00000015;border-radius:4px;height:6px;margin:3px 0;">'
+                    f'<div style="background:{color};border-radius:4px;height:6px;width:{bar_w}%;"></div></div>'
+                    f'</div>'
+                    f'<div style="text-align:right;min-width:110px;">'
+                    f'<strong style="font-size:0.92rem;color:{color};">{litros_ing:,.0f} L</strong><br>'
+                    f'<span style="font-size:0.78rem;color:#555;">~{sacos_ing:.1f} sacos</span>'
+                    f'</div></div>', unsafe_allow_html=True)
+
+            # Resumen final
+            if total_pct == 100:
+                st.markdown(
+                    f'<div style="background:#E8F5E9;border-radius:10px;padding:0.8rem 1.1rem;margin-top:0.6rem;">'
+                    f'<strong style="color:#1B4332;">🛒 Lista de compra estimada</strong><br>'
+                    + "".join(
+                        f'• {lbl}: <strong>{l_tot * pcts[k] / 100:,.0f} L</strong> (~{l_tot * pcts[k] / 100 / saco_l:.1f} sacos de {saco_l}L)<br>'
+                        for lbl, k, *_ in _ingredientes
+                    )
+                    + f'<br><strong>Total sacos a comprar: ~{sacos_tot:.0f} sacos de {saco_l} L</strong>'
+                    + '</div>', unsafe_allow_html=True)
+
+
+        _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
+                  ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
+
         # ── Clima histórico del lugar ─────────────────────────────
+
         geo_clima = data.get("geo_clima_anual")
         if geo_clima:
             try:
@@ -892,8 +1235,181 @@ def render():
 
                     st.caption("📡 Fuente: Open-Meteo Historical Weather API (open-meteo.com) · "
                                "Nominatim OpenStreetMap para geocodificación.")
+
             except Exception:
                 pass
+
+        # ── Energía Solar del Lugar (independiente de geo_clima) ─────
+        sol_data_raw = data.get("geo_solar")
+        if sol_data_raw:
+            try:
+                import ast as _ast_s
+                sol_data = _ast_s.literal_eval(sol_data_raw) if isinstance(sol_data_raw, str) else sol_data_raw
+                if not isinstance(sol_data, dict):
+                    sol_data = None
+            except Exception:
+                sol_data = None
+        else:
+            sol_data = None
+
+        if sol_data:
+            st.markdown("---")
+            st.markdown("#### ☀️ Energía Solar del Lugar")
+            # Derive metrics from the real keys (monthly_kwh_m2, annual_avg_kwh_m2)
+            monthly_vals = sol_data.get("monthly_kwh_m2", [])
+            months_list  = sol_data.get("months", [])
+            ann_avg = sol_data.get("annual_avg_kwh_m2", 0)
+            if not ann_avg and monthly_vals:
+                ann_avg = round(sum(monthly_vals) / len(monthly_vals), 2)
+            # Best / worst month
+            best_val, best_name, worst_val, worst_name = 0, "—", 0, "—"
+            if monthly_vals:
+                idx_best  = monthly_vals.index(max(monthly_vals))
+                idx_worst = monthly_vals.index(min(monthly_vals))
+                best_val  = monthly_vals[idx_best]
+                worst_val = monthly_vals[idx_worst]
+                best_name  = months_list[idx_best]  if idx_best  < len(months_list) else "—"
+                worst_name = months_list[idx_worst] if idx_worst < len(months_list) else "—"
+
+            st.markdown(
+                '<div style="background:#FFFDE7;border-radius:8px;padding:0.7rem 1rem;'
+                'margin-bottom:0.8rem;font-size:0.85rem;color:#827717;line-height:1.6;border:1px solid #FFF176;">'
+                'La radiación solar (GHI) indica la energía disponible para fotosíntesis y sistemas fotovoltaicos. '
+                'Valores en <strong>kWh/m²/día</strong>.</div>', unsafe_allow_html=True)
+
+            skm1, skm2, skm3 = st.columns(3)
+            with skm1: st.metric("☀️ Promedio Anual", f"{ann_avg:.2f} kWh/m²/día")
+            with skm2: st.metric("🔥 Mejor Mes", f"{best_val:.2f} kWh/m²/día", delta=best_name, delta_color="off")
+            with skm3: st.metric("❄️ Peor Mes", f"{worst_val:.2f} kWh/m²/día", delta=worst_name, delta_color="off")
+
+            # ── Selector de panel + producción estimada ──────────────
+            st.markdown("**🔧 Simulador de panel solar**")
+            _panel_opciones = {
+                "100 W  (pequeño — iluminación + celulares)": 100,
+                "200 W  (balcón / terraza pequeña)":          200,
+                "300 W  (uso doméstico básico)":              300,
+                "400 W  (uso doméstico estándar ✅ más común)": 400,
+                "500 W  (sistema robusto)":                   500,
+            }
+            _sel_panel_label = st.selectbox(
+                "Selecciona el tipo de panel solar",
+                list(_panel_opciones.keys()),
+                index=3,
+                key="rpt_panel_selector",
+            )
+            _panel_w  = _panel_opciones[_sel_panel_label]
+            _panel_kw = _panel_w / 1000
+            _efi      = 0.80  # eficiencia del sistema (80%)
+
+            # Producción mensual del panel seleccionado = monthly_kwh_m2 × kW × eficiencia
+            _panel_monthly = [round(v * _panel_kw * _efi, 2) for v in monthly_vals] if monthly_vals else []
+            _panel_avg     = round(sum(_panel_monthly) / len(_panel_monthly), 2) if _panel_monthly else 0
+            _panel_best    = max(_panel_monthly) if _panel_monthly else 0
+            _panel_worst   = min(_panel_monthly) if _panel_monthly else 0
+
+            pm1, pm2, pm3 = st.columns(3)
+            with pm1: st.metric(f"⚡ Producción media ({_panel_w}W)", f"{_panel_avg:.2f} kWh/día")
+            with pm2: st.metric("☀️ Mes con más sol", f"{_panel_best:.2f} kWh/día", delta=best_name,  delta_color="off")
+            with pm3: st.metric("❄️ Mes con menos sol", f"{_panel_worst:.2f} kWh/día", delta=worst_name, delta_color="off")
+
+            # ── Selector de precio kWh ────────────────────────────────
+            st.markdown("**💰 Tarifa eléctrica ($/kWh)**")
+            st.markdown(
+                '<div style="background:#F3E5F5;border-radius:8px;padding:0.5rem 0.9rem;'
+                'margin-bottom:0.5rem;font-size:0.8rem;color:#4A148C;line-height:1.7;">'
+                '📋 <strong>Tarifas BT1 referenciales — Enel, Abril 2026</strong> '
+                '(<a href="https://cuentadelaluz.cl/" target="_blank" style="color:#7B1FA2;">cuentadelaluz.cl</a>):<br>'
+                '&nbsp;&nbsp;• <strong>T1</strong> ≤ 200 kWh/mes → <strong>$226/kWh</strong> &nbsp;·&nbsp; '
+                '<strong>T2</strong> 201–350 kWh → <strong>$260/kWh</strong> &nbsp;·&nbsp; '
+                '<strong>T3</strong> 351–450 kWh → <strong>$280/kWh</strong> &nbsp;·&nbsp; '
+                '<strong>T4</strong> 451–650 kWh → <strong>$310/kWh</strong><br>'
+                '&nbsp;&nbsp;Cargo fijo mensual: $709 (independiente del consumo).'
+                '</div>', unsafe_allow_html=True)
+
+            _tarifa_presets = {
+                "T1 — ≤ 200 kWh/mes  →  $226/kWh  (más común hogares pequeños)": 226,
+                "T2 — 201–350 kWh/mes →  $260/kWh": 260,
+                "T3 — 351–450 kWh/mes →  $280/kWh": 280,
+                "T4 — 451–650 kWh/mes →  $310/kWh": 310,
+                "Ingresar precio personalizado →": None,
+            }
+            tc1, tc2, tc3 = st.columns([3, 1, 1])
+            with tc1:
+                _tarifa_sel = st.selectbox(
+                    "Selecciona tu tramo tarifario",
+                    list(_tarifa_presets.keys()),
+                    index=0,
+                    key="rpt_tarifa_selector",
+                )
+            _precio_base = _tarifa_presets[_tarifa_sel]
+            with tc2:
+                _precio_kwh = st.number_input(
+                    "$/kWh",
+                    min_value=50, max_value=800,
+                    value=int(_precio_base) if _precio_base else 226,
+                    step=5,
+                    key="rpt_precio_kwh",
+                    help="Costo variable por kWh consumido. Fuente: cuentadelaluz.cl",
+                )
+            with tc3:
+                _cargo_fijo = st.number_input(
+                    "Cargo fijo $/mes",
+                    min_value=0, max_value=5000,
+                    value=709,
+                    step=10,
+                    key="rpt_cargo_fijo",
+                    help="Costo fijo mensual de conexión a la red (BT1 Enel Abril 2026: $709). No se reduce con paneles solares.",
+                )
+
+            # Texto interpretativo con precio seleccionado
+            _ahorro_mes = round(_panel_avg * 30 * _precio_kwh)
+            _ahorro_año = _ahorro_mes * 12
+            _cuenta_sin_paneles = _cargo_fijo + round(_panel_avg * 30 * _precio_kwh)  # lo que se paga sin paneles
+            # nota: el cargo fijo se sigue pagando con paneles
+
+            st.markdown(
+                f'<div style="background:#E8F5E9;border-radius:10px;padding:0.8rem 1.1rem;'
+                f'margin:0.6rem 0 0.8rem;font-size:0.88rem;color:#1B4332;line-height:1.85;">'
+                f'☀️ Un panel de <strong>{_panel_w} W</strong> en este espacio generaría en promedio '
+                f'<strong>{_panel_avg:.2f} kWh/día</strong> — es decir, '
+                f'<strong>{round(_panel_avg*30, 1)} kWh/mes</strong>.<br>'
+                f'💰 A <strong>${_precio_kwh}/kWh</strong>, el ahorro en energía variable es de '
+                f'<strong>${_ahorro_mes:,}/mes</strong> · <strong>${_ahorro_año:,}/año</strong>.<br>'
+                f'<span style="font-size:0.8rem;color:#555;">'
+                f'📌 Cargo fijo: <strong>${_cargo_fijo:,}/mes</strong> — este costo de conexión a la red '
+                f'<em>se sigue pagando aunque tengas paneles</em>. &nbsp;'
+                f'⚙️ Cálculo: {_panel_w}W × {ann_avg:.2f} GHI × 80% eficiencia del sistema.'
+                f'</span></div>', unsafe_allow_html=True)
+
+            # ── Gráfico mensual GHI + producción del panel ────────────
+            if monthly_vals and months_list:
+                fig_sol = go.Figure()
+                fig_sol.add_trace(go.Bar(
+                    name=f"Producción panel {_panel_w}W (kWh/día)",
+                    x=months_list, y=_panel_monthly,
+                    marker_color="rgba(255,167,38,0.75)",
+                    text=[f"{v:.2f}" for v in _panel_monthly],
+                    textposition="outside", textfont=dict(size=9, color="#E65100"),
+                ))
+                fig_sol.add_trace(go.Scatter(
+                    name="Radiación GHI (kWh/m²/día)",
+                    x=months_list, y=monthly_vals,
+                    mode="lines+markers",
+                    line=dict(color="#FDD835", width=2.5),
+                    marker=dict(size=7, color="#F57F17"),
+                    yaxis="y2",
+                ))
+                fig_sol.update_layout(
+                    yaxis=dict(title=f"Producción panel {_panel_w}W (kWh/día)", range=[0, max(_panel_monthly or [1]) * 1.3]),
+                    yaxis2=dict(title="GHI kWh/m²/día", overlaying="y", side="right",
+                                range=[0, max(monthly_vals or [1]) * 1.3]),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, font=dict(size=10)),
+                    height=300, margin=dict(l=40, r=40, t=30, b=30),
+                    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(255,253,231,0.4)",
+                    barmode="group",
+                )
+                st.plotly_chart(fig_sol, use_container_width=True, key="rpt_solar_chart")
+
 
         # ── Potencial de captación de agua de lluvia ───────────────
         prec_v  = _safe_float(data.get("agua_prec_anual"))
@@ -1160,87 +1676,8 @@ def render():
         st.markdown(
             '<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:1rem;'
             'font-size:0.85rem;color:#2D6A4F;line-height:1.7;">'
-            'Al aplicar el analisis de sectores, se integra la observacion cuidadosa del espacio, '
-            'su entorno y las necesidades de quienes lo habitan. Este analisis es fundamental '
-            'para el diseno de ecosistemas regenerativos: antes de intervenir, '
-            'es necesario comprender las condiciones reales del lugar.</div>', unsafe_allow_html=True)
-
-        # ── 4a. Observacion Ecologica ──
-        st.markdown(f"### Observacion Ecologica &nbsp; {_status_badge('mod_sitio')}", unsafe_allow_html=True)
-        st.markdown(
-            '<div style="background:#E8F5E9;border-radius:6px;padding:0.5rem;margin-bottom:0.8rem;font-size:0.82rem;color:#2D6A4F;">'
-            'Lectura del sitio: suelo, agua, sol, viento y biodiversidad. '
-            'Sigue el primer principio de Holmgren: observar e interactuar antes de disenar.</div>', unsafe_allow_html=True)
-
-        # Surface metrics
-        area_tot = _safe_float(data.get("proyecto_area") or data.get("proyecto_superficie"))
-        area_cult_act = _safe_float(data.get("cultivo_m2"))
-        area_cult_fut = _safe_float(data.get("cultivo_m2_futuro"))
-        pct_act = round(area_cult_act/area_tot*100,1) if area_tot>0 and area_cult_act>0 else 0
-        pct_fut = round(area_cult_fut/area_tot*100,1) if area_tot>0 and area_cult_fut>0 else 0
-        if area_tot>0:
-            cols = st.columns(5)
-            for i,(v,l) in enumerate([(f"{area_tot:.1f} m²","Superficie total"),(f"{area_cult_act:.1f} m²","m² cultivables actuales"),
-                                      (f"{pct_act}%","% cultivable actual"),(f"{area_cult_fut:.1f} m²","m² cultivables futuros"),(f"{pct_fut}%","% cultivable futuro")]):
-                with cols[i]:
-                    if _safe_float(v.replace("m²","").replace("%","").strip())>0:
-                        st.metric(label=l, value=v)
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("**Suelo**")
-            st.caption("Tipo, compactacion, materia organica, drenaje y condiciones generales del sustrato.")
-            for k,l in [("suelo_tipo","Tipo"),("suelo_compactacion","Compactación"),("suelo_materia_organica","Materia orgánica"),
-                        ("suelo_drenaje","Drenaje"),("suelo_color","Color"),("suelo_olor","Olor"),("suelo_notas","Notas")]:
-                _card(l, str(data.get(k,"")) if data.get(k) else "")
-            st.markdown("**Vegetacion**")
-            st.caption("Especies presentes, diversidad vegetal e invasoras identificadas.")
-            veg = data.get("veg_tipos",[])
-            if isinstance(veg, list) and veg: _card("Tipos de vegetación", ", ".join(veg))
-            for k,l in [("veg_especies","Especies identificadas"),("veg_invasoras","Invasoras"),("eco_notas","Notas ecológicas")]:
-                _card(l, str(data.get(k,"")) if data.get(k) else "")
-        with c2:
-            st.markdown("**Flujos naturales**")
-            st.caption("Horas de sol, orientacion, patron de vientos y flujo de agua lluvia.")
-            for k,l in [("sol_horas","Horas sol/día"),("sol_horas_invierno","Sol invierno"),("sol_horas_verano","Sol verano"),
-                        ("sol_orientacion","Orientación"),("sol_zonas_max","Zonas soleadas"),("sol_sombra_perm","Sombra permanente"),
-                        ("viento_direccion","Dirección viento"),("viento_protegidas","Zonas protegidas"),("viento_expuestas","Zonas expuestas"),
-                        ("agua_flujo_lluvia","Flujo agua lluvia"),("agua_acumulacion","Acumulación agua"),("flujos_notas","Notas flujos")]:
-                _card(l, str(data.get(k,"")) if data.get(k) else "", bg="#E3F2FD", border="#1565C0")
-
-        st.markdown("**Cultivo**")
-        st.caption("Superficie cultivable actual y futura, produccion existente y potencial de expansion.")
-        for k,l in [("cultivo_produce_hoy","Produce hoy"),("cultivo_interes","Interés en producir"),
-                    ("cultivo_frutales","Frutales"),("cultivo_verticales","Verticales"),
-                    ("cultivo_plantas_actuales","Plantas actuales"),("cultivo_notas","Notas cultivo")]:
-            _card(l, str(data.get(k,"")) if data.get(k) else "")
-
-        # Fauna
-        fauna_fields = [("fauna_lombrices","Lombrices"),("fauna_plagas","Plagas"),("fauna_aves_especies","Aves")]
-        if any(data.get(k) for k,_ in fauna_fields):
-            st.markdown("**Fauna observada**")
-            st.caption("Lombrices, polinizadores, aves y otros indicadores de salud del ecosistema.")
-            cf = st.columns(3)
-            for col,(k,l) in zip(cf,fauna_fields):
-                with col: _card(l, str(data.get(k,"")) if data.get(k) else "")
-
-        # Bancales
-        bancales = data.get("bancales", [])
-        if isinstance(bancales, list) and bancales:
-            st.markdown(f"**{len(bancales)} zonas de cultivo registradas**")
-            cols_b = st.columns(min(len(bancales), 3))
-            for i, b in enumerate(bancales):
-                estado = b.get("estado","observado")
-                bg = "#F0FFF4" if estado == "observado" else "#FFFDE7"
-                border = "#40916C" if estado == "observado" else "#F57C00"
-                with cols_b[i % 3]:
-                    st.markdown(f'<div style="background:{bg};border-radius:8px;padding:0.5rem;margin-bottom:0.4rem;border-left:3px solid {border};">'
-                        f'<div style="font-weight:700;font-size:0.82rem;color:#1B4332;">{b.get("nombre","Zona")}</div>'
-                        f'<div style="font-size:0.78rem;color:#40916C;">{b.get("tipo","")} · {b.get("area",0)} m²</div></div>', unsafe_allow_html=True)
-
-        _ref_box([("Holmgren, D. (2002)", "Permacultura: Principios y senderos", "https://permacultureprinciples.com/es/"),
-                  ("Mason, F. (2025)", "Introducción al enfoque de la regeneración", MASON_URL)])
-        st.markdown("---")
+            'Al aplicar el analisis de sectores, se integra la observacion del espacio y el comportamiento '
+            'de los sistemas que lo sustentan (Agua, Energía y Ciclo de Materiales).</div>', unsafe_allow_html=True)
 
         # ── 4b. Contexto, Agua, Energia y Materiales ──
         st.markdown(f"##### Entorno Urbano, Agua, Energia y Materiales &nbsp; {_status_badge('mod_sistemas')}", unsafe_allow_html=True)
@@ -1488,7 +1925,7 @@ def render():
     # SECCIÓN 6 — REGISTRO FOTOGRÁFICO (restored from v6)
     # ══════════════════════════════════════════════════════════════════
     if _show("fotos"):
-        st.markdown("#### 📷 Registro Fotografico")
+        st.markdown(f"#### 📷 Registro Fotografico &nbsp; {_status_badge('mod_fotos')}", unsafe_allow_html=True)
         st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
             'Fotografias registradas durante el diagnostico del espacio. '
             'Documentan el estado actual, las condiciones ecologicas y las oportunidades identificadas.</div>', unsafe_allow_html=True)
@@ -1553,39 +1990,7 @@ def render():
     # (Flor + Potenciales están integrados en Visión y Estado Regenerativo → Perspectiva Comparada)
 
 
-    # ══════════════════════════════════════════════════════════════════
-    # SECCIÓN 7 — SÍNTESIS Y PLAN
-    # ══════════════════════════════════════════════════════════════════
-    if _show("sintesis"):
-        st.markdown("#### 🗺️ Síntesis y Plan de Acción")
-        st.markdown('<div style="background:#F0FFF4;border-radius:8px;padding:0.7rem;margin-bottom:0.8rem;font-size:0.85rem;color:#2D6A4F;">'
-            'Integración de los hallazgos del diagnóstico en fortalezas, oportunidades, desafíos y '
-            'un plan de acción en 3 horizontes temporales (Mason, 2025).</div>', unsafe_allow_html=True)
-
-        for key, lbl, bg, fg in [("sint_fortalezas","💚 Fortalezas","#E8F5E9","#2E7D32"),
-                                  ("sint_oportunidades","🌱 Oportunidades","#F0FFF4","#40916C"),
-                                  ("sint_limitaciones","⚡ Desafíos","#FFF3E0","#E65100"),
-                                  ("sint_quick_wins","🎯 Primeros pasos","#E8F5E9","#1B4332")]:
-            _render_sintesis_list(data.get(key,""), lbl, bg, fg)
-
-        fases = [("plan_inmediatas","⚡ Fase 1 (0-3 meses)","Acciones inmediatas de bajo costo.","#52B788"),
-                 ("plan_estacionales","🌱 Fase 2 (3-12 meses)","Intervenciones estacionales.","#2D6A4F"),
-                 ("plan_estructurales","🌳 Fase 3 (1-5 años)","Transformaciones estructurales.","#1B4332")]
-        st.markdown("")
-        for pk, fase, desc, color in fases:
-            st.markdown(f"##### {fase}")
-            st.caption(desc)
-            v = data.get(pk, "")
-            if v:
-                if isinstance(v, list):
-                    for item in v:
-                        txt = item.get("titulo","") if isinstance(item, dict) else str(item)
-                        if txt: st.markdown(f"→ {txt}")
-                else:
-                    st.markdown(str(v))
-
-        st.markdown("---")
-
+    # (Síntesis y Plan movida al inicio — ver bloque SECCIÓN 2 más arriba)
 
   
     # ══════════════════════════════════════════════════════════════════

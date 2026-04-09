@@ -144,6 +144,38 @@ def generate_docx(data:dict)->bytes:
         ("cultivo_frutales","Frutales"),("cultivo_plantas_actuales","Plantas actuales")])]:
         rows=[(l,str(data.get(k,""))) for k,l in fields if data.get(k)]
         if rows: _H(d,sec,2,C2,11); _kv(d,rows)
+    bancales = data.get("bancales", [])
+    if isinstance(bancales, list) and bancales:
+        _H(d, "Zonas de Cultivo Detalladas", 2, C2, 11)
+        
+        # --- Totales de cultivo ---
+        obs_b = [b for b in bancales if b.get("estado","observado") == "observado"]
+        pot_b = [b for b in bancales if b.get("estado","observado") == "potencial"]
+        a_obs = round(sum(b.get("area", 0) for b in obs_b), 2)
+        a_pot = round(sum(b.get("area", 0) for b in pot_b), 2)
+        t_area = round(a_obs + a_pot, 2)
+        t_lit = round(sum(b.get("litros", 0) for b in bancales))
+        s_litros = data.get("cultivo_saco_litros", 40)
+        t_sacos = round(t_lit / s_litros, 1) if s_litros > 0 else 0
+        
+        summary_rows = [
+            ("Área actual (observada)", f"{a_obs} m²"),
+            ("Área posible de construir (potencial)", f"{a_pot} m²"),
+            ("Área total proyectada", f"{t_area} m²"),
+            ("Sustrato total necesario", f"{t_lit:,} L"),
+            ("Sacos de sustrato (aprox)", f"{t_sacos} sacos de {s_litros}L")
+        ]
+        _kv(d, summary_rows)
+        d.add_paragraph()
+        
+        bancales_rows = []
+        for b in bancales:
+            estado = b.get("estado", "observado")
+            lbl_estado = " (Actual)" if estado == "observado" else " (Posible de construir)"
+            dim_txt = f' | Medidas: {b.get("dim")}' if b.get("dim") else ""
+            txt = f"{b.get('tipo', '')}{dim_txt} | {b.get('area', 0)} m² | {b.get('vol', 0)} m³ | {b.get('litros', 0)} L"
+            bancales_rows.append((f"{b.get('nombre', 'Zona')}{lbl_estado}", txt))
+        _kv(d, bancales_rows)
     # Climate
     lat=_sf(data.get("geo_lat")); lon=_sf(data.get("geo_lon")); elev=_sf(data.get("geo_elevation"))
     if lat and lon:
@@ -250,7 +282,7 @@ def generate_docx(data:dict)->bytes:
     # ═══ SÍNTESIS ═══
     _H(d,"Síntesis y Plan de Acción",1,C1,14)
     for k,l in [("sint_fortalezas","💚 Fortalezas"),("sint_oportunidades","🌱 Oportunidades"),
-                ("sint_limitaciones","⚡ Desafíos"),("sint_quick_wins","🎯 Primeros pasos")]:
+                ("sint_limitaciones","⚡ Desafíos")]:
         v=data.get(k,"");
         if v: _p(d,f"{l}: {v}",c=CG,sz=10)
     d.add_paragraph()
